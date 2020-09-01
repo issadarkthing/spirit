@@ -100,12 +100,19 @@
             counter
             (count (next coll) (inc counter)))))
 
+
 (defn concat [coll1 coll2]
     (if (not (seq? coll1))
         (throw "argument coll1 must be a seq, not " (type coll1)))
     (if (not (seq? coll2))
         (throw "argument coll2 must be a seq, not " (type coll2)))
     (apply-seq coll1.Conj coll2))
+
+
+(defn range [min max]
+  (if (= min max)
+    []
+    (concat [min] (range (+ 1 min) max))))
 
 (defn map
     ([f coll]
