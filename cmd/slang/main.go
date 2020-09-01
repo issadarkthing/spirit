@@ -5,7 +5,9 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/chzyer/readline"
@@ -21,9 +23,7 @@ var (
 	version = "N/A"
 	commit  = "N/A"
 
-	executeFile = flag.String("f", "", "File to read and execute")
-	executeStr  = flag.String("e", "", "Execute string")
-	noREPL      = flag.Bool("norepl", false, "Don't start REPL after executing file and string")
+	executeStr = flag.String("e", "", "Execute string")
 )
 
 type temp struct {
@@ -43,29 +43,37 @@ func main() {
 	var result sabre.Value
 	var err error
 
-	if *executeFile != "" {
-		fh, err := os.Open(*executeFile)
+	if len(os.Args) > 1 {
+
+		resolvedPath, err := filepath.Abs("lib/core.lisp")
 		if err != nil {
 			fatalf("error: %v\n", err)
 		}
-		defer fh.Close()
 
-		result, err = sl.ReadEval(fh)
+		core, err := ioutil.ReadFile(resolvedPath)
+		if err != nil {
+			fatalf("error: %v\n", err)
+		}
+
+		fh, err := ioutil.ReadFile(os.Args[1])
+		if err != nil {
+			fatalf("error: %v\n", err)
+		}
+
+		result, err = sl.ReadEvalStr(string(append(core, fh...)))
 		if err != nil {
 			fatalf("error: %v\n", err)
 		}
 		sl.SwitchNS(sabre.Symbol{Value: "user"})
+		return
 	}
 
 	if *executeStr != "" {
 		result, err = sl.ReadEvalStr(*executeStr)
+		fmt.Println(result)
 		if err != nil {
 			fatalf("error: %v\n", err)
 		}
-	}
-
-	if *noREPL {
-		fmt.Println(result)
 		return
 	}
 
