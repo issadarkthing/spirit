@@ -2,14 +2,14 @@
 (def 🧠 "The Brain!")
 (assert (= 🧠 "The Brain!"))
 
-; basic functions
+; ; basic functions
 (assert (= 3 (eval '(int (+ 1 2)))))
 (assert (true? true))
 (assert (true? []))
 (assert (not (true? false)))
 (assert (not (true? nil)))
 
-; sequence functions
+; ; sequence functions
 (assert (seq? []))
 (assert (not (seq? nil)))
 (assert (= 1 (first [1 2 3 4])))
@@ -18,24 +18,23 @@
 (assert (= [1 2 3 4] (cons 1 [2 3 4])))
 (assert (= [1 2 3 4] (conj [1 2] 3 4)))
 
-; threading macros
+; ; threading macros
 (assert (= (-> 1 (cons [2 3 4])) [1 2 3 4]))
 (assert (= (->>  1 (conj [2 3 4])) [2 3 4 1]))
 
-; basic math operators
-(assert (= 3.00000 (+ 1 2)))
-(assert (= 0.00000 (+)))
-(assert (= 3.00000 (- 5 2)))
-(assert (= -5.00000 (- 5)))
-(assert (= 10.00000 (* 5 2)))
-(assert (= 5.00000 (/ 10 2)))
+; ; basic math operators
+(assert (= 3 (+ 1 2)))
+(assert (= 3 (- 5 2)))
+(assert (= -5 (- 5)))
+(assert (= 10 (* 5 2)))
+(assert (= 5 (/ 10 2)))
 (assert (= 0.50000 (/ 2)))
 (assert (> 10 9 8 7 6 1 -1 -10))
 (assert (< -10 1 2 3 4 10 23.32423432 100000))
 (assert (>= 10 10 10 9 8 7 7 7 5))
 (assert (<= -1.5 -1 0 0  0  0 0 0 1 2 3 4 5))
 
-; type initialization functions
+; ; type initialization functions
 (assert (= #{} (set [])))
 (assert (= #{1 2 3} (set [1 1 2 2 3])))
 (assert (= [] (vector)))
@@ -49,7 +48,7 @@
 (assert (= 1 (int 1.5677)))
 (assert (= 3.00000 (float 3)))
 
-; type checking functions
+; ; type checking functions
 (assert (int? 10))
 (assert (not (int? 10.0)))
 (assert (string? ""))
@@ -65,18 +64,18 @@
 (assert (= 10 (-> 5 (+ 5) (int))))
 (assert (= "hello" (-> 0 ["hello" 1 2 #{}])))
 
-; simple function definition
+; ; simple function definition
 (def dec (fn* [i] (int (- i 1))))
 (assert (= 9 (dec 10)))
 
-; simple recursive function with variadic args
+; ; simple recursive function with variadic args
 (def down-range (fn* down-range [start & args]
     (if (> start 0)
-        (cons start (down-range (int (dec start))))
+        (cons start (down-range (dec start)))
         [0])))
 (assert (= '(5 4 3 2 1 0) (down-range 5)))
 
-; complex recursive function
+; ; complex recursive function
 (def reverse (fn* reverse [coll]
     (if (not (seq? coll))
         (throw "argument must be a sequence"))
@@ -91,9 +90,9 @@
   (if (> n 1)  ; if n=0 or n=1 return n
     (+ (fib (- n 1)) (fib (- n 2)))
     n)))
-(assert (= 2584.00000 (fib 18)))
+(assert (= 2584 (fib 18)))
 
-; multi arity function
+; ; multi arity function
 (def greet (fn* greet
     ([] "Hello!")
     ([name] (str "Hello " name "!"))
@@ -102,7 +101,7 @@
 (assert (= "Hello Bob!" (greet "Bob")))
 (assert (= "Hi Bob!" (greet 'Hi 'Bob)))
 
-; tests for special forms
+; ; tests for special forms
 (def nested-special-forms (fn* defn [name args & body]
     `(def ~name (fn* ~args (do (quote ~body))))))
 
@@ -124,5 +123,5 @@
 (defn square [num] (* num num))
 (defn positive? [num] (> num 0))
 
-(assert (= [1.0 4.0 9.0 25.0] (map square [1 2 3 5])))
+(assert (= [1 4 9 25] (map square [1 2 3 5])))
 (assert (= [2 5 4 1] (filter positive? [-1 0 -2 2 5 4 1])))

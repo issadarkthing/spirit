@@ -1,47 +1,110 @@
 package slang
 
+import (
+	"github.com/spy16/sabre"
+)
+
+type Any interface{}
+
 // Add adds given floating point numbers and returns the sum.
-func Add(args ...float64) float64 {
-	sum := 0.0
-	for _, a := range args {
-		sum += a
+func Add(args ...Any) Any {
+	switch args[0].(type) {
+	case sabre.Int64:
+		var sum sabre.Int64
+		for _, a := range args {
+			sum += a.(sabre.Int64)
+		}
+		return sum
+	case sabre.Float64:
+		var sum sabre.Float64
+		for _, a := range args {
+			sum += a.(sabre.Float64)
+		}
+		return sum
+	default:
+		return nil
 	}
-	return sum
 }
 
 // Sub subtracts args from 'x' and returns the final result.
-func Sub(x float64, args ...float64) float64 {
-	if len(args) == 0 {
-		return -1 * x
-	}
+func Sub(x Any, args ...Any) Any {
+	switch x.(type) {
+	case sabre.Float64:
+		var result sabre.Float64 = x.(sabre.Float64)
+		if len(args) == 0 {
+			return -1 * x.(sabre.Float64)
+		}
 
-	for _, a := range args {
-		x -= a
-	}
+		for _, a := range args {
+			result -= a.(sabre.Float64)
+		}
+		return result
+	case sabre.Int64:
+		var result sabre.Int64 = x.(sabre.Int64)
+		if len(args) == 0 {
+			return -1 * x.(sabre.Int64)
+		}
 
-	return x
+		for _, a := range args {
+			result -= a.(sabre.Int64)
+		}
+		return result
+	default:
+		return nil
+	}
 }
 
 // Multiply multiplies the given args to 1 and returns the result.
-func Multiply(args ...float64) float64 {
-	p := 1.0
-	for _, a := range args {
-		p *= a
+func Multiply(first Any, args ...Any) Any {
+	switch args[0].(type) {
+	case sabre.Int64:
+		result := first.(sabre.Int64)
+		for _, a := range args {
+			result *= a.(sabre.Int64)
+		}
+		return result
+	case sabre.Float64:
+		result := first.(sabre.Float64)
+		for _, a := range args {
+			result *= a.(sabre.Float64)
+		}
+		return result
+	default:
+		return nil
 	}
-	return p
 }
 
 // Divide returns the product of given numbers.
-func Divide(first float64, args ...float64) float64 {
-	if len(args) == 0 {
-		return 1 / first
+func Divide(first Any, args ...Any) Any {
+
+	switch first.(type) {
+	case sabre.Float64:
+		var result sabre.Float64 = first.(sabre.Float64)
+
+		if len(args) == 0 {
+			return 1 / first.(sabre.Float64)
+		}
+
+		for _, a := range args {
+			result /= a.(sabre.Float64)
+		}
+		return result
+
+	case sabre.Int64:
+		var result sabre.Int64 = first.(sabre.Int64)
+
+		if len(args) == 0 {
+			return 1 / sabre.Float64(first.(sabre.Int64))
+		}
+
+		for _, a := range args {
+			result /= a.(sabre.Int64)
+		}
+		return result
+	default:
+		return nil
 	}
 
-	for _, a := range args {
-		first /= a
-	}
-
-	return first
 }
 
 // Lt returns true if the given args are monotonically increasing.
