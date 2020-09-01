@@ -16,3 +16,4 @@ bin/
 expt/
 sabre.iml
 temp.lisp
+sample.clj
