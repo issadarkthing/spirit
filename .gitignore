@@ -17,3 +17,7 @@ expt/
 sabre.iml
 temp.lisp
 sample.clj
+
+.clj-kondo/*
+.lsp/*
+sample.lisp
