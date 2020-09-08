@@ -5,7 +5,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -50,21 +49,26 @@ func main() {
 			fatalf("error: %v\n", err)
 		}
 
-		core, err := ioutil.ReadFile(resolvedPath)
+		core, err := os.Open(resolvedPath)
 		if err != nil {
 			fatalf("error: %v\n", err)
 		}
+		defer core.Close()
 
-		fh, err := ioutil.ReadFile(os.Args[1])
-		if err != nil {
-			fatalf("error: %v\n", err)
-		}
+		_, err = sl.ReadEval(core)
 
-		result, err = sl.ReadEvalStr(string(append(core, fh...)))
+		fh, err := os.Open(os.Args[1])
 		if err != nil {
 			fatalf("error: %v\n", err)
 		}
+		defer fh.Close()
+
 		sl.SwitchNS(sabre.Symbol{Value: "user"})
+
+		_, err = sl.ReadEval(fh)
+		if err != nil {
+			fatalf("error: %v\n", err)
+		}
 		return
 	}
 
