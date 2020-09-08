@@ -9,6 +9,14 @@ import (
 // BindAll binds all core functions into the given scope.
 func BindAll(scope sabre.Scope) error {
 	core := map[string]sabre.Value{
+		// built-in
+		"core/range": sabre.ValueOf(slangRange),
+		"core/map": &sabre.Fn{
+			Args:     []string{"fn", "list"},
+			Func:     slangMap,
+			Variadic: false,
+		},
+
 		"core/->": &sabre.Fn{
 			Args:     []string{"exprs"},
 			Func:     ThreadFirst,
@@ -59,8 +67,8 @@ func BindAll(scope sabre.Scope) error {
 		"core/<=":  sabre.ValueOf(LtE),
 
 		// io functions
-		"core/println": sabre.ValueOf(Println),
-		"core/printf":  sabre.ValueOf(Printf),
+		"core/print":  sabre.ValueOf(Println),
+		"core/printf": sabre.ValueOf(Printf),
 
 		"types/Seq":       TypeOf((*sabre.Seq)(nil)),
 		"types/Invokable": TypeOf((*sabre.Invokable)(nil)),

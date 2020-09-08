@@ -183,3 +183,94 @@ func isTruthy(v sabre.Value) bool {
 
 	return true
 }
+
+func slangRange(min, max Any) (Any, error) {
+
+	var imin, imax sabre.Int64
+	result := make([]sabre.Value, 0, imax-imin)
+
+	switch min.(type) {
+	case sabre.Float64:
+		imin = sabre.Int64(min.(sabre.Float64))
+		imax = sabre.Int64(max.(sabre.Float64))
+	case sabre.Int64:
+		imin = min.(sabre.Int64)
+		imax = max.(sabre.Int64)
+	default:
+		return nil, fmt.Errorf("Invalid type (%T, %T)", min, max)
+	}
+
+	for i := imin; i < imax; i++ {
+		result = append(result, i)
+	}
+
+	return &sabre.List{Values: result}, nil
+}
+
+func slangMap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+
+	if len(args) < 2 {
+		return nil, fmt.Errorf(
+			"invalid number of argument; expected (%d) got (%d)",
+			2, len(args),
+		)
+	}
+
+	fn, err := sabre.Eval(scope, args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	list, err := sabre.Eval(scope, args[1])
+	if err != nil {
+		return nil, err
+	}
+
+	switch list.(type) {
+	case *sabre.List:
+
+		result := make([]sabre.Value, 0, len(list.(*sabre.List).Values))
+		for _, v := range list.(*sabre.List).Values {
+
+			applied, err := fn.(sabre.MultiFn).Invoke(scope, v)
+			if err != nil {
+				return nil, err
+			}
+
+			result = append(result, applied)
+		}
+		return &sabre.List{Values: result}, nil
+
+	case sabre.Vector:
+
+		result := make([]sabre.Value, 0, len(list.(sabre.Vector).Values))
+		for _, v := range list.(sabre.Vector).Values {
+
+			applied, err := fn.(sabre.MultiFn).Invoke(scope, v)
+			if err != nil {
+				return nil, err
+			}
+
+			result = append(result, applied)
+		}
+		return &sabre.Vector{Values: result}, nil
+
+	default:
+		return nil, fmt.Errorf("Expected Seq instead got %T", list)
+	}
+
+}
+
+func traverse(seq sabre.Seq, callBack func(val sabre.Value)) {
+
+	curr := seq.First()
+	if curr == nil {
+		return
+	}
+
+	for curr != nil {
+		callBack(curr)
+		seq = seq.Next()
+		curr = seq.First()
+	}
+}
