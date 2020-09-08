@@ -109,20 +109,16 @@
     (apply-seq coll1.Conj coll2))
 
 
-(defn range [min max]
-  (if (= min max)
-    []
-    (concat [min] (range (+ 1 min) max))))
 
-(defn map
+(defn x-map
     ([f coll]
         (if (empty? coll)
             nil)
-        (map f coll []))
+        (x-map f coll []))
     ([f coll acc]
         (if (empty? coll)
             acc
-            (map f (next coll) (conj acc (f (first coll)))))))
+            (x-map f (next coll) (conj acc (f (first coll)))))))
 
 (defn filter
     ([f coll]
