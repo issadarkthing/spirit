@@ -210,10 +210,7 @@ func slangRange(min, max Any) (Any, error) {
 func slangMap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
 	if len(args) < 2 {
-		return nil, fmt.Errorf(
-			"invalid number of argument; expected (%d) got (%d)",
-			2, len(args),
-		)
+		return nil, invalidArgNumberError{2, len(args)}
 	}
 
 	fn, err := sabre.Eval(scope, args[0])
@@ -221,56 +218,72 @@ func slangMap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 		return nil, err
 	}
 
-	list, err := sabre.Eval(scope, args[1])
+	val, err := sabre.Eval(scope, args[1])
 	if err != nil {
 		return nil, err
 	}
 
-	switch list.(type) {
-	case *sabre.List:
+	seq, ok := val.(sabre.Seq)
 
-		result := make([]sabre.Value, 0, len(list.(*sabre.List).Values))
-		for _, v := range list.(*sabre.List).Values {
-
-			applied, err := fn.(sabre.MultiFn).Invoke(scope, v)
-			if err != nil {
-				return nil, err
-			}
-
-			result = append(result, applied)
-		}
-		return &sabre.List{Values: result}, nil
-
-	case sabre.Vector:
-
-		result := make([]sabre.Value, 0, len(list.(sabre.Vector).Values))
-		for _, v := range list.(sabre.Vector).Values {
-
-			applied, err := fn.(sabre.MultiFn).Invoke(scope, v)
-			if err != nil {
-				return nil, err
-			}
-
-			result = append(result, applied)
-		}
-		return &sabre.Vector{Values: result}, nil
-
-	default:
-		return nil, fmt.Errorf("Expected Seq instead got %T", list)
+	if !ok {
+		return nil, fmt.Errorf("invalid type given; expected %s got %T",
+			"sabre.Seq", val)
 	}
 
+	list := Realize(seq)
+
+	result := make([]sabre.Value, 0, len(list.Values))
+	for _, v := range list.Values {
+
+		applied, err := fn.(sabre.MultiFn).Invoke(scope, v)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, applied)
+	}
+
+	return &sabre.List{Values: result}, nil
 }
 
-func traverse(seq sabre.Seq, callBack func(val sabre.Value)) {
+func filter(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
-	curr := seq.First()
-	if curr == nil {
-		return
+	if len(args) < 2 {
+		return nil, &invalidArgNumberError{2, len(args)}
 	}
 
-	for curr != nil {
-		callBack(curr)
-		seq = seq.Next()
-		curr = seq.First()
+	fn, err := sabre.Eval(scope, args[0])
+	if err != nil {
+		return nil, err
 	}
+
+	val, err := sabre.Eval(scope, args[1])
+	if err != nil {
+		return nil, err
+	}
+
+	seq, ok := val.(sabre.Seq)
+
+	if !ok {
+		return nil, fmt.Errorf("Invalid type given; expected %s instead got %T",
+			"sabre.Seq", val)
+	}
+
+	list := Realize(seq)
+	result := make([]sabre.Value, 0, len(list.Values))
+
+	for _, v := range list.Values {
+
+		applied, err := fn.(sabre.MultiFn).Invoke(scope, v)
+		if err != nil {
+			return nil, err
+		}
+
+		if isTruthy(applied) {
+			result = append(result, v)
+		}
+
+	}
+
+	return &sabre.List{Values: result}, nil
 }

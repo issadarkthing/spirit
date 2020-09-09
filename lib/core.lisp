@@ -120,7 +120,7 @@
             acc
             (x-map f (next coll) (conj acc (f (first coll)))))))
 
-(defn filter
+(defn x-filter
     ([f coll]
         (if (empty? coll)
             nil)

@@ -12,9 +12,13 @@ func BindAll(scope sabre.Scope) error {
 		// built-in
 		"core/range": sabre.ValueOf(slangRange),
 		"core/map": &sabre.Fn{
-			Args:     []string{"fn", "list"},
-			Func:     slangMap,
-			Variadic: false,
+			Args: []string{"fn", "list"},
+			Func: slangMap,
+		},
+
+		"core/filter": &sabre.Fn{
+			Args: []string{"fn", "list"},
+			Func: filter,
 		},
 
 		"core/->": &sabre.Fn{
