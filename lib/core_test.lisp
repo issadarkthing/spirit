@@ -134,6 +134,6 @@
 
 (assert (= 45 (reduce + (range 10))))
 (assert (= 55 (reduce + 10 (range 10))))
-(assert (= 7 (reduce + [1 2 3])))
+(assert (= 6 (reduce + [1 2 3])))
 (assert (= 26 (reduce + 20 [1 2 3])))
 

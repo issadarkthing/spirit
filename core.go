@@ -353,6 +353,7 @@ func reduce(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 	} else {
 		// if not use the first elem from the list
 		result = list.Values[0]
+		list.Values = list.Values[1:]
 	}
 
 	for _, v := range list.Values {
