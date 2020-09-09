@@ -184,27 +184,46 @@ func isTruthy(v sabre.Value) bool {
 	return true
 }
 
-func slangRange(min, max Any) (Any, error) {
+func slangRange(args ...int) (Any, error) {
+	var result []sabre.Value
 
-	var imin, imax sabre.Int64
-	result := make([]sabre.Value, 0, imax-imin)
-
-	switch min.(type) {
-	case sabre.Float64:
-		imin = sabre.Int64(min.(sabre.Float64))
-		imax = sabre.Int64(max.(sabre.Float64))
-	case sabre.Int64:
-		imin = min.(sabre.Int64)
-		imax = max.(sabre.Int64)
-	default:
-		return nil, fmt.Errorf("Invalid type (%T, %T)", min, max)
-	}
-
-	for i := imin; i < imax; i++ {
-		result = append(result, i)
+	switch len(args) {
+	case 1:
+		result = slangRange1(args[0])
+	case 2:
+		result = slangRange2(args[0], args[1])
+	case 3:
+		result = slangRange3(args[0], args[1], args[2])
 	}
 
 	return &sabre.List{Values: result}, nil
+}
+
+func slangRange1(max int) []sabre.Value {
+
+	result := make([]sabre.Value, 0, max)
+	for i := 0; i < max; i++ {
+		result = append(result, sabre.Int64(i))
+	}
+	return result
+}
+
+func slangRange2(min, max int) []sabre.Value {
+
+	result := make([]sabre.Value, 0, max-min)
+	for i := min; i < max; i++ {
+		result = append(result, sabre.Int64(i))
+	}
+	return result
+}
+
+func slangRange3(min, max, step int) []sabre.Value {
+
+	result := make([]sabre.Value, 0, max-min)
+	for i := min; i < max; i += step {
+		result = append(result, sabre.Int64(i))
+	}
+	return result
 }
 
 func slangMap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
