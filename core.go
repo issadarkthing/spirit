@@ -306,3 +306,64 @@ func filter(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
 	return &sabre.List{Values: result}, nil
 }
+
+func reduce(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+
+	if len(args) < 2 {
+		return nil, &invalidArgNumberError{2, len(args)}
+	}
+
+	// predicate function
+	fn, err := sabre.Eval(scope, args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	// determine the list position, if 3 argument given, the list position
+	// index starting from 0 is 1; otherwise list on the 2
+	listPos := 1
+
+	if len(args) == 3 {
+		listPos = 2
+	}
+
+	val, err := sabre.Eval(scope, args[listPos])
+	if err != nil {
+		return nil, err
+	}
+
+	seq, ok := val.(sabre.Seq)
+
+	if !ok {
+		return nil, fmt.Errorf("Invalid type given; expected %s instead got %T",
+			"sabre.Seq", val)
+	}
+
+	list := Realize(seq)
+
+	// determine the initial value
+	var result sabre.Value
+
+	// if initial value given
+	if len(args) == 3 {
+		result, err = sabre.Eval(scope, args[1])
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// if not use the first elem from the list
+		result = list.Values[0]
+	}
+
+	for _, v := range list.Values {
+
+		applied, err := fn.(sabre.Invokable).Invoke(scope, result, v)
+		if err != nil {
+			return nil, err
+		}
+
+		result = applied
+	}
+
+	return result, nil
+}

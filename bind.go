@@ -21,6 +21,11 @@ func BindAll(scope sabre.Scope) error {
 			Func: filter,
 		},
 
+		"core/reduce": &sabre.Fn{
+			Args: []string{"fn", "list"},
+			Func: reduce,
+		},
+
 		"core/->": &sabre.Fn{
 			Args:     []string{"exprs"},
 			Func:     ThreadFirst,
