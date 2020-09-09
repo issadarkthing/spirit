@@ -123,6 +123,10 @@
 (defn square [num] (* num num))
 (defn positive? [num] (> num 0))
 
+(assert (= '(0 1 2) (range 3)))
+(assert (= '(4 5 6 7 8) (range 4 9)))
+(assert (= '(4 6 8) (range 4 9 2)))
+
 (assert (= [1 4 9 25] (map square [1 2 3 5])))
 (assert (= '(1 4 9 25) (map square '(1 2 3 5))))
 (assert (= [2 5 4 1] (filter positive? [-1 0 -2 2 5 4 1])))
