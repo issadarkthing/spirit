@@ -254,7 +254,7 @@ func slangMap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 	result := make([]sabre.Value, 0, len(list.Values))
 	for _, v := range list.Values {
 
-		applied, err := fn.(sabre.MultiFn).Invoke(scope, v)
+		applied, err := fn.(sabre.Invokable).Invoke(scope, v)
 		if err != nil {
 			return nil, err
 		}
@@ -293,7 +293,7 @@ func filter(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
 	for _, v := range list.Values {
 
-		applied, err := fn.(sabre.MultiFn).Invoke(scope, v)
+		applied, err := fn.(sabre.Invokable).Invoke(scope, v)
 		if err != nil {
 			return nil, err
 		}
