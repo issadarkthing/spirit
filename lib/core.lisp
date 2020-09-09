@@ -124,13 +124,13 @@
     ([f coll]
         (if (empty? coll)
             nil)
-        (filter f coll []))
+        (x-filter f coll []))
     ([f coll acc]
         (if (empty? coll)
             acc
             (if (f (first coll))
-                (filter f (next coll) (conj acc (first coll)))
-                (filter f (next coll) acc)))))
+                (x-filter f (next coll) (conj acc (first coll)))
+                (x-filter f (next coll) acc)))))
 
 ; important macros -----------------------------------
 (defmacro apply-seq [callable args]
