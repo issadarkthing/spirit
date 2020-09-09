@@ -129,4 +129,11 @@
 
 (assert (= [1 4 9 25] (map square [1 2 3 5])))
 (assert (= '(1 4 9 25) (map square '(1 2 3 5))))
+
 (assert (= [2 5 4 1] (filter positive? [-1 0 -2 2 5 4 1])))
+
+(assert (= 45 (reduce + (range 10))))
+(assert (= 55 (reduce + 10 (range 10))))
+(assert (= 7 (reduce + [1 2 3])))
+(assert (= 26 (reduce + 20 [1 2 3])))
+
