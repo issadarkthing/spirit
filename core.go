@@ -234,17 +234,24 @@ func doSeq(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 		return nil, fmt.Errorf("Invalid type")
 	}
 
-	list, err := vecs.Values[1].Eval(scope)
+	coll, err := vecs.Values[1].Eval(scope)
 	if err != nil {
 		return nil, err
 	}
+
+	l, ok := coll.(sabre.Seq)
+	if !ok {
+		return nil, fmt.Errorf("Invalid type")
+	}
+
+	list := Realize(l)
 
 	symbol, ok := vecs.Values[0].(sabre.Symbol)
 	if !ok {
 		return nil, fmt.Errorf("invalid type; expected symbol")
 	}
 
-	for _, v := range list.(*sabre.List).Values {
+	for _, v := range list.Values {
 		scope.Bind(symbol.Value, v)
 		for _, body := range args[1:] {
 			_, err := body.Eval(scope)
