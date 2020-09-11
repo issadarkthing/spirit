@@ -18,12 +18,12 @@
     (decl.Cons 'fn*)))
 
 (def defn (macro* defn [name & fdecl]
-    (let* [with-name (fdecl.Cons name)
+    (let [with-name (fdecl.Cons name)
            func      (fdecl.Cons 'fn*)]
         `(def ~name ~func))))
 
 (def defmacro (macro* defmacro [name & mdecl]
-    (let* [with-name (mdecl.Cons name)
+    (let [with-name (mdecl.Cons name)
            macro     (mdecl.Cons 'macro*)]
         `(def ~name ~macro))))
 
@@ -70,7 +70,7 @@
             (throw "cons cannot be done for " (type coll)))))
 
 (defn last [coll]
-    (let* [v   (first coll)
+    (let [v   (first coll)
            rem (next coll)]
         (if (nil? rem)
             v
@@ -92,7 +92,7 @@
         (throw "argument must be a sequence"))
     (if (nil? (next coll))
         [(first coll)]
-        (let* [first-value   (first coll)
+        (let [first-value   (first coll)
                reversed      (reverse (next coll))]
             (conj reversed first-value)))))
 
@@ -114,20 +114,20 @@
   ([f coll]
    (reduce f (first coll) (next coll)))
   ([f acc coll]
-   (let* [z acc]
+   (let [z acc]
      (doseq [x coll]
        (unsafe/swap acc (f acc x)))
      acc)))
 
 (defn map [f coll]
-  (let* [z '()]
+  (let [z '()]
     (doseq [x coll]
       (unsafe/swap z (conj z (f x))))
     z))
 
 
 (defn filter [f coll]
-  (let* [z '()]
+  (let [z '()]
     (doseq [x coll]
       (if (f x)
         (unsafe/swap z (conj z x))))
@@ -148,15 +148,15 @@
     `(eval (cons ~callable ~args)))
 
 (defmacro when [expr & body]
-    (let* [body (cons 'do body)]
+    (let [body (cons 'do body)]
     `(if ~expr ~body)))
 
 (defmacro when-not [expr & body]
-    (let* [body (cons 'do body)]
+    (let [body (cons 'do body)]
     `(if (not ~expr) ~body)))
 
 (defmacro assert
-    ([expr] (let* [message "assertion failed"]
+    ([expr] (let [message "assertion failed"]
                 `(when-not ~expr (throw ~message))))
     ([expr message] `(when-not ~expr (throw ~message))))
 

@@ -81,7 +81,7 @@
         (throw "argument must be a sequence"))
     (if (nil? (next coll))
         [(first coll)]
-        (let* [first-value   (first coll)
+        (let [first-value   (first coll)
                reversed      (reverse (next coll))]
             (conj reversed first-value)))))
 (assert (= '(5 4 3 2 1) (reverse '(1 2 3 4 5))))
@@ -109,12 +109,12 @@
            (nested-special-forms 'hello '[arg] 'arg)))
 
 (assert (= "Hello Bob!"
-            (let* [name "Bob"]
+            (let [name "Bob"]
                 (str "Hello " name "!"))))
 
-(def sum-through-let (let* [numbers [1 2 3 4 5]]
+(def sum-through-let (let [numbers [1 2 3 4 5]]
                         (do (print "Numbers: " numbers)
-                            (let* [sum (apply-seq + numbers)]
+                            (let [sum (apply-seq + numbers)]
                                 (print "Sum of numbers: " sum)
                                 sum))))
 (assert (= (+ 1 2 3 4 5) sum-through-let))
