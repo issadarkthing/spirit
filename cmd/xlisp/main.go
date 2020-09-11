@@ -22,19 +22,18 @@ var (
 	version = "N/A"
 	commit  = "N/A"
 
-	executeStr = flag.String("e", "", "Execute string")
+	executeStr   = flag.String("e", "", "Execute string")
+	printVersion = flag.Bool("v", false, "Prints slang version and exit")
 )
 
-type temp struct {
-	Name string
-}
-
-func (temp *temp) Foo() {
-	fmt.Println("foo called")
-}
 
 func main() {
 	flag.Parse()
+
+	if *printVersion {
+		fmt.Println(version)
+		return
+	}
 
 	sl := slang.New()
 	sl.BindGo("*version*", version)

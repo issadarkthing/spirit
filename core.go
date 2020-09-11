@@ -285,7 +285,6 @@ func swap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 		return nil, err
 	}
 
-
 	scope.Bind(symbol.Value, value)
 	return value, nil
 }
