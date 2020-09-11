@@ -116,13 +116,13 @@
   ([f acc coll]
    (let* [z acc]
      (doseq [x coll]
-       (unsafe/mutate acc (f acc x)))
+       (unsafe/swap acc (f acc x)))
      acc)))
 
 (defn map [f coll]
   (let* [z '()]
     (doseq [x coll]
-      (unsafe/mutate z (conj z (f x))))
+      (unsafe/swap z (conj z (f x))))
     z))
 
 
@@ -130,7 +130,7 @@
   (let* [z '()]
     (doseq [x coll]
       (if (f x)
-        (unsafe/mutate z (conj z x))))
+        (unsafe/swap z (conj z x))))
     z))
 
 (defn concat [coll1 coll2]

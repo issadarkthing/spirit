@@ -18,9 +18,9 @@ func BindAll(scope sabre.Scope) error {
 			Func:     doSeq,
 		},
 
-		"unsafe/mutate": &sabre.Fn{
+		"unsafe/swap": &sabre.Fn{
 			Args: []string{"vector", "exprs"},
-			Func: mutate,
+			Func: swap,
 		},
 
 		"core/->": &sabre.Fn{
