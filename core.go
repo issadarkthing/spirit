@@ -11,8 +11,10 @@ import (
 
 // Case implements the switch case construct.
 func Case(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
-	if len(args) < 2 {
-		return nil, errors.New("case requires at-least 2 args")
+
+	err := checkArityAtLeast(2, len(args))
+	if err != nil {
+		return nil, err
 	}
 
 	res, err := sabre.Eval(scope, args[0])
@@ -136,8 +138,10 @@ func MakeString(vals ...sabre.Value) sabre.Value {
 }
 
 func threadCall(scope sabre.Scope, args []sabre.Value, last bool) (sabre.Value, error) {
-	if len(args) == 0 {
-		return nil, errors.New("at-least 1 argument required")
+
+	err := checkArityAtLeast(1, len(args))
+	if err != nil {
+		return nil, err
 	}
 
 	res, err := sabre.Eval(scope, args[0])
@@ -264,11 +268,11 @@ func doSeq(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 	return sabre.Nil{}, nil
 }
 
-func mutate(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+func swap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
-	if len(args) < 2 {
-		return nil, fmt.Errorf(
-			"invalid number of arguments; expected %d got %d", 2, len(args))
+	err := checkArity(2, len(args))
+	if err != nil {
+		return nil, err
 	}
 
 	symbol, ok := args[0].(sabre.Symbol)
