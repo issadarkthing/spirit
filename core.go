@@ -367,4 +367,35 @@ func reduce(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 	}
 
 	return result, nil
+
+func doSeq(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+
+	arg1 := args[0]
+	vecs, ok := arg1.(sabre.Vector)
+	if !ok {
+		return nil, fmt.Errorf("Invalid type")
+	}
+
+	list, err := vecs.Values[1].Eval(scope)
+	if err != nil {
+		return nil, err
+	}
+
+	symbol, ok := vecs.Values[0].(sabre.Symbol)
+	if !ok {
+		return nil, fmt.Errorf("invalid type; expected symbol")
+	}
+
+	for _, v := range list.(*sabre.List).Values {
+		scope.Bind(symbol.Value, v)
+		for _, body := range args[1:] {
+			_, err := body.Eval(scope)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return sabre.Nil{}, nil
 }
+

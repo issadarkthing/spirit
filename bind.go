@@ -11,6 +11,12 @@ func BindAll(scope sabre.Scope) error {
 	core := map[string]sabre.Value{
 		// built-in
 		"core/range": sabre.ValueOf(slangRange),
+
+		"core/doseq": &sabre.Fn{
+			Args:     []string{"vector", "exprs"},
+			Variadic: true,
+			Func:     doSeq,
+		},
 		"core/map": &sabre.Fn{
 			Args: []string{"fn", "list"},
 			Func: slangMap,
