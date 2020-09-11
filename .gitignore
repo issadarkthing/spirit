@@ -21,3 +21,5 @@ sample.clj
 .clj-kondo/*
 .lsp/*
 sample.lisp
+
+foldl.lisp
