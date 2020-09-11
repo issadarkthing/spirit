@@ -23,21 +23,6 @@ func BindAll(scope sabre.Scope) error {
 			Func: mutate,
 		},
 
-		"core/map": &sabre.Fn{
-			Args: []string{"fn", "list"},
-			Func: slangMap,
-		},
-
-		"core/filter": &sabre.Fn{
-			Args: []string{"fn", "list"},
-			Func: filter,
-		},
-
-		"core/reduce": &sabre.Fn{
-			Args: []string{"fn", "list"},
-			Func: reduce,
-		},
-
 		"core/->": &sabre.Fn{
 			Args:     []string{"exprs"},
 			Func:     ThreadFirst,
