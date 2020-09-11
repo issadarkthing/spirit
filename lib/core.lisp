@@ -119,10 +119,27 @@
        (unsafe/swap acc (f acc x)))
      acc)))
 
+(defn reduce-indexed
+  ([f coll]
+   (reduce f (first col) (next coll)))
+  ([f acc coll]
+   (let [z acc i 0]
+     (doseq [x coll]
+       (unsafe/swap z (f z x i))
+       (unsafe/swap i (inc i)))
+     z)))
+
 (defn map [f coll]
   (let [z '()]
     (doseq [x coll]
       (unsafe/swap z (conj z (f x))))
+    z))
+
+(defn map-indexed [f coll]
+  (let [z '() i 0]
+    (doseq [x coll]
+      (unsafe/swap z (conj z (f x i)))
+      (unsafe/swap i (inc i)))
     z))
 
 
