@@ -10,6 +10,7 @@
 (def Keyword(type :specimen))
 (def Symbol (type 'specimen))
 (def Fn     (type (fn* [])))
+(def HashMap(type {}))
 
 (ns 'core)
 
@@ -86,6 +87,15 @@
 (defn odd? [num]
     (= (mod num 2) 1.0))
 
+(def reverse (fn* reverse [coll]
+    (if (not (seq? coll))
+        (throw "argument must be a sequence"))
+    (if (nil? (next coll))
+        [(first coll)]
+        (let* [first-value   (first coll)
+               reversed      (reverse (next coll))]
+            (conj reversed first-value)))))
+
 (defn inc [num]
     (if (not (number? num))
         (throw "argument must be a number"))
@@ -100,6 +110,28 @@
             counter
             (count (next coll) (inc counter)))))
 
+(defn reduce
+  ([f coll]
+   (reduce f (first coll) (next coll)))
+  ([f acc coll]
+   (let* [z acc]
+     (doseq [x coll]
+       (unsafe/mutate acc (f acc x)))
+     acc)))
+
+(defn map [f coll]
+  (let* [z '()]
+    (doseq [x coll]
+      (unsafe/mutate z (conj z (f x))))
+    z))
+
+
+(defn filter [f coll]
+  (let* [z '()]
+    (doseq [x coll]
+      (if (f x)
+        (unsafe/mutate z (conj z x))))
+    z))
 
 (defn concat [coll1 coll2]
     (if (not (seq? coll1))
@@ -110,27 +142,6 @@
 
 
 
-(defn x-map
-    ([f coll]
-        (if (empty? coll)
-            nil)
-        (x-map f coll []))
-    ([f coll acc]
-        (if (empty? coll)
-            acc
-            (x-map f (next coll) (conj acc (f (first coll)))))))
-
-(defn x-filter
-    ([f coll]
-        (if (empty? coll)
-            nil)
-        (x-filter f coll []))
-    ([f coll acc]
-        (if (empty? coll)
-            acc
-            (if (f (first coll))
-                (x-filter f (next coll) (conj acc (first coll)))
-                (x-filter f (next coll) acc)))))
 
 ; important macros -----------------------------------
 (defmacro apply-seq [callable args]
