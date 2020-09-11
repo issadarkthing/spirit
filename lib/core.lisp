@@ -19,12 +19,12 @@
 
 (def defn (macro* defn [name & fdecl]
     (let [with-name (fdecl.Cons name)
-           func      (fdecl.Cons 'fn*)]
+           func      (with-name.Cons 'fn*)]
         `(def ~name ~func))))
 
 (def defmacro (macro* defmacro [name & mdecl]
     (let [with-name (mdecl.Cons name)
-           macro     (mdecl.Cons 'macro*)]
+           macro     (with-name.Cons 'macro*)]
         `(def ~name ~macro))))
 
 (defn nil? [arg] (= nil arg))
