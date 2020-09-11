@@ -367,6 +367,7 @@ func reduce(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 	}
 
 	return result, nil
+}
 
 func doSeq(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
@@ -399,3 +400,23 @@ func doSeq(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 	return sabre.Nil{}, nil
 }
 
+func mutate(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+
+	if len(args) < 2 {
+		return nil, fmt.Errorf(
+			"invalid number of arguments; expected %d got %d", 2, len(args))
+	}
+
+	symbol, ok := args[0].(sabre.Symbol)
+	if !ok {
+		return nil, fmt.Errorf("Expected symbol")
+	}
+
+	value, err := args[1].Eval(scope)
+	if err != nil {
+		return nil, err
+	}
+
+	scope.Bind(symbol.Value, value)
+	return value, nil
+}

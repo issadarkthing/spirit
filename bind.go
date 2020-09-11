@@ -17,6 +17,12 @@ func BindAll(scope sabre.Scope) error {
 			Variadic: true,
 			Func:     doSeq,
 		},
+
+		"unsafe/mutate": &sabre.Fn{
+			Args: []string{"vector", "exprs"},
+			Func: mutate,
+		},
+
 		"core/map": &sabre.Fn{
 			Args: []string{"fn", "list"},
 			Func: slangMap,
