@@ -75,6 +75,7 @@ func BindAll(scope sabre.Scope) error {
 		// io functions
 		"core/print":  sabre.ValueOf(Println),
 		"core/printf": sabre.ValueOf(Printf),
+		"core/read*":  sabre.ValueOf(Read),
 
 		"types/Seq":       TypeOf((*sabre.Seq)(nil)),
 		"types/Invokable": TypeOf((*sabre.Invokable)(nil)),

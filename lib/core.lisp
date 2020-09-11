@@ -29,6 +29,14 @@
 
 (defn nil? [arg] (= nil arg))
 
+; io operations -----------------------------------
+
+(defn read
+  ([]
+   (read* ""))
+  ([prompt]
+   (read* prompt)))
+
 ; sequence operations -------------------------------
 (defn seq? [arg] (impl? arg types/Seq))
 
