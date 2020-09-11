@@ -176,8 +176,8 @@
 (defn set [coll] (apply-seq (type #{}) coll))
 (defn list [& coll] (apply-seq (type ()) coll))
 (defn vector [& coll] (apply-seq (type []) coll))
-(defn int [arg] (to-type arg (type 0)))
-(defn float [arg] (to-type arg (type 0.0)))
+(defn int [arg] (to-type (type 0) arg))
+(defn float [arg] (to-type (type 0.0) arg))
 (defn boolean [arg] (true? arg))
 
 ; boolean operations --------------------------------

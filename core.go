@@ -92,7 +92,7 @@ func Implements(v interface{}, t sabre.Type) (bool, error) {
 
 // ToType attempts to convert given sabre value to target type. Returns
 // error if conversion not possible.
-func ToType(val sabre.Value, to sabre.Type) (sabre.Value, error) {
+func ToType(to sabre.Type, val sabre.Value) (sabre.Value, error) {
 	rv := reflect.ValueOf(val)
 	if rv.Type().ConvertibleTo(to.T) || rv.Type().AssignableTo(to.T) {
 		return sabre.ValueOf(rv.Convert(to.T).Interface()), nil
