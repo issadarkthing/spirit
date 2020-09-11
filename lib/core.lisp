@@ -110,14 +110,15 @@
             counter
             (count (next coll) (inc counter)))))
 
+
 (defn reduce
   ([f coll]
    (reduce f (first coll) (next coll)))
   ([f acc coll]
    (let [z acc]
      (doseq [x coll]
-       (unsafe/swap acc (f acc x)))
-     acc)))
+       (unsafe/swap z (f z x)))
+     z)))
 
 (defn reduce-indexed
   ([f coll]
