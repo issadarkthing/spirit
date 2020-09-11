@@ -1,4 +1,4 @@
-package slang
+package xlisp
 
 import (
 	"math"

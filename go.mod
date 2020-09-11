@@ -1,4 +1,4 @@
-module github.com/spy16/slang
+module github.com/issadarkthing/xlisp
 
 go 1.13
 

@@ -9,7 +9,7 @@ fmt:
 
 install:
 	@echo "Installing slang to GOBIN..."
-	@go install -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" ./cmd/slang/
+	@go install -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" ./cmd/xlisp/
 
 clean:
 	@echo "Cleaning up..."
@@ -31,4 +31,4 @@ benchmark:
 build:
 	@echo "Building..."
 	@mkdir -p ./bin
-	@go build -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" -o ./bin/slang ./cmd/slang/
+	@go build -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" -o ./bin/xlisp ./cmd/xlisp/

@@ -1,4 +1,4 @@
-package slang_test
+package xlisp_test
 
 import (
 	"io/ioutil"
@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/issadarkthing/xlisp"
 	"github.com/spy16/sabre"
-	"github.com/spy16/slang"
 )
 
 const (
@@ -16,10 +16,10 @@ const (
 	libDir  = "./lib"
 )
 
-var _ sabre.Scope = (*slang.Slang)(nil)
+var _ sabre.Scope = (*xlisp.Xlisp)(nil)
 
-func TestSlang_Bind(t *testing.T) {
-	sl := slang.New()
+func TestXlisp_Bind(t *testing.T) {
+	sl := xlisp.New()
 
 	tests := []struct {
 		name    string
@@ -57,8 +57,8 @@ func TestSlang_Bind(t *testing.T) {
 	}
 }
 
-func TestSlang_Resolve(t *testing.T) {
-	sl := slang.New()
+func TestXlisp_Resolve(t *testing.T) {
+	sl := xlisp.New()
 	sl.Bind("pi", sabre.Float64(3.1412))
 
 	tests := []struct {
@@ -92,7 +92,7 @@ func TestSlang_Resolve(t *testing.T) {
 	}
 }
 
-func TestSlang(t *testing.T) {
+func TestXlisp(t *testing.T) {
 	if testing.Short() {
 		return
 	}
@@ -122,9 +122,9 @@ func testFile(t *testing.T, file string) {
 	}
 	defer fh.Close()
 
-	sl, err := initSlang()
+	sl, err := initxlisp()
 	if err != nil {
-		t.Fatalf("failed to init slang: %v", err)
+		t.Fatalf("failed to init xlisp: %v", err)
 	}
 
 	_, err = sl.ReadEval(fh)
@@ -133,13 +133,13 @@ func testFile(t *testing.T, file string) {
 	}
 }
 
-func initSlang() (*slang.Slang, error) {
+func initxlisp() (*xlisp.Xlisp, error) {
 	di, err := ioutil.ReadDir(testDir)
 	if err != nil {
 		return nil, err
 	}
 
-	sl := slang.New()
+	sl := xlisp.New()
 	for _, fi := range di {
 		if !strings.HasSuffix(fi.Name(), ".lisp") ||
 			strings.HasSuffix(fi.Name(), "_test.lisp") {

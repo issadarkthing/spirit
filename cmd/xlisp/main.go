@@ -10,13 +10,13 @@ import (
 	"runtime"
 
 	"github.com/chzyer/readline"
+	"github.com/issadarkthing/xlisp"
 	"github.com/spy16/sabre"
 	"github.com/spy16/sabre/repl"
-	"github.com/spy16/slang"
 )
 
-const help = `Slang %s [Commit: %s] [Compiled with %s]
-Visit https://github.com/spy16/sabre for more.`
+const help = `Xlisp %s [Commit: %s] [Compiled with %s]
+Visit https://github.com/issadarkthing/xlisp for more.`
 
 var (
 	version = "N/A"
@@ -26,7 +26,6 @@ var (
 	printVersion = flag.Bool("v", false, "Prints slang version and exit")
 )
 
-
 func main() {
 	flag.Parse()
 
@@ -35,8 +34,8 @@ func main() {
 		return
 	}
 
-	sl := slang.New()
-	sl.BindGo("*version*", version)
+	xl := xlisp.New()
+	xl.BindGo("*version*", version)
 
 	var result sabre.Value
 	var err error
@@ -54,7 +53,7 @@ func main() {
 		}
 		defer core.Close()
 
-		_, err = sl.ReadEval(core)
+		_, err = xl.ReadEval(core)
 
 		fh, err := os.Open(os.Args[1])
 		if err != nil {
@@ -62,9 +61,9 @@ func main() {
 		}
 		defer fh.Close()
 
-		sl.SwitchNS(sabre.Symbol{Value: "user"})
+		xl.SwitchNS(sabre.Symbol{Value: "user"})
 
-		_, err = sl.ReadEval(fh)
+		_, err = xl.ReadEval(fh)
 		if err != nil {
 			fatalf("error: %v\n", err)
 		}
@@ -72,7 +71,7 @@ func main() {
 	}
 
 	if *executeStr != "" {
-		result, err = sl.ReadEvalStr(*executeStr)
+		result, err = xl.ReadEvalStr(*executeStr)
 		fmt.Println(result)
 		if err != nil {
 			fatalf("error: %v\n", err)
@@ -82,7 +81,7 @@ func main() {
 
 	lr, errMapper := readlineInstance()
 
-	repl := repl.New(sl,
+	repl := repl.New(xl,
 		repl.WithBanner(fmt.Sprintf(help, version, commit, runtime.Version())),
 		repl.WithInput(lr, errMapper),
 		repl.WithOutput(lr.Stdout()),

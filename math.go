@@ -1,4 +1,4 @@
-package slang
+package xlisp
 
 import (
 	"github.com/spy16/sabre"

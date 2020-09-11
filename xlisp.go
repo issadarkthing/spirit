@@ -1,7 +1,4 @@
-// Package slang (short for Sabre lang) provides a tiny LISP dialect built
-// using  factilities provided by Sabre. See New() for  initializing Slang
-// and using it.
-package slang
+package xlisp
 
 import (
 	"fmt"
@@ -17,9 +14,9 @@ const (
 	defaultNS   = "user"
 )
 
-// New returns a new instance of Slang interpreter.
-func New() *Slang {
-	sl := &Slang{
+// returns new xlisp instance
+func New() *Xlisp {
+	sl := &Xlisp{
 		mu:       &sync.RWMutex{},
 		bindings: map[nsSymbol]sabre.Value{},
 	}
@@ -34,8 +31,8 @@ func New() *Slang {
 	return sl
 }
 
-// Slang represents an instance of slang interpreter.
-type Slang struct {
+// xlisp instance
+type Xlisp struct {
 	mu        *sync.RWMutex
 	currentNS string
 	checkNS   bool
@@ -43,24 +40,24 @@ type Slang struct {
 }
 
 // Eval evaluates the given value in Slang context.
-func (slang *Slang) Eval(v sabre.Value) (sabre.Value, error) {
+func (slang *Xlisp) Eval(v sabre.Value) (sabre.Value, error) {
 	return sabre.Eval(slang, v)
 }
 
 // ReadEval reads from the given reader and evaluates all the forms
 // obtained in Slang context.
-func (slang *Slang) ReadEval(r io.Reader) (sabre.Value, error) {
+func (slang *Xlisp) ReadEval(r io.Reader) (sabre.Value, error) {
 	return sabre.ReadEval(slang, r)
 }
 
 // ReadEvalStr reads the source and evaluates it in Slang context.
-func (slang *Slang) ReadEvalStr(src string) (sabre.Value, error) {
+func (slang *Xlisp) ReadEvalStr(src string) (sabre.Value, error) {
 	return sabre.ReadEvalStr(slang, src)
 }
 
 // Bind binds the given name to the given Value into the slang interpreter
 // context.
-func (slang *Slang) Bind(symbol string, v sabre.Value) error {
+func (slang *Xlisp) Bind(symbol string, v sabre.Value) error {
 	slang.mu.Lock()
 	defer slang.mu.Unlock()
 
@@ -79,7 +76,7 @@ func (slang *Slang) Bind(symbol string, v sabre.Value) error {
 
 // Resolve finds the value bound to the given symbol and returns it if
 // found in the Slang context and returns it.
-func (slang *Slang) Resolve(symbol string) (sabre.Value, error) {
+func (slang *Xlisp) Resolve(symbol string) (sabre.Value, error) {
 	slang.mu.RLock()
 	defer slang.mu.RUnlock()
 
@@ -97,12 +94,12 @@ func (slang *Slang) Resolve(symbol string) (sabre.Value, error) {
 
 // BindGo is similar to Bind but handles conversion of Go value 'v' to
 // sabre Value type.
-func (slang *Slang) BindGo(symbol string, v interface{}) error {
+func (slang *Xlisp) BindGo(symbol string, v interface{}) error {
 	return slang.Bind(symbol, sabre.ValueOf(v))
 }
 
 // SwitchNS changes the current namespace to the string value of given symbol.
-func (slang *Slang) SwitchNS(sym sabre.Symbol) error {
+func (slang *Xlisp) SwitchNS(sym sabre.Symbol) error {
 	slang.mu.Lock()
 	slang.currentNS = sym.String()
 	slang.mu.Unlock()
@@ -111,7 +108,7 @@ func (slang *Slang) SwitchNS(sym sabre.Symbol) error {
 }
 
 // CurrentNS returns the current active namespace.
-func (slang *Slang) CurrentNS() string {
+func (slang *Xlisp) CurrentNS() string {
 	slang.mu.RLock()
 	defer slang.mu.RUnlock()
 
@@ -119,11 +116,11 @@ func (slang *Slang) CurrentNS() string {
 }
 
 // Parent always returns nil to represent this is the root scope.
-func (slang *Slang) Parent() sabre.Scope {
+func (slang *Xlisp) Parent() sabre.Scope {
 	return nil
 }
 
-func (slang *Slang) resolveAny(symbol string, syms ...nsSymbol) (sabre.Value, error) {
+func (slang *Xlisp) resolveAny(symbol string, syms ...nsSymbol) (sabre.Value, error) {
 	for _, s := range syms {
 		v, found := slang.bindings[s]
 		if found {
@@ -134,7 +131,7 @@ func (slang *Slang) resolveAny(symbol string, syms ...nsSymbol) (sabre.Value, er
 	return nil, fmt.Errorf("unable to resolve symbol: %v", symbol)
 }
 
-func (slang *Slang) splitSymbol(symbol string) (*nsSymbol, error) {
+func (slang *Xlisp) splitSymbol(symbol string) (*nsSymbol, error) {
 	sep := string(nsSeparator)
 	if symbol == sep {
 		return &nsSymbol{
