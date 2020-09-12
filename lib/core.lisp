@@ -37,6 +37,7 @@
   ([prompt]
    (read* prompt)))
 
+
 ; sequence operations -------------------------------
 (defn seq? [arg] (impl? arg types/Seq))
 
@@ -54,6 +55,15 @@
     (if (not (seq? coll))
         (throw "argument must be a collection, not " (type coll)))
     (coll.Next))
+
+; same as next but returns empty list if no next member instead of nil
+(defn rest [coll]
+    (if (not (seq? coll))
+        (throw "argument must be a collection, not " (type coll)))
+    (if (nil? (coll.Next))
+      '()
+      (coll.Next)))
+
 
 (defn cons [v coll]
     (if (not (seq? coll))
