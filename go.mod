@@ -9,3 +9,5 @@ require (
 	github.com/spy16/sabre v0.3.4-0.20200301123719-349ed2090d1e
 	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect
 )
+
+replace github.com/spy16/sabre => github.com/issadarkthing/sabre v0.3.4
