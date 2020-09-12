@@ -3,7 +3,11 @@ package xlisp
 import (
 	"bufio"
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
+
+	"github.com/spy16/sabre"
 )
 
 // Println is an alias for fmt.Println which ignores the return values.
@@ -29,4 +33,20 @@ func Read(prompt string) (string, error) {
 	}
 
 	return text[:len(text)-1], nil
+}
+
+func Random(max int) int {
+	rand.Seed(time.Now().UnixNano())
+	result := rand.Intn(max)
+	return result
+}
+
+func Shuffle(seq sabre.Seq) sabre.Seq {
+	rand.Seed(time.Now().UnixNano())
+	list := Realize(seq)	
+	values := list.Values
+	rand.Shuffle(len(list.Values), func(i, j int) {
+		values[i], values[j] = values[j], values[i]
+	})
+	return list
 }

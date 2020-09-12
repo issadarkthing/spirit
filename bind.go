@@ -12,12 +12,6 @@ func BindAll(scope sabre.Scope) error {
 		// built-in
 		"core/range": sabre.ValueOf(slangRange),
 
-		"core/recur": &sabre.Fn{
-			Args:     []string{"symbol", "exprs"},
-			Variadic: true,
-			Func:     recur,
-		},
-
 		"core/doseq": &sabre.Fn{
 			Args:     []string{"vector", "exprs"},
 			Variadic: true,
@@ -54,6 +48,7 @@ func BindAll(scope sabre.Scope) error {
 		"core/let":          sabre.Let,
 		"core/quote":        sabre.SimpleQuote,
 		"core/syntax-quote": sabre.SyntaxQuote,
+		"core/recur":        sabre.Recur,
 
 		"core/macroexpand": sabre.ValueOf(MacroExpand),
 		"core/eval":        sabre.ValueOf(sabre.Eval),
@@ -82,6 +77,8 @@ func BindAll(scope sabre.Scope) error {
 		"core/print":  sabre.ValueOf(Println),
 		"core/printf": sabre.ValueOf(Printf),
 		"core/read*":  sabre.ValueOf(Read),
+		"core/random": sabre.ValueOf(Random),
+		"core/shuffle": sabre.ValueOf(Shuffle),
 
 		"types/Seq":       TypeOf((*sabre.Seq)(nil)),
 		"types/Invokable": TypeOf((*sabre.Invokable)(nil)),
