@@ -288,3 +288,18 @@ func swap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 	scope.Bind(symbol.Value, value)
 	return value, nil
 }
+
+func recur(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+
+	symbol := sabre.Symbol{
+		Value: "recur",
+	}
+
+	results, err := evalValueList(scope, args)
+	if err != nil {
+		return nil, err
+	}
+
+	results = append([]sabre.Value{symbol}, results...)
+	return &sabre.List{Values: results}, nil
+}

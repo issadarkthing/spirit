@@ -12,6 +12,12 @@ func BindAll(scope sabre.Scope) error {
 		// built-in
 		"core/range": sabre.ValueOf(slangRange),
 
+		"core/recur": &sabre.Fn{
+			Args:     []string{"symbol", "exprs"},
+			Variadic: true,
+			Func:     recur,
+		},
+
 		"core/doseq": &sabre.Fn{
 			Args:     []string{"vector", "exprs"},
 			Variadic: true,

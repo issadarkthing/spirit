@@ -130,7 +130,7 @@
 
 (defn reduce-indexed
   ([f coll]
-   (reduce f (first col) (next coll)))
+   (reduce-indexed f (first coll) (next coll)))
   ([f acc coll]
    (let [z acc i 0]
      (doseq [x coll]
@@ -157,6 +157,15 @@
     (doseq [x coll]
       (if (f x)
         (unsafe/swap z (conj z x))))
+    z))
+
+
+(defn filter-indexed [f coll]
+  (let [z '() i 0]
+    (doseq [x coll]
+      (if (f x i)
+        (unsafe/swap z (conj z x)))
+      (unsafe/swap i (inc i)))
     z))
 
 (defn concat [coll1 coll2]

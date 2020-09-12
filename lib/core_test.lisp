@@ -129,11 +129,23 @@
 
 (assert (= [1 4 9 25] (map square [1 2 3 5])))
 (assert (= '(1 4 9 25) (map square '(1 2 3 5))))
+(assert (= '(10 1 12 3 14 5) (map-indexed 
+                               (fn [x i] 
+                                 (if (even? i)
+                                   (+ 10 x)
+                                   x)) 
+                               (range 6))))
+
 
 (assert (= [2 5 4 1] (filter positive? [-1 0 -2 2 5 4 1])))
+(assert (= '(0 2 4) (filter-indexed (fn [x i] (even? i)) (range 6))))
 
 (assert (= 45 (reduce + (range 10))))
 (assert (= 55 (reduce + 10 (range 10))))
 (assert (= 6 (reduce + [1 2 3])))
 (assert (= 26 (reduce + 20 [1 2 3])))
-
+(assert (= '(0 2 4 6 8) (reduce-indexed 
+                         (fn [acc v i]
+                           (if (even? i)
+                             (conj acc v)
+                             acc)) '() (range 10))))
