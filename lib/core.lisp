@@ -186,6 +186,11 @@
     (apply-seq coll1.Conj coll2))
 
 
+(defn concat 
+  ([coll1 coll2]
+   (apply-seq coll1.Conj coll2))
+  ([coll1 coll2 & more]
+   (reduce concat (concat coll1 coll2) more)))
 
 
 ; important macros -----------------------------------
