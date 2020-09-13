@@ -66,7 +66,6 @@ func BindAll(scope sabre.Scope) error {
 		"core/impl?":       sabre.ValueOf(Implements),
 		"core/realize":     sabre.ValueOf(Realize),
 		"core/throw":       sabre.ValueOf(Throw),
-		"core/to-nil":      sabre.ValueOf(toNil),
 
 		// Type system functions
 		"core/str": sabre.ValueOf(MakeString),
