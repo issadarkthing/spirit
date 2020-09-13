@@ -3,14 +3,23 @@ package xlisp
 import (
 	"math"
 
+	"github.com/rivo/tview"
 	"github.com/spy16/sabre"
 )
+
 
 // BindAll binds all core functions into the given scope.
 func BindAll(scope sabre.Scope) error {
 	core := map[string]sabre.Value{
+		// gui frontend
+		"tview/new-app":  sabre.ValueOf(tview.NewApplication),
+		"tview/new-form": sabre.ValueOf(tview.NewForm),
+		"tview/new-box":  sabre.ValueOf(tview.NewBox),
+		"tview/new-textview": sabre.ValueOf(tview.NewTextView),
+
 		// built-in
 		"core/range": sabre.ValueOf(slangRange),
+		"core/null": nil,
 
 		"core/doseq": &sabre.Fn{
 			Args:     []string{"vector", "exprs"},
@@ -57,6 +66,7 @@ func BindAll(scope sabre.Scope) error {
 		"core/impl?":       sabre.ValueOf(Implements),
 		"core/realize":     sabre.ValueOf(Realize),
 		"core/throw":       sabre.ValueOf(Throw),
+		"core/to-nil":      sabre.ValueOf(toNil),
 
 		// Type system functions
 		"core/str": sabre.ValueOf(MakeString),
@@ -74,10 +84,10 @@ func BindAll(scope sabre.Scope) error {
 		"core/<=":  sabre.ValueOf(LtE),
 
 		// io functions
-		"core/print":  sabre.ValueOf(Println),
-		"core/printf": sabre.ValueOf(Printf),
-		"core/read*":  sabre.ValueOf(Read),
-		"core/random": sabre.ValueOf(Random),
+		"core/print":   sabre.ValueOf(Println),
+		"core/printf":  sabre.ValueOf(Printf),
+		"core/read*":   sabre.ValueOf(Read),
+		"core/random":  sabre.ValueOf(Random),
 		"core/shuffle": sabre.ValueOf(Shuffle),
 
 		"types/Seq":       TypeOf((*sabre.Seq)(nil)),

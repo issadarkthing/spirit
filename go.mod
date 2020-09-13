@@ -6,8 +6,8 @@ require (
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
+	github.com/rivo/tview v0.0.0-20200818120338-53d50e499bf9
 	github.com/spy16/sabre v0.3.4-0.20200301123719-349ed2090d1e
-	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect
 )
 
 replace github.com/spy16/sabre => github.com/issadarkthing/sabre v0.3.4

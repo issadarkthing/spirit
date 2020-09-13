@@ -43,7 +43,7 @@ func Random(max int) int {
 
 func Shuffle(seq sabre.Seq) sabre.Seq {
 	rand.Seed(time.Now().UnixNano())
-	list := Realize(seq)	
+	list := Realize(seq)
 	values := list.Values
 	rand.Shuffle(len(list.Values), func(i, j int) {
 		values[i], values[j] = values[j], values[i]
