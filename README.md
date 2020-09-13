@@ -39,4 +39,5 @@ Then, you can run this example using `bin/xlisp example/sample.lisp`
 ```
 Then it will fill up your terminal with box and texts. You can `ctrl + c` to cancel
 the application.
-[terminal](/example.png)
+
+![terminal](/example.png)
