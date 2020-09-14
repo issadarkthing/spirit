@@ -326,33 +326,13 @@ func future(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 	
 	go func() {
 		
-		for i, v := range args {
-
-			list, ok := v.(*sabre.List)
-			if !ok {
-				return
-			}
-
-			symbol, ok := list.First().(sabre.Symbol)
-			if !ok {
-				continue
-			}
-
-			fn, err := scope.Resolve(symbol.Value)
-			if err != nil {
-				continue
-			}
-
-			res, err := fn.(sabre.Invokable).Invoke(scope, list.Values[1:]...)
-			if err != nil {
-				continue
-			}
-
-			if i == len(args)-1 {
-				ch <- res
-				close(ch)
-			}
+		val, err := args[0].Eval(scope)
+		if err != nil {
+			panic(err)
 		}
+
+		ch <- val
+		close(ch)
 	}()
 
 	return sabre.ValueOf(ch), nil
