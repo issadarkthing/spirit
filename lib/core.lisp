@@ -188,6 +188,7 @@
 
 
 ; important macros -----------------------------------
+
 (defmacro apply-seq [callable args]
     `(eval (cons ~callable ~args)))
 
@@ -203,6 +204,9 @@
     ([expr] (let [message "assertion failed"]
                 `(when-not ~expr (throw ~message))))
     ([expr message] `(when-not ~expr (throw ~message))))
+
+(defmacro deref [symbol]
+  `(deref* 'a ~a))
 
 ; Type check functions -------------------------------
 (defn is-type? [typ arg] (= typ (type arg)))

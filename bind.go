@@ -7,19 +7,26 @@ import (
 	"github.com/spy16/sabre"
 )
 
-
 // BindAll binds all core functions into the given scope.
 func BindAll(scope sabre.Scope) error {
 	core := map[string]sabre.Value{
 		// gui frontend
-		"tview/new-app":  sabre.ValueOf(tview.NewApplication),
-		"tview/new-form": sabre.ValueOf(tview.NewForm),
-		"tview/new-box":  sabre.ValueOf(tview.NewBox),
-		"tview/new-textview": sabre.ValueOf(tview.NewTextView),
+		"tview/new-app":       sabre.ValueOf(tview.NewApplication),
+		"tview/new-form":      sabre.ValueOf(tview.NewForm),
+		"tview/new-box":       sabre.ValueOf(tview.NewBox),
+		"tview/new-textview":  sabre.ValueOf(tview.NewTextView),
+		"tview/new-list":      sabre.ValueOf(tview.NewList),
+		"tview/list-add-item": sabre.ValueOf(ListAddItem(scope)),
 
 		// built-in
 		"core/range": sabre.ValueOf(slangRange),
-		"core/null": nil,
+		"core/future": &sabre.Fn{
+			Args: []string{"body"},
+			Variadic: true,
+			Func: future,
+		},
+
+		"core/deref*": sabre.ValueOf(deref(scope)), 
 
 		"core/doseq": &sabre.Fn{
 			Args:     []string{"vector", "exprs"},

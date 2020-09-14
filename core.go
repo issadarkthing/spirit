@@ -303,3 +303,65 @@ func recur(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 	results = append([]sabre.Value{symbol}, results...)
 	return &sabre.List{Values: results}, nil
 }
+
+// Evaluate the expressions in another goroutine; returns chan
+func future(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+
+	ch := make(chan sabre.Value)
+	
+	go func() {
+		
+		for i, v := range args {
+
+			list, ok := v.(*sabre.List)
+			if !ok {
+				return
+			}
+
+			symbol, ok := list.First().(sabre.Symbol)
+			if !ok {
+				continue
+			}
+
+			fn, err := scope.Resolve(symbol.Value)
+			if err != nil {
+				continue
+			}
+
+			res, err := fn.(sabre.Invokable).Invoke(scope, list.Values[1:]...)
+			if err != nil {
+				continue
+			}
+
+			if i == len(args)-1 {
+				ch <- res
+				close(ch)
+			}
+		}
+	}()
+
+	return sabre.ValueOf(ch), nil
+}
+
+// Deref chan from future to get the value. This call is blocking until future is resolved.
+// The result will be cached.
+func deref(scope sabre.Scope) (func(sabre.Value, <-chan sabre.Value) (sabre.Value, error)) {
+
+	return func(symbol sabre.Value, ch <-chan sabre.Value) (sabre.Value, error) {
+
+		derefSymbol := fmt.Sprintf("__deref__%s__result__", symbol.String())
+
+		value :=<-ch	
+		if value != nil {
+			scope.Bind(derefSymbol, value)
+			return value, nil
+		}
+
+		value, err := scope.Resolve(derefSymbol)
+		if err != nil {
+			return nil, err
+		}
+
+		return value, nil
+	}
+}
