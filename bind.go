@@ -20,7 +20,7 @@ func BindAll(scope sabre.Scope) error {
 
 		// built-in
 		"core/range": sabre.ValueOf(slangRange),
-		"core/future": &sabre.Fn{
+		"core/future*": &sabre.Fn{
 			Args: []string{"body"},
 			Variadic: true,
 			Func: future,
