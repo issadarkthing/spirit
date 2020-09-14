@@ -340,14 +340,14 @@ func future(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
 // Deref chan from future to get the value. This call is blocking until future is resolved.
 // The result will be cached.
-func deref(scope sabre.Scope) (func(sabre.Value, <-chan sabre.Value) (sabre.Value, error)) {
+func deref(scope sabre.Scope) (func(sabre.Symbol, <-chan sabre.Value) (sabre.Value, error)) {
 
-	return func(symbol sabre.Value, ch <-chan sabre.Value) (sabre.Value, error) {
+	return func(symbol sabre.Symbol, ch <-chan sabre.Value) (sabre.Value, error) {
 
-		derefSymbol := fmt.Sprintf("__deref__%s__result__", symbol.String())
+		derefSymbol := fmt.Sprintf("__deref__%s__result__", symbol.Value)
 
-		value :=<-ch	
-		if value != nil {
+		value, ok :=<-ch	
+		if ok {
 			scope.Bind(derefSymbol, value)
 			return value, nil
 		}
