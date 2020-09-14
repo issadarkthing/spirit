@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/rivo/tview"
 	"github.com/spy16/sabre"
@@ -358,5 +359,19 @@ func deref(scope sabre.Scope) (func(sabre.Symbol, <-chan sabre.Value) (sabre.Val
 		}
 
 		return value, nil
+	}
+}
+
+func sleep(s int) {
+	time.Sleep(time.Millisecond * time.Duration(s))
+}
+
+
+func futureRealize(ch <-chan sabre.Value) bool {
+	select {
+	case _, ok := <-ch:
+		return !ok
+	default:
+		return false
 	}
 }
