@@ -251,6 +251,7 @@ func doSeq(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 	return sabre.Nil{}, nil
 }
 
+// unsafely swap the value. Does not mutate the value rather just swapping
 func swap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
 	err := checkArity(2, len(args))
@@ -268,10 +269,13 @@ func swap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 		return nil, err
 	}
 
+
 	scope.Bind(symbol.Value, value)
 	return value, nil
 }
 
+// Returns '(recur & expressions) so it'll be recognize by fn.Invoke method as
+// tail recursive function
 func recur(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
 	symbol := sabre.Symbol{
