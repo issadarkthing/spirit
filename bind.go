@@ -26,6 +26,7 @@ func BindAll(scope sabre.Scope) error {
 			Func: future,
 		},
 
+		"core/sleep": sabre.ValueOf(sleep),
 		"core/deref*": sabre.ValueOf(deref(scope)), 
 
 		"core/doseq": &sabre.Fn{
@@ -71,7 +72,7 @@ func BindAll(scope sabre.Scope) error {
 		"core/type":        sabre.ValueOf(TypeOf),
 		"core/to-type":     sabre.ValueOf(ToType),
 		"core/impl?":       sabre.ValueOf(Implements),
-		"core/realize":     sabre.ValueOf(Realize),
+		"core/realized*":   sabre.ValueOf(futureRealize),
 		"core/throw":       sabre.ValueOf(Throw),
 
 		// Type system functions

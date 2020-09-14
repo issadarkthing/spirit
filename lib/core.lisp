@@ -121,6 +121,16 @@
         (int (+ 1 num))
         (+ 1 num)))
 
+(defn zero? [num]
+  (= num 0))
+
+(defn dec [num]
+    (if (not (number? num))
+        (throw "argument must be a number"))
+    (if (int? num)
+        (int (- num 1))
+        (- num 1)))
+
 (defn count
     ([coll] (count coll 0))
     ([coll counter]
@@ -187,7 +197,14 @@
    (reduce concat (concat coll1 coll2) more)))
 
 
+(defn realized? [x]
+  (if (fn? x)
+    false
+    (realized* x)))
+
+
 ; important macros -----------------------------------
+
 
 (defmacro apply-seq [callable args]
     `(eval (cons ~callable ~args)))
@@ -206,12 +223,26 @@
     ([expr message] `(when-not ~expr (throw ~message))))
 
 (defmacro deref [symbol]
-  `(deref* 'a ~a))
+  `(deref* '~symbol ~symbol))
+
+(defmacro future [& body]
+  (let [body (cons 'do body)]
+    `(future* ~body)))
+
+(defmacro delay [& body]
+  (let [body (cons 'do body)]
+    `(fn [] (future* ~body))))
+
+(defmacro force [x]
+  `(deref* '~x (~x)))
+
+
 
 ; Type check functions -------------------------------
 (defn is-type? [typ arg] (= typ (type arg)))
 (defn set? [arg] (is-type? #{} arg))
 (defn list? [arg] (is-type? types/List arg))
+(defn fn? [arg] (is-type? types/Fn arg))
 (defn vector? [arg] (is-type? types/Vector arg))
 (defn int? [arg] (is-type? types/Int arg))
 (defn float? [arg] (is-type? types/Float arg))
