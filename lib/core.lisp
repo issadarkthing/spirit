@@ -73,7 +73,7 @@
 (defn conj [coll & vals]
     (if (not (seq? coll))
         (throw "argument must be a collection, not " (type coll)))
-    (apply-seq coll.Conj vals))
+    (apply coll.Conj vals))
 
 (defn empty? [coll]
     (if (nil? coll)
@@ -192,7 +192,7 @@
 
 (defn concat 
   ([coll1 coll2]
-   (apply-seq coll1.Conj coll2))
+   (apply coll1.Conj coll2))
   ([coll1 coll2 & more]
    (reduce concat (concat coll1 coll2) more)))
 
@@ -206,7 +206,7 @@
 ; important macros -----------------------------------
 
 
-(defmacro apply-seq [callable args]
+(defmacro apply [callable args]
     `(eval (cons ~callable ~args)))
 
 (defmacro when [expr & body]
@@ -238,6 +238,7 @@
 
 
 
+
 ; Type check functions -------------------------------
 (defn is-type? [typ arg] (= typ (type arg)))
 (defn set? [arg] (is-type? #{} arg))
@@ -252,9 +253,9 @@
 (defn symbol? [arg] (is-type? types/Symbol arg))
 
 ; Type initialization functions ---------------------
-(defn set [coll] (apply-seq (type #{}) coll))
-(defn list [& coll] (apply-seq (type ()) coll))
-(defn vector [& coll] (apply-seq (type []) coll))
+(defn set [coll] (apply (type #{}) coll))
+(defn list [& coll] (apply (type ()) coll))
+(defn vector [& coll] (apply (type []) coll))
 (defn int [arg] (to-type (type 0) arg))
 (defn float [arg] (to-type (type 0.0) arg))
 (defn boolean [arg] (true? arg))
