@@ -3,6 +3,7 @@ package xlisp
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"time"
@@ -49,4 +50,14 @@ func Shuffle(seq sabre.Seq) sabre.Seq {
 		values[i], values[j] = values[j], values[i]
 	})
 	return list
+}
+
+func ReadFile(name string) (string, error) {
+
+	content, err := ioutil.ReadFile(name)
+	if err != nil {
+		return "", err
+	}
+
+	return string(content), nil
 }

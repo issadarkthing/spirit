@@ -2,6 +2,7 @@ package xlisp
 
 import (
 	"math"
+	"strings"
 
 	"github.com/rivo/tview"
 	"github.com/spy16/sabre"
@@ -21,14 +22,19 @@ func BindAll(scope sabre.Scope) error {
 		// built-in
 		"core/range": sabre.ValueOf(slangRange),
 		"core/future*": &sabre.Fn{
-			Args: []string{"body"},
+			Args:     []string{"body"},
 			Variadic: true,
-			Func: future,
+			Func:     future,
 		},
 
-		"core/sleep": sabre.ValueOf(sleep),
-		"core/deref*": sabre.ValueOf(deref(scope)), 
+		"core/time": &sabre.Fn{
+			Args:     []string{"body"},
+			Variadic: true,
+			Func:     xlispTime,
+		},
 
+		"core/sleep":            sabre.ValueOf(sleep),
+		"core/deref*":           sabre.ValueOf(deref(scope)),
 		"core/doseq": &sabre.Fn{
 			Args:     []string{"vector", "exprs"},
 			Variadic: true,
@@ -55,6 +61,10 @@ func BindAll(scope sabre.Scope) error {
 			Func:     Case,
 			Variadic: true,
 		},
+		"core/loop": sabre.SpecialForm{
+			Name:  "loop",
+			Parse: parseLoop,
+		},
 
 		// special forms
 		"core/do":           sabre.Do,
@@ -69,11 +79,14 @@ func BindAll(scope sabre.Scope) error {
 
 		"core/macroexpand": sabre.ValueOf(MacroExpand),
 		"core/eval":        sabre.ValueOf(sabre.Eval),
+		"core/eval-string": sabre.ValueOf(sabre.ReadEvalStr),
 		"core/type":        sabre.ValueOf(TypeOf),
 		"core/to-type":     sabre.ValueOf(ToType),
 		"core/impl?":       sabre.ValueOf(Implements),
 		"core/realized*":   sabre.ValueOf(futureRealize),
 		"core/throw":       sabre.ValueOf(Throw),
+		"core/substring":   sabre.ValueOf(strings.Contains),
+		"core/trim-suffix": sabre.ValueOf(strings.TrimSuffix),
 
 		// Type system functions
 		"core/str": sabre.ValueOf(MakeString),
@@ -91,11 +104,12 @@ func BindAll(scope sabre.Scope) error {
 		"core/<=":  sabre.ValueOf(LtE),
 
 		// io functions
-		"core/print":   sabre.ValueOf(Println),
-		"core/printf":  sabre.ValueOf(Printf),
-		"core/read*":   sabre.ValueOf(Read),
-		"core/random":  sabre.ValueOf(Random),
-		"core/shuffle": sabre.ValueOf(Shuffle),
+		"core/print":     sabre.ValueOf(Println),
+		"core/printf":    sabre.ValueOf(Printf),
+		"core/read*":     sabre.ValueOf(Read),
+		"core/random":    sabre.ValueOf(Random),
+		"core/shuffle":   sabre.ValueOf(Shuffle),
+		"core/read-file": sabre.ValueOf(ReadFile),
 
 		"types/Seq":       TypeOf((*sabre.Seq)(nil)),
 		"types/Invokable": TypeOf((*sabre.Invokable)(nil)),
