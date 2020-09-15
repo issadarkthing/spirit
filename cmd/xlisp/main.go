@@ -23,6 +23,7 @@ var (
 	commit  = "N/A"
 
 	executeStr   = flag.String("e", "", "Execute string")
+	unload       = flag.Bool("u", false, "Unload core library")
 	printVersion = flag.Bool("v", false, "Prints slang version and exit")
 )
 
@@ -40,29 +41,35 @@ func main() {
 	var result sabre.Value
 	var err error
 
+	resolvedPath, err := filepath.Abs("lib/core.lisp")
+	if err != nil {
+		fatalf("error: %v\n", err)
+	}
+
+	core, err := os.Open(resolvedPath)
+	if err != nil {
+		fatalf("error: %v\n", err)
+	}
+	defer core.Close()
+
+	if !*unload {
+		_, err = xl.ReadEval(core)
+	}
+
+	xl.SwitchNS(sabre.Symbol{Value: "user"})
+
 	if len(os.Args) > 1 {
 
-		resolvedPath, err := filepath.Abs("lib/core.lisp")
-		if err != nil {
-			fatalf("error: %v\n", err)
-		}
+		var file int
+		file = flag.NFlag() + 1
 
-		core, err := os.Open(resolvedPath)
-		if err != nil {
-			fatalf("error: %v\n", err)
-		}
-		defer core.Close()
-
-		_, err = xl.ReadEval(core)
-
-		fh, err := os.Open(os.Args[1])
+		fh, err := os.Open(os.Args[file])
 		if err != nil {
 			fatalf("error: %v\n", err)
 		}
 		defer fh.Close()
 
-		xl.SwitchNS(sabre.Symbol{Value: "user"})
-
+		xl.BindGo("*file*", fh.Name())
 		_, err = xl.ReadEval(fh)
 		if err != nil {
 			fatalf("error: %v\n", err)
