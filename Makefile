@@ -29,6 +29,5 @@ benchmark:
 	@go test -benchmem -run="none" -bench="Benchmark.*" -v ./...
 
 build:
-	@echo "Building..."
 	@mkdir -p ./bin
 	@go build -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" -o ./bin/xlisp ./cmd/xlisp/
