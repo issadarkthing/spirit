@@ -138,6 +138,13 @@
             counter
             (recur (next coll) (inc counter)))))
 
+(defn take
+  ([n coll]
+   (take n coll '()))
+  ([n coll acc]
+   (if (= n (count acc))
+     acc
+     (recur n (next coll) (conj acc (first coll))))))
 
 (defn reduce
   ([f coll]
@@ -201,6 +208,13 @@
   (if (fn? x)
     false
     (realized* x)))
+
+
+; source a file. Beware of circular dependency
+(defn source [filename]
+  (let [target (str filename ".lisp")
+        content (read-file target)]
+    (eval-string content)))
 
 
 ; important macros -----------------------------------
