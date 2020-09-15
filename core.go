@@ -146,10 +146,11 @@ func threadCall(scope sabre.Scope, args []sabre.Value, last bool) (sabre.Value, 
 		return nil, err
 	}
 
-	res, err := sabre.Eval(scope, args[0])
-	if err != nil {
-		return nil, err
-	}
+	res := args[0]
+	// res, err := sabre.Eval(scope, args[0])
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	for args = args[1:]; len(args) > 0; args = args[1:] {
 		form := args[0]
@@ -162,6 +163,9 @@ func threadCall(scope sabre.Scope, args []sabre.Value, last bool) (sabre.Value, 
 				f.Values = append([]sabre.Value{f.Values[0], res}, f.Values[1:]...)
 			}
 			res, err = sabre.Eval(scope, f)
+			if v, ok := res.(*sabre.List); ok {
+				res = v.Cons(sabre.Symbol{Value: "list"})
+			}
 
 		case sabre.Invokable:
 			res, err = f.Invoke(scope, res)
@@ -173,6 +177,10 @@ func threadCall(scope sabre.Scope, args []sabre.Value, last bool) (sabre.Value, 
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	if res, ok := res.(*sabre.List); ok {
+		return res.Eval(scope)
 	}
 
 	return res, nil
@@ -204,7 +212,6 @@ func slangRange(args ...int) (Any, error) {
 
 	return &sabre.List{Values: result}, nil
 }
-
 
 func createRange(min, max, step int) []sabre.Value {
 
@@ -271,7 +278,6 @@ func swap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 		return nil, err
 	}
 
-
 	scope.Bind(symbol.Value, value)
 	return value, nil
 }
@@ -295,8 +301,8 @@ func recur(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
 // TODO wrap all functions in tview library that require callback
 func ListAddItem(scope sabre.Scope) interface{} {
-	return func (
-		list *tview.List, first, second string, 
+	return func(
+		list *tview.List, first, second string,
 		shortcut rune, selected interface{},
 	) (sabre.Value, error) {
 
@@ -324,9 +330,9 @@ func stringTypeOf(v interface{}) string {
 func future(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
 	ch := make(chan sabre.Value)
-	
+
 	go func() {
-		
+
 		val, err := args[0].Eval(scope)
 		if err != nil {
 			panic(err)
@@ -341,13 +347,13 @@ func future(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
 // Deref chan from future to get the value. This call is blocking until future is resolved.
 // The result will be cached.
-func deref(scope sabre.Scope) (func(sabre.Symbol, <-chan sabre.Value) (sabre.Value, error)) {
+func deref(scope sabre.Scope) func(sabre.Symbol, <-chan sabre.Value) (sabre.Value, error) {
 
 	return func(symbol sabre.Symbol, ch <-chan sabre.Value) (sabre.Value, error) {
 
 		derefSymbol := fmt.Sprintf("__deref__%s__result__", symbol.Value)
 
-		value, ok :=<-ch	
+		value, ok := <-ch
 		if ok {
 			scope.Bind(derefSymbol, value)
 			return value, nil
@@ -365,7 +371,6 @@ func deref(scope sabre.Scope) (func(sabre.Symbol, <-chan sabre.Value) (sabre.Val
 func sleep(s int) {
 	time.Sleep(time.Millisecond * time.Duration(s))
 }
-
 
 func futureRealize(ch <-chan sabre.Value) bool {
 	select {
