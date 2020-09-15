@@ -380,3 +380,112 @@ func futureRealize(ch <-chan sabre.Value) bool {
 		return false
 	}
 }
+
+func xlispTime(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+
+	var lastVal sabre.Value
+	var err error
+	initial := time.Now()
+	for _, v := range args {
+		lastVal, err = v.Eval(scope)
+		if err != nil {
+			return nil, err
+		}
+	}
+	final := time.Since(initial)
+	fmt.Printf("Elapsed time: %s\n", final.String())
+
+	return lastVal, nil
+}
+
+func parseLoop(scope sabre.Scope, args []sabre.Value) (*sabre.Fn, error) {
+	if len(args) < 1 {
+		return nil, fmt.Errorf("call requires at-least bindings argument")
+	}
+
+	vec, isVector := args[0].(sabre.Vector)
+	if !isVector {
+		return nil, fmt.Errorf(
+			"first argument to let must be bindings vector, not %v",
+			reflect.TypeOf(args[0]),
+		)
+	}
+
+	if len(vec.Values)%2 != 0 {
+		return nil, fmt.Errorf("bindings must contain event forms")
+	}
+
+	var bindings []binding
+	for i := 0; i < len(vec.Values); i += 2 {
+		sym, isSymbol := vec.Values[i].(sabre.Symbol)
+		if !isSymbol {
+			return nil, fmt.Errorf(
+				"item at %d must be symbol, not %s",
+				i, vec.Values[i],
+			)
+		}
+
+		bindings = append(bindings, binding{
+			Name: sym.Value,
+			Expr: vec.Values[i+1],
+		})
+	}
+
+	return &sabre.Fn{
+		Func: func(scope sabre.Scope, _ []sabre.Value) (sabre.Value, error) {
+			letScope := sabre.NewScope(scope)
+			for _, b := range bindings {
+				v, err := b.Expr.Eval(letScope)
+				if err != nil {
+					return nil, err
+				}
+				_ = letScope.Bind(b.Name, v)
+			}
+
+			result, err := sabre.Module(args[1:]).Eval(letScope)
+			if err != nil {
+				return nil, err
+			}
+
+			for isRecur(result) {
+
+				newBindings := result.(*sabre.List).Values[1:]
+				for i, b := range bindings {
+					letScope.Bind(b.Name, newBindings[i])
+				}
+
+				result, err = sabre.Module(args[1:]).Eval(letScope)
+				if err != nil {
+					return nil, err
+				}
+			}
+
+			return result, err
+		},
+	}, nil
+}
+
+func isRecur(value sabre.Value) bool {
+
+	list, ok := value.(*sabre.List)
+	if !ok {
+		return false
+	}
+
+	sym, ok := list.First().(sabre.Symbol)
+	if !ok {
+		return false
+	}
+
+	if sym.Value != "recur" {
+		return false
+	}
+
+	return true
+}
+
+type binding struct {
+	Name string
+	Expr sabre.Value
+}
+
