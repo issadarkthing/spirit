@@ -136,7 +136,7 @@
     ([coll counter]
         (if (empty? coll)
             counter
-            (count (next coll) (inc counter)))))
+            (recur (next coll) (inc counter)))))
 
 
 (defn reduce
