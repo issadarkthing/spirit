@@ -4,6 +4,7 @@ import (
 	"math"
 	"strings"
 
+	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 	"github.com/spy16/sabre"
 )
@@ -12,12 +13,17 @@ import (
 func BindAll(scope sabre.Scope) error {
 	core := map[string]sabre.Value{
 		// gui frontend
-		"tview/new-app":       sabre.ValueOf(tview.NewApplication),
-		"tview/new-form":      sabre.ValueOf(tview.NewForm),
-		"tview/new-box":       sabre.ValueOf(tview.NewBox),
-		"tview/new-textview":  sabre.ValueOf(tview.NewTextView),
-		"tview/new-list":      sabre.ValueOf(tview.NewList),
-		"tview/list-add-item": sabre.ValueOf(ListAddItem(scope)),
+		"tview/new-app":               sabre.ValueOf(tview.NewApplication),
+		"tview/app-set-before-draw":   sabre.ValueOf(AppSetBeforeDrawFunc(scope)),
+		"tview/new-form":              sabre.ValueOf(tview.NewForm),
+		"tview/new-box":               sabre.ValueOf(tview.NewBox),
+		"tview/new-textview":          sabre.ValueOf(tview.NewTextView),
+		"tview/new-list":              sabre.ValueOf(tview.NewList),
+		"tview/list-add-item":         sabre.ValueOf(ListAddItem(scope)),
+		"tview/color-default":         sabre.ValueOf(tcell.ColorDefault),
+		"tview/color-green":           sabre.ValueOf(tcell.ColorGreen),
+		"tview/color-red":             sabre.ValueOf(tcell.ColorRed),
+		"tview/app-set-input-capture": sabre.ValueOf(AppSetInputCapture(scope)),
 
 		// built-in
 		"core/range": sabre.ValueOf(slangRange),
@@ -32,9 +38,9 @@ func BindAll(scope sabre.Scope) error {
 			Variadic: true,
 			Func:     xlispTime,
 		},
-
-		"core/sleep":            sabre.ValueOf(sleep),
-		"core/deref*":           sabre.ValueOf(deref(scope)),
+		"core/bounded?": sabre.ValueOf(bound(scope)),
+		"core/sleep":    sabre.ValueOf(sleep),
+		"core/deref*":   sabre.ValueOf(deref(scope)),
 		"core/doseq": &sabre.Fn{
 			Args:     []string{"vector", "exprs"},
 			Variadic: true,
@@ -46,6 +52,14 @@ func BindAll(scope sabre.Scope) error {
 			Func: swap,
 		},
 
+		"core/atom": sabre.ValueOf(newAtom),
+		"core/swap!": &sabre.Fn{
+			Args: []string{"atom", "fn"},
+			Func: safeSwap,
+		},
+
+		"core/and*": sabre.ValueOf(and),
+		"core/or*":  sabre.ValueOf(or),
 		"core/->": &sabre.Fn{
 			Args:     []string{"exprs"},
 			Func:     ThreadFirst,
@@ -87,6 +101,9 @@ func BindAll(scope sabre.Scope) error {
 		"core/throw":       sabre.ValueOf(Throw),
 		"core/substring":   sabre.ValueOf(strings.Contains),
 		"core/trim-suffix": sabre.ValueOf(strings.TrimSuffix),
+		"core/warning":     sabre.ValueOf(warning),
+		"core/warningf":    sabre.ValueOf(warningf),
+		"core/resolve":     sabre.ValueOf(resolve(scope)),
 
 		// Type system functions
 		"core/str": sabre.ValueOf(MakeString),

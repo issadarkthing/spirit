@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rivo/tview"
 	"github.com/spy16/sabre"
 )
 
@@ -468,3 +467,40 @@ type binding struct {
 	Expr sabre.Value
 }
 
+func and(x sabre.Value, y sabre.Value) bool {
+	return isTruthy(x) && isTruthy(y)
+}
+
+func or(x sabre.Value, y sabre.Value) bool {
+	return isTruthy(x) || isTruthy(y)
+}
+
+func safeSwap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+
+	atom := args[0]
+	atom, err := atom.Eval(scope)
+	if err != nil {
+		return nil, fmt.Errorf("unable to resolve symbol")
+	}
+
+	fn, err := args[1].Eval(scope)
+	if err != nil {
+		return nil, fmt.Errorf("unable to resolve symbol")
+	}
+
+	return atom.(*Atom).UpdateState(scope, fn.(sabre.Invokable))
+}
+
+func bound(scope sabre.Scope) func(sabre.Symbol) bool {
+	return func(sym sabre.Symbol) bool {
+		_, err := scope.Resolve(sym.Value)
+		return err == nil
+	}
+}
+
+func resolve(scope sabre.Scope) func(sabre.Symbol) sabre.Value {
+	return func(sym sabre.Symbol) sabre.Value {
+		val, _ := scope.Resolve(sym.Value)
+		return val
+	}
+}
