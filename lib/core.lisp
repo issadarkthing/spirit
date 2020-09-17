@@ -53,6 +53,9 @@
 (defn second [coll]
     (first (next coll)))
 
+(defn third [coll]
+  (first (next (next coll))))
+
 (defn next [coll]
     (if (not (seq? coll))
         (throw "argument must be a collection, not " (type coll)))
@@ -76,6 +79,9 @@
     (if (not (seq? coll))
         (throw "argument must be a collection, not " (type coll)))
     (apply coll.Conj vals))
+
+; (defn swap! [atom f]
+;   (atom.UpdateState f))
 
 (defn empty? [coll]
     (if (nil? coll)
@@ -107,14 +113,13 @@
 (defn odd? [num]
     (= (mod num 2) 1.0))
 
-(def reverse (fn* reverse [coll]
-    (if (not (seq? coll))
-        (throw "argument must be a sequence"))
-    (if (nil? (next coll))
-        [(first coll)]
-        (let [first-value   (first coll)
-               reversed      (reverse (next coll))]
-            (conj reversed first-value)))))
+(defn reverse [coll]
+  (when-not (seq? coll)
+    (throw "argument must be Seq"))
+  (loop [result '() target coll]
+    (if (empty? target)
+      result
+      (recur (cons (first target) result) (rest target)))))
 
 (defn inc [num]
     (if (not (number? num))
@@ -133,12 +138,11 @@
         (int (- num 1))
         (- num 1)))
 
-(defn count
-    ([coll] (count coll 0))
-    ([coll counter]
-        (if (empty? coll)
-            counter
-            (recur (next coll) (inc counter)))))
+(defn count [coll]
+    (if (not (seq? coll))
+      (throw "argument must be a Seq"))
+    (coll.Size))
+
 
 (defn take
   ([n coll]
@@ -197,7 +201,10 @@
       (unsafe/swap i (inc i)))
     z))
 
-
+; deref all
+(defn deref-all [& coll]
+  (doseq [v coll]
+    (deref v)))
 
 (defn concat 
   ([coll1 coll2]
@@ -241,6 +248,7 @@
 (defmacro deref [symbol]
   `(deref* '~symbol ~symbol))
 
+
 (defmacro future [& body]
   (let [body (cons 'do body)]
     `(future* ~body)))
@@ -251,8 +259,6 @@
 
 (defmacro force [x]
   `(deref* '~x (~x)))
-
-
 
 
 ; Type check functions -------------------------------
@@ -283,5 +289,12 @@
         (if (boolean? arg)
             arg
             true)))
+
+(defn and [& args]
+  (reduce (fn [acc x] (and* acc x)) args))
+
+
+(defn or [& args]
+  (reduce (fn [acc x] (or* acc x)) args))
 
 (defn not [arg] (= false (true? arg)))
