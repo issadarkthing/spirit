@@ -300,28 +300,6 @@ func recur(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 	return &sabre.List{Values: results}, nil
 }
 
-// TODO wrap all functions in tview library that require callback
-func ListAddItem(scope sabre.Scope) interface{} {
-	return func(
-		list *tview.List, first, second string,
-		shortcut rune, selected interface{},
-	) (sabre.Value, error) {
-
-		if stringTypeOf(selected) == stringTypeOf(sabre.Nil{}) {
-			return sabre.ValueOf(list.AddItem(first, second, shortcut, nil)), nil
-		}
-
-		callBack := func() {
-			_, err := selected.(sabre.Invokable).Invoke(scope)
-			if err != nil {
-				panic(err)
-			}
-		}
-
-		return sabre.ValueOf(list.AddItem(first, second, shortcut, callBack)), nil
-	}
-}
-
 // Returns string representation of type
 func stringTypeOf(v interface{}) string {
 	return reflect.TypeOf(v).String()
