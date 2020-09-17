@@ -247,17 +247,18 @@ func doSeq(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 		return nil, fmt.Errorf("invalid type; expected symbol")
 	}
 
+	var result sabre.Value
 	for _, v := range list.Values {
 		scope.Bind(symbol.Value, v)
 		for _, body := range args[1:] {
-			_, err := body.Eval(scope)
+			result, err = body.Eval(scope)
 			if err != nil {
 				return nil, err
 			}
 		}
 	}
 
-	return sabre.Nil{}, nil
+	return result, nil
 }
 
 // unsafely swap the value. Does not mutate the value rather just swapping
