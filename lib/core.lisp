@@ -9,10 +9,12 @@
 (def String (type "specimen"))
 (def Keyword(type :specimen))
 (def Symbol (type 'specimen))
+(def Char   (type \a))
 (def Fn     (type (fn* [])))
 (def HashMap(type {}))
 
 (ns 'core)
+
 
 (def fn (macro* fn [& decl]
     (decl.Cons 'fn*)))
