@@ -16,33 +16,30 @@ func checkIfNil(value interface{}) bool {
 func ListAddItem(scope sabre.Scope) interface{} {
 	return func(
 		list *tview.List, first, second string,
-		shortcut rune, selected interface{},
+		shortcut rune, selected sabre.Invokable,
 	) (sabre.Value, error) {
 
-		if checkIfNil(selected) {
-			return sabre.ValueOf(list.AddItem(first, second, shortcut, nil)), nil
-		}
-
 		callBack := func() {
-			_, err := selected.(sabre.Invokable).Invoke(scope)
+			_, err := selected.Invoke(scope)
 			if err != nil {
 				panic(err)
 			}
 		}
-
 		return sabre.ValueOf(list.AddItem(first, second, shortcut, callBack)), nil
 	}
 }
 
-func AppSetBeforeDrawFunc(scope sabre.Scope) interface{} {
-	return func(app *tview.Application, cb interface{}) (sabre.Value, error) {
+// func ListSetChangedFunc(scope sabre.Scope) interface{} {
+// 	return func(list *tview.List, handler sabre.Invokable) (sabre.Value, error) {
 
-		if checkIfNil(cb) {
-			return sabre.ValueOf(app.SetBeforeDrawFunc(nil)), nil
-		}
+// 	}
+// }
+
+func AppSetBeforeDrawFunc(scope sabre.Scope) interface{} {
+	return func(app *tview.Application, cb sabre.Invokable) (sabre.Value, error) {
 
 		callBack := func(screen tcell.Screen) bool {
-			val, err := cb.(sabre.Invokable).Invoke(scope, sabre.ValueOf(screen))
+			val, err := cb.Invoke(scope, sabre.ValueOf(screen))
 			if err != nil {
 				panic(err)
 			}
@@ -54,18 +51,15 @@ func AppSetBeforeDrawFunc(scope sabre.Scope) interface{} {
 }
 
 func AppSetInputCapture(scope sabre.Scope) interface{} {
-	return func(app *tview.Application, cb interface{}) (sabre.Value, error) {
-
-		if checkIfNil(cb) {
-			return sabre.ValueOf(app.SetInputCapture(nil)), nil
-		}
+	return func(app *tview.Application, cb sabre.Invokable) (sabre.Value, error) {
 
 		callBack := func(e *tcell.EventKey) *tcell.EventKey {
-			_, err := cb.(sabre.Invokable).Invoke(scope, sabre.ValueOf(e))
+			val, err := cb.Invoke(scope, sabre.ValueOf(e))
 			if err != nil {
 				panic(err)
 			}
-			return e
+			result := val.(sabre.Any).V.Interface()
+			return result.(*tcell.EventKey)
 		}
 
 		return sabre.ValueOf(app.SetInputCapture(callBack)), nil
