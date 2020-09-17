@@ -101,8 +101,6 @@ func BindAll(scope sabre.Scope) error {
 		"core/throw":       sabre.ValueOf(Throw),
 		"core/substring":   sabre.ValueOf(strings.Contains),
 		"core/trim-suffix": sabre.ValueOf(strings.TrimSuffix),
-		"core/warning":     sabre.ValueOf(warning),
-		"core/warningf":    sabre.ValueOf(warningf),
 		"core/resolve":     sabre.ValueOf(resolve(scope)),
 
 		// Type system functions
