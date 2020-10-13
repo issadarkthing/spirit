@@ -23,6 +23,7 @@ var (
 
 	executeStr   = flag.String("e", "", "Execute string")
 	unload       = flag.Bool("u", false, "Unload core library")
+	preload      = flag.String("p", "", "Pre-loads file")
 	printVersion = flag.Bool("v", false, "Prints slang version and exit")
 )
 
@@ -58,14 +59,24 @@ func main() {
 		_, err = xl.ReadEval(core)
 	}
 
+	if *preload != "" {
+		preloadFile, err := os.Open(*preload)
+		if err != nil {
+			fatalf("error: %v\n", err)
+		}
+		defer preloadFile.Close()
+
+		_, err = xl.ReadEval(preloadFile)
+		if err != nil {
+			fatalf("error: %v\n", err)
+		}
+	}
+
 	xl.SwitchNS(internal.Symbol{Value: "user"})
 
-	if len(os.Args) > 1 {
+	if len(flag.Args()) > 0 {
 
-		var file int
-		file = flag.NFlag() + 1
-
-		fh, err := os.Open(os.Args[file])
+		fh, err := os.Open(flag.Arg(0))
 		if err != nil {
 			fatalf("error: %v\n", err)
 		}
