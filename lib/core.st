@@ -17,17 +17,17 @@
 
 
 (def fn (macro* fn [& decl]
-    (decl.Cons 'fn*)))
+         (decl.Cons 'fn*)))
 
 (def defn (macro* defn [name & fdecl]
-    (let [with-name (fdecl.Cons name)
-           func      (with-name.Cons 'fn*)]
-        `(def ~name ~func))))
+           (let [with-name (fdecl.Cons name)
+                  func      (with-name.Cons 'fn*)]
+               `(def ~name ~func))))
 
 (def defmacro (macro* defmacro [name & mdecl]
-    (let [with-name (mdecl.Cons name)
-           macro     (with-name.Cons 'macro*)]
-        `(def ~name ~macro))))
+               (let [with-name (mdecl.Cons name)
+                      macro     (with-name.Cons 'macro*)]
+                   `(def ~name ~macro))))
 
 (defn nil? [arg] (= nil arg))
 
@@ -234,11 +234,11 @@
 
 (defmacro when [expr & body]
     (let [body (cons 'do body)]
-    `(if ~expr ~body)))
+     `(if ~expr ~body)))
 
 (defmacro when-not [expr & body]
     (let [body (cons 'do body)]
-    `(if (not ~expr) ~body)))
+     `(if (not ~expr) ~body)))
 
 (defmacro assert
     ([expr] (let [message "assertion failed"]
