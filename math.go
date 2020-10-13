@@ -1,7 +1,7 @@
-package xlisp
+package spirit
 
 import (
-	"github.com/spy16/sabre"
+	"github.com/issadarkthing/spirit/internal"
 )
 
 type Any interface{}
@@ -9,16 +9,16 @@ type Any interface{}
 // Add adds given floating point numbers and returns the sum.
 func Add(args ...Any) Any {
 	switch args[0].(type) {
-	case sabre.Int64:
-		var sum sabre.Int64
+	case internal.Int64:
+		var sum internal.Int64
 		for _, a := range args {
-			sum += a.(sabre.Int64)
+			sum += a.(internal.Int64)
 		}
 		return sum
-	case sabre.Float64:
-		var sum sabre.Float64
+	case internal.Float64:
+		var sum internal.Float64
 		for _, a := range args {
-			sum += a.(sabre.Float64)
+			sum += a.(internal.Float64)
 		}
 		return sum
 	default:
@@ -29,24 +29,24 @@ func Add(args ...Any) Any {
 // Sub subtracts args from 'x' and returns the final result.
 func Sub(x Any, args ...Any) Any {
 	switch x.(type) {
-	case sabre.Float64:
-		var result sabre.Float64 = x.(sabre.Float64)
+	case internal.Float64:
+		var result internal.Float64 = x.(internal.Float64)
 		if len(args) == 0 {
-			return -1 * x.(sabre.Float64)
+			return -1 * x.(internal.Float64)
 		}
 
 		for _, a := range args {
-			result -= a.(sabre.Float64)
+			result -= a.(internal.Float64)
 		}
 		return result
-	case sabre.Int64:
-		var result sabre.Int64 = x.(sabre.Int64)
+	case internal.Int64:
+		var result internal.Int64 = x.(internal.Int64)
 		if len(args) == 0 {
-			return -1 * x.(sabre.Int64)
+			return -1 * x.(internal.Int64)
 		}
 
 		for _, a := range args {
-			result -= a.(sabre.Int64)
+			result -= a.(internal.Int64)
 		}
 		return result
 	default:
@@ -57,16 +57,16 @@ func Sub(x Any, args ...Any) Any {
 // Multiply multiplies the given args to 1 and returns the result.
 func Multiply(first Any, args ...Any) Any {
 	switch args[0].(type) {
-	case sabre.Int64:
-		result := first.(sabre.Int64)
+	case internal.Int64:
+		result := first.(internal.Int64)
 		for _, a := range args {
-			result *= a.(sabre.Int64)
+			result *= a.(internal.Int64)
 		}
 		return result
-	case sabre.Float64:
-		result := first.(sabre.Float64)
+	case internal.Float64:
+		result := first.(internal.Float64)
 		for _, a := range args {
-			result *= a.(sabre.Float64)
+			result *= a.(internal.Float64)
 		}
 		return result
 	default:
@@ -78,27 +78,27 @@ func Multiply(first Any, args ...Any) Any {
 func Divide(first Any, args ...Any) Any {
 
 	switch first.(type) {
-	case sabre.Float64:
-		var result sabre.Float64 = first.(sabre.Float64)
+	case internal.Float64:
+		var result internal.Float64 = first.(internal.Float64)
 
 		if len(args) == 0 {
-			return 1 / first.(sabre.Float64)
+			return 1 / first.(internal.Float64)
 		}
 
 		for _, a := range args {
-			result /= a.(sabre.Float64)
+			result /= a.(internal.Float64)
 		}
 		return result
 
-	case sabre.Int64:
-		var result sabre.Int64 = first.(sabre.Int64)
+	case internal.Int64:
+		var result internal.Int64 = first.(internal.Int64)
 
 		if len(args) == 0 {
-			return 1 / sabre.Float64(first.(sabre.Int64))
+			return 1 / internal.Float64(first.(internal.Int64))
 		}
 
 		for _, a := range args {
-			result /= a.(sabre.Int64)
+			result /= a.(internal.Int64)
 		}
 		return result
 	default:

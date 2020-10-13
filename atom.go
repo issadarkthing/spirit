@@ -1,18 +1,18 @@
-package xlisp
+package spirit
 
 import (
 	"fmt"
 	"sync"
 
-	"github.com/spy16/sabre"
+	"github.com/issadarkthing/spirit/internal"
 )
 
 type Atom struct {
 	mu  sync.RWMutex
-	Val sabre.Value
+	Val internal.Value
 }
 
-func (a *Atom) UpdateState(scope sabre.Scope, fn sabre.Invokable) (sabre.Value, error) {
+func (a *Atom) UpdateState(scope internal.Scope, fn internal.Invokable) (internal.Value, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
@@ -25,7 +25,7 @@ func (a *Atom) UpdateState(scope sabre.Scope, fn sabre.Invokable) (sabre.Value, 
 	return res, nil
 }
 
-func (a *Atom) GetVal() sabre.Value {
+func (a *Atom) GetVal() internal.Value {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
 	return a.Val
@@ -35,10 +35,10 @@ func (a *Atom) String() string {
 	return fmt.Sprintf("(atom %v)", a.GetVal())
 }
 
-func (a *Atom) Eval(_ sabre.Scope) (sabre.Value, error) {
-	return sabre.ValueOf(a), nil
+func (a *Atom) Eval(_ internal.Scope) (internal.Value, error) {
+	return internal.ValueOf(a), nil
 }
 
-func newAtom(val sabre.Value) *Atom {
+func newAtom(val internal.Value) *Atom {
 	return &Atom{Val: val}
 }

@@ -6,17 +6,16 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 	"runtime"
 
 	"github.com/chzyer/readline"
-	"github.com/issadarkthing/xlisp"
-	"github.com/spy16/sabre"
-	"github.com/spy16/sabre/repl"
+	"github.com/issadarkthing/spirit"
+	"github.com/issadarkthing/spirit/internal"
+	"github.com/issadarkthing/spirit/internal/repl"
 )
 
-const help = `Xlisp %s [Commit: %s] [Compiled with %s]
-Visit https://github.com/issadarkthing/xlisp for more.`
+const help = `spirit %s [Commit: %s] [Compiled with %s]
+Visit https://github.com/issadarkthing/spirit for more.`
 
 var (
 	version = "N/A"
@@ -35,18 +34,20 @@ func main() {
 		return
 	}
 
-	xl := xlisp.New()
+	xl := spirit.New()
 	xl.BindGo("*version*", version)
 
-	var result sabre.Value
+	var result internal.Value
 	var err error
 
-	resolvedPath, err := filepath.Abs("lib/core.lisp")
+	home, err := os.UserHomeDir()
 	if err != nil {
 		fatalf("error: %v\n", err)
 	}
 
-	core, err := os.Open(resolvedPath)
+	libPath := home + "/.local/lib/spirit/core.st"
+
+	core, err := os.Open(libPath)
 	if err != nil {
 		fatalf("error: %v\n", err)
 	}
@@ -56,7 +57,7 @@ func main() {
 		_, err = xl.ReadEval(core)
 	}
 
-	xl.SwitchNS(sabre.Symbol{Value: "user"})
+	xl.SwitchNS(internal.Symbol{Value: "user"})
 
 	if len(os.Args) > 1 {
 

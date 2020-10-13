@@ -1,17 +1,17 @@
-package xlisp
+package spirit
 
 import (
 	"fmt"
 	"sort"
 
-	"github.com/spy16/sabre"
+	"github.com/issadarkthing/spirit/internal"
 )
 
-func evalValueList(scope sabre.Scope, vals []sabre.Value) ([]sabre.Value, error) {
-	var result []sabre.Value
+func evalValueList(scope internal.Scope, vals []internal.Value) ([]internal.Value, error) {
+	var result []internal.Value
 
 	for _, arg := range vals {
-		v, err := sabre.Eval(scope, arg)
+		v, err := internal.Eval(scope, arg)
 		if err != nil {
 			return nil, err
 		}
@@ -22,7 +22,7 @@ func evalValueList(scope sabre.Scope, vals []sabre.Value) ([]sabre.Value, error)
 	return result, nil
 }
 
-func verifyArgCount(arities []int, args []sabre.Value) error {
+func verifyArgCount(arities []int, args []internal.Value) error {
 	actual := len(args)
 	sort.Ints(arities)
 

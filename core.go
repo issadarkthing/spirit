@@ -1,4 +1,4 @@
-package xlisp
+package spirit
 
 import (
 	"errors"
@@ -7,24 +7,24 @@ import (
 	"strings"
 	"time"
 
-	"github.com/spy16/sabre"
+	"github.com/issadarkthing/spirit/internal"
 )
 
 // Case implements the switch case construct.
-func Case(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+func Case(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
 	err := checkArityAtLeast(2, len(args))
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := sabre.Eval(scope, args[0])
+	res, err := internal.Eval(scope, args[0])
 	if err != nil {
 		return nil, err
 	}
 
 	if len(args) == 2 {
-		return sabre.Eval(scope, args[1])
+		return internal.Eval(scope, args[1])
 	}
 
 	start := 1
@@ -34,31 +34,31 @@ func Case(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 			return val, nil
 		}
 
-		if sabre.Compare(res, val) {
-			return sabre.Eval(scope, args[start+1])
+		if internal.Compare(res, val) {
+			return internal.Eval(scope, args[start+1])
 		}
 	}
 
 	return nil, fmt.Errorf("no matching clause for '%s'", res)
 }
 
-// MacroExpand is a wrapper around the sabre MacroExpand function that
+// MacroExpand is a wrapper around the internal MacroExpand function that
 // ignores the expanded bool flag.
-func MacroExpand(scope sabre.Scope, f sabre.Value) (sabre.Value, error) {
-	f, _, err := sabre.MacroExpand(scope, f)
+func MacroExpand(scope internal.Scope, f internal.Value) (internal.Value, error) {
+	f, _, err := internal.MacroExpand(scope, f)
 	return f, err
 }
 
 // Throw converts args to strings and returns an error with all the strings
 // joined.
-func Throw(scope sabre.Scope, args ...sabre.Value) error {
+func Throw(scope internal.Scope, args ...internal.Value) error {
 	return errors.New(strings.Trim(MakeString(args...).String(), "\""))
 }
 
 // Realize realizes a sequence by continuously calling First() and Next()
 // until the sequence becomes nil.
-func Realize(seq sabre.Seq) *sabre.List {
-	var vals []sabre.Value
+func Realize(seq internal.Seq) *internal.List {
+	var vals []internal.Value
 
 	for seq != nil {
 		v := seq.First()
@@ -69,17 +69,17 @@ func Realize(seq sabre.Seq) *sabre.List {
 		seq = seq.Next()
 	}
 
-	return &sabre.List{Values: vals}
+	return &internal.List{Values: vals}
 }
 
 // TypeOf returns the type information object for the given argument.
-func TypeOf(v interface{}) sabre.Value {
-	return sabre.ValueOf(reflect.TypeOf(v))
+func TypeOf(v interface{}) internal.Value {
+	return internal.ValueOf(reflect.TypeOf(v))
 }
 
 // Implements checks if given value implements the interface represented
 // by 't'. Returns error if 't' does not represent an interface type.
-func Implements(v interface{}, t sabre.Type) (bool, error) {
+func Implements(v interface{}, t internal.Type) (bool, error) {
 	if t.T.Kind() == reflect.Ptr {
 		t.T = t.T.Elem()
 	}
@@ -91,12 +91,12 @@ func Implements(v interface{}, t sabre.Type) (bool, error) {
 	return reflect.TypeOf(v).Implements(t.T), nil
 }
 
-// ToType attempts to convert given sabre value to target type. Returns
+// ToType attempts to convert given internal value to target type. Returns
 // error if conversion not possible.
-func ToType(to sabre.Type, val sabre.Value) (sabre.Value, error) {
+func ToType(to internal.Type, val internal.Value) (internal.Value, error) {
 	rv := reflect.ValueOf(val)
 	if rv.Type().ConvertibleTo(to.T) || rv.Type().AssignableTo(to.T) {
-		return sabre.ValueOf(rv.Convert(to.T).Interface()), nil
+		return internal.ValueOf(rv.Convert(to.T).Interface()), nil
 	}
 
 	return nil, fmt.Errorf("cannot convert '%s' to '%s'", rv.Type(), to.T)
@@ -104,41 +104,41 @@ func ToType(to sabre.Type, val sabre.Value) (sabre.Value, error) {
 
 // ThreadFirst threads the expressions through forms by inserting result of
 // eval as first argument to next expr.
-func ThreadFirst(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+func ThreadFirst(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 	return threadCall(scope, args, false)
 }
 
 // ThreadLast threads the expressions through forms by inserting result of
 // eval as last argument to next expr.
-func ThreadLast(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+func ThreadLast(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 	return threadCall(scope, args, true)
 }
 
 // MakeString returns stringified version of all args.
-func MakeString(vals ...sabre.Value) sabre.Value {
+func MakeString(vals ...internal.Value) internal.Value {
 	argc := len(vals)
 	switch argc {
 	case 0:
-		return sabre.String("")
+		return internal.String("")
 
 	case 1:
-		nilVal := sabre.Nil{}
+		nilVal := internal.Nil{}
 		if vals[0] == nilVal || vals[0] == nil {
-			return sabre.String("")
+			return internal.String("")
 		}
 
-		return sabre.String(strings.Trim(vals[0].String(), "\""))
+		return internal.String(strings.Trim(vals[0].String(), "\""))
 
 	default:
 		var sb strings.Builder
 		for _, v := range vals {
 			sb.WriteString(strings.Trim(v.String(), "\""))
 		}
-		return sabre.String(sb.String())
+		return internal.String(sb.String())
 	}
 }
 
-func threadCall(scope sabre.Scope, args []sabre.Value, last bool) (sabre.Value, error) {
+func threadCall(scope internal.Scope, args []internal.Value, last bool) (internal.Value, error) {
 
 	err := checkArityAtLeast(1, len(args))
 	if err != nil {
@@ -146,7 +146,7 @@ func threadCall(scope sabre.Scope, args []sabre.Value, last bool) (sabre.Value, 
 	}
 
 	res := args[0]
-	// res, err := sabre.Eval(scope, args[0])
+	// res, err := internal.Eval(scope, args[0])
 	// if err != nil {
 	// 	return nil, err
 	// }
@@ -155,18 +155,18 @@ func threadCall(scope sabre.Scope, args []sabre.Value, last bool) (sabre.Value, 
 		form := args[0]
 
 		switch f := form.(type) {
-		case *sabre.List:
+		case *internal.List:
 			if last {
 				f.Values = append(f.Values, res)
 			} else {
-				f.Values = append([]sabre.Value{f.Values[0], res}, f.Values[1:]...)
+				f.Values = append([]internal.Value{f.Values[0], res}, f.Values[1:]...)
 			}
-			res, err = sabre.Eval(scope, f)
-			if v, ok := res.(*sabre.List); ok {
-				res = v.Cons(sabre.Symbol{Value: "list"})
+			res, err = internal.Eval(scope, f)
+			if v, ok := res.(*internal.List); ok {
+				res = v.Cons(internal.Symbol{Value: "list"})
 			}
 
-		case sabre.Invokable:
+		case internal.Invokable:
 			res, err = f.Invoke(scope, res)
 
 		default:
@@ -178,19 +178,19 @@ func threadCall(scope sabre.Scope, args []sabre.Value, last bool) (sabre.Value, 
 		}
 	}
 
-	if res, ok := res.(*sabre.List); ok {
+	if res, ok := res.(*internal.List); ok {
 		return res.Eval(scope)
 	}
 
 	return res, nil
 }
 
-func isTruthy(v sabre.Value) bool {
-	if v == nil || v == (sabre.Nil{}) {
+func isTruthy(v internal.Value) bool {
+	if v == nil || v == (internal.Nil{}) {
 		return false
 	}
 
-	if b, ok := v.(sabre.Bool); ok {
+	if b, ok := v.(internal.Bool); ok {
 		return bool(b)
 	}
 
@@ -198,7 +198,7 @@ func isTruthy(v sabre.Value) bool {
 }
 
 func slangRange(args ...int) (Any, error) {
-	var result []sabre.Value
+	var result []internal.Value
 
 	switch len(args) {
 	case 1:
@@ -209,22 +209,22 @@ func slangRange(args ...int) (Any, error) {
 		result = createRange(args[0], args[1], args[2])
 	}
 
-	return &sabre.List{Values: result}, nil
+	return &internal.List{Values: result}, nil
 }
 
-func createRange(min, max, step int) []sabre.Value {
+func createRange(min, max, step int) []internal.Value {
 
-	result := make([]sabre.Value, 0, max-min)
+	result := make([]internal.Value, 0, max-min)
 	for i := min; i < max; i += step {
-		result = append(result, sabre.Int64(i))
+		result = append(result, internal.Int64(i))
 	}
 	return result
 }
 
-func doSeq(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
 	arg1 := args[0]
-	vecs, ok := arg1.(sabre.Vector)
+	vecs, ok := arg1.(internal.Vector)
 	if !ok {
 		return nil, fmt.Errorf("Invalid type")
 	}
@@ -234,19 +234,19 @@ func doSeq(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 		return nil, err
 	}
 
-	l, ok := coll.(sabre.Seq)
+	l, ok := coll.(internal.Seq)
 	if !ok {
 		return nil, fmt.Errorf("Invalid type")
 	}
 
 	list := Realize(l)
 
-	symbol, ok := vecs.Values[0].(sabre.Symbol)
+	symbol, ok := vecs.Values[0].(internal.Symbol)
 	if !ok {
 		return nil, fmt.Errorf("invalid type; expected symbol")
 	}
 
-	var result sabre.Value
+	var result internal.Value
 	for _, v := range list.Values {
 		scope.Bind(symbol.Value, v)
 		for _, body := range args[1:] {
@@ -261,14 +261,14 @@ func doSeq(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 }
 
 // unsafely swap the value. Does not mutate the value rather just swapping
-func swap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+func swap(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
 	err := checkArity(2, len(args))
 	if err != nil {
 		return nil, err
 	}
 
-	symbol, ok := args[0].(sabre.Symbol)
+	symbol, ok := args[0].(internal.Symbol)
 	if !ok {
 		return nil, fmt.Errorf("Expected symbol")
 	}
@@ -284,9 +284,9 @@ func swap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 
 // Returns '(recur & expressions) so it'll be recognize by fn.Invoke method as
 // tail recursive function
-func recur(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+func recur(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
-	symbol := sabre.Symbol{
+	symbol := internal.Symbol{
 		Value: "recur",
 	}
 
@@ -295,8 +295,8 @@ func recur(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 		return nil, err
 	}
 
-	results = append([]sabre.Value{symbol}, results...)
-	return &sabre.List{Values: results}, nil
+	results = append([]internal.Value{symbol}, results...)
+	return &internal.List{Values: results}, nil
 }
 
 // Returns string representation of type
@@ -305,9 +305,9 @@ func stringTypeOf(v interface{}) string {
 }
 
 // Evaluate the expressions in another goroutine; returns chan
-func future(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+func future(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
-	ch := make(chan sabre.Value)
+	ch := make(chan internal.Value)
 
 	go func() {
 
@@ -320,14 +320,14 @@ func future(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 		close(ch)
 	}()
 
-	return sabre.ValueOf(ch), nil
+	return internal.ValueOf(ch), nil
 }
 
 // Deref chan from future to get the value. This call is blocking until future is resolved.
 // The result will be cached.
-func deref(scope sabre.Scope) func(sabre.Symbol, <-chan sabre.Value) (sabre.Value, error) {
+func deref(scope internal.Scope) func(internal.Symbol, <-chan internal.Value) (internal.Value, error) {
 
-	return func(symbol sabre.Symbol, ch <-chan sabre.Value) (sabre.Value, error) {
+	return func(symbol internal.Symbol, ch <-chan internal.Value) (internal.Value, error) {
 
 		derefSymbol := fmt.Sprintf("__deref__%s__result__", symbol.Value)
 
@@ -350,7 +350,7 @@ func sleep(s int) {
 	time.Sleep(time.Millisecond * time.Duration(s))
 }
 
-func futureRealize(ch <-chan sabre.Value) bool {
+func futureRealize(ch <-chan internal.Value) bool {
 	select {
 	case _, ok := <-ch:
 		return !ok
@@ -359,9 +359,9 @@ func futureRealize(ch <-chan sabre.Value) bool {
 	}
 }
 
-func xlispTime(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+func xlispTime(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
-	var lastVal sabre.Value
+	var lastVal internal.Value
 	var err error
 	initial := time.Now()
 	for _, v := range args {
@@ -376,12 +376,12 @@ func xlispTime(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 	return lastVal, nil
 }
 
-func parseLoop(scope sabre.Scope, args []sabre.Value) (*sabre.Fn, error) {
+func parseLoop(scope internal.Scope, args []internal.Value) (*internal.Fn, error) {
 	if len(args) < 1 {
 		return nil, fmt.Errorf("call requires at-least bindings argument")
 	}
 
-	vec, isVector := args[0].(sabre.Vector)
+	vec, isVector := args[0].(internal.Vector)
 	if !isVector {
 		return nil, fmt.Errorf(
 			"first argument to let must be bindings vector, not %v",
@@ -395,7 +395,7 @@ func parseLoop(scope sabre.Scope, args []sabre.Value) (*sabre.Fn, error) {
 
 	var bindings []binding
 	for i := 0; i < len(vec.Values); i += 2 {
-		sym, isSymbol := vec.Values[i].(sabre.Symbol)
+		sym, isSymbol := vec.Values[i].(internal.Symbol)
 		if !isSymbol {
 			return nil, fmt.Errorf(
 				"item at %d must be symbol, not %s",
@@ -409,9 +409,9 @@ func parseLoop(scope sabre.Scope, args []sabre.Value) (*sabre.Fn, error) {
 		})
 	}
 
-	return &sabre.Fn{
-		Func: func(scope sabre.Scope, _ []sabre.Value) (sabre.Value, error) {
-			letScope := sabre.NewScope(scope)
+	return &internal.Fn{
+		Func: func(scope internal.Scope, _ []internal.Value) (internal.Value, error) {
+			letScope := internal.NewScope(scope)
 			for _, b := range bindings {
 				v, err := b.Expr.Eval(letScope)
 				if err != nil {
@@ -420,19 +420,19 @@ func parseLoop(scope sabre.Scope, args []sabre.Value) (*sabre.Fn, error) {
 				_ = letScope.Bind(b.Name, v)
 			}
 
-			result, err := sabre.Module(args[1:]).Eval(letScope)
+			result, err := internal.Module(args[1:]).Eval(letScope)
 			if err != nil {
 				return nil, err
 			}
 
 			for isRecur(result) {
 
-				newBindings := result.(*sabre.List).Values[1:]
+				newBindings := result.(*internal.List).Values[1:]
 				for i, b := range bindings {
 					letScope.Bind(b.Name, newBindings[i])
 				}
 
-				result, err = sabre.Module(args[1:]).Eval(letScope)
+				result, err = internal.Module(args[1:]).Eval(letScope)
 				if err != nil {
 					return nil, err
 				}
@@ -443,14 +443,14 @@ func parseLoop(scope sabre.Scope, args []sabre.Value) (*sabre.Fn, error) {
 	}, nil
 }
 
-func isRecur(value sabre.Value) bool {
+func isRecur(value internal.Value) bool {
 
-	list, ok := value.(*sabre.List)
+	list, ok := value.(*internal.List)
 	if !ok {
 		return false
 	}
 
-	sym, ok := list.First().(sabre.Symbol)
+	sym, ok := list.First().(internal.Symbol)
 	if !ok {
 		return false
 	}
@@ -464,18 +464,18 @@ func isRecur(value sabre.Value) bool {
 
 type binding struct {
 	Name string
-	Expr sabre.Value
+	Expr internal.Value
 }
 
-func and(x sabre.Value, y sabre.Value) bool {
+func and(x internal.Value, y internal.Value) bool {
 	return isTruthy(x) && isTruthy(y)
 }
 
-func or(x sabre.Value, y sabre.Value) bool {
+func or(x internal.Value, y internal.Value) bool {
 	return isTruthy(x) || isTruthy(y)
 }
 
-func safeSwap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
+func safeSwap(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
 	atom := args[0]
 	atom, err := atom.Eval(scope)
@@ -488,19 +488,28 @@ func safeSwap(scope sabre.Scope, args []sabre.Value) (sabre.Value, error) {
 		return nil, fmt.Errorf("unable to resolve symbol")
 	}
 
-	return atom.(*Atom).UpdateState(scope, fn.(sabre.Invokable))
+	return atom.(*Atom).UpdateState(scope, fn.(internal.Invokable))
 }
 
-func bound(scope sabre.Scope) func(sabre.Symbol) bool {
-	return func(sym sabre.Symbol) bool {
+func bound(scope internal.Scope) func(internal.Symbol) bool {
+	return func(sym internal.Symbol) bool {
 		_, err := scope.Resolve(sym.Value)
 		return err == nil
 	}
 }
 
-func resolve(scope sabre.Scope) func(sabre.Symbol) sabre.Value {
-	return func(sym sabre.Symbol) sabre.Value {
+func resolve(scope internal.Scope) func(internal.Symbol) internal.Value {
+	return func(sym internal.Symbol) internal.Value {
 		val, _ := scope.Resolve(sym.Value)
 		return val
 	}
+}
+
+func splitString(str, sep internal.String) *internal.List {
+	result := strings.Split(string(str), string(sep))
+	values := make([]internal.Value, 0, len(result))
+	for _, v := range result {
+		values = append(values, internal.String(v))
+	}
+	return &internal.List{Values: values}
 }

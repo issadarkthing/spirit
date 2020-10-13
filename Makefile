@@ -8,8 +8,8 @@ fmt:
 	@goimports -l -w ./
 
 install:
-	@echo "Installing slang to GOBIN..."
-	@go install -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" ./cmd/xlisp/
+	mkdir -p ~/.local/lib/spirit
+	cp ./bin/spirit ~/.local/bin && cp ./lib/core.st ~/.local/lib/spirit
 
 clean:
 	@echo "Cleaning up..."
@@ -30,4 +30,4 @@ benchmark:
 
 build:
 	@mkdir -p ./bin
-	@go build -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" -o ./bin/xlisp ./cmd/xlisp/
+	@go build -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" -o ./bin/spirit ./cmd/spirit/

@@ -1,14 +1,17 @@
-package xlisp
+package spirit
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"os/exec"
+	"strings"
 	"time"
 
-	"github.com/spy16/sabre"
+	"github.com/issadarkthing/spirit/internal"
 )
 
 // Println is an alias for fmt.Println which ignores the return values.
@@ -42,7 +45,7 @@ func Random(max int) int {
 	return result
 }
 
-func Shuffle(seq sabre.Seq) sabre.Seq {
+func Shuffle(seq internal.Seq) internal.Seq {
 	rand.Seed(time.Now().UnixNano())
 	list := Realize(seq)
 	values := list.Values
@@ -60,4 +63,35 @@ func ReadFile(name string) (string, error) {
 	}
 
 	return string(content), nil
+}
+
+func createShellOutput(out, err string, exit int) *internal.HashMap {
+	return &internal.HashMap{
+		Data: map[internal.Value]internal.Value{
+			internal.Keyword("exit"): internal.Int64(exit),
+			internal.Keyword("out"):  internal.String(out),
+			internal.Keyword("err"):  internal.String(err),
+		},
+	}
+}
+
+func Shell(command string) (*internal.HashMap, error) {
+
+	cmd := exec.Command("bash", "-c", command)
+	var cmdout, cmderr bytes.Buffer
+
+	cmd.Stdout = &cmdout
+	cmd.Stderr = &cmderr
+
+	err := cmd.Run()
+	if exitErr, ok := err.(*exec.ExitError); ok {
+		errMsg := strings.TrimSpace(cmderr.String())
+		return createShellOutput("", errMsg, exitErr.ExitCode()), nil
+	} else if err != nil {
+		return &internal.HashMap{}, err
+	}
+
+	output := strings.TrimSpace(cmdout.String())
+
+	return createShellOutput(output, "", 0), nil
 }

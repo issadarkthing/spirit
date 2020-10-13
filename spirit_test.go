@@ -1,4 +1,4 @@
-package xlisp_test
+package spirit_test
 
 import (
 	"io/ioutil"
@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/issadarkthing/xlisp"
-	"github.com/spy16/sabre"
+	"github.com/issadarkthing/spirit"
+	"github.com/issadarkthing/spirit/internal"
 )
 
 const (
@@ -16,10 +16,10 @@ const (
 	libDir  = "./lib"
 )
 
-var _ sabre.Scope = (*xlisp.Xlisp)(nil)
+var _ internal.Scope = (*spirit.Spirit)(nil)
 
-func TestXlisp_Bind(t *testing.T) {
-	sl := xlisp.New()
+func TestSpirit_Bind(t *testing.T) {
+	sl := spirit.New()
 
 	tests := []struct {
 		name    string
@@ -48,7 +48,7 @@ func TestXlisp_Bind(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := sl.Bind(tt.symbol, sabre.Nil{})
+			err := sl.Bind(tt.symbol, internal.Nil{})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Bind() error = %#v, wantErr %#v", err, tt.wantErr)
 				return
@@ -57,9 +57,9 @@ func TestXlisp_Bind(t *testing.T) {
 	}
 }
 
-func TestXlisp_Resolve(t *testing.T) {
-	sl := xlisp.New()
-	sl.Bind("pi", sabre.Float64(3.1412))
+func TestSpirit_Resolve(t *testing.T) {
+	sl := spirit.New()
+	sl.Bind("pi", internal.Float64(3.1412))
 
 	tests := []struct {
 		name    string
@@ -92,7 +92,7 @@ func TestXlisp_Resolve(t *testing.T) {
 	}
 }
 
-func TestXlisp(t *testing.T) {
+func TestSpirit(t *testing.T) {
 	if testing.Short() {
 		return
 	}
@@ -122,9 +122,9 @@ func testFile(t *testing.T, file string) {
 	}
 	defer fh.Close()
 
-	sl, err := initxlisp()
+	sl, err := initspirit()
 	if err != nil {
-		t.Fatalf("failed to init xlisp: %v", err)
+		t.Fatalf("failed to init spirit: %v", err)
 	}
 
 	_, err = sl.ReadEval(fh)
@@ -133,13 +133,13 @@ func testFile(t *testing.T, file string) {
 	}
 }
 
-func initxlisp() (*xlisp.Xlisp, error) {
+func initspirit() (*spirit.Spirit, error) {
 	di, err := ioutil.ReadDir(testDir)
 	if err != nil {
 		return nil, err
 	}
 
-	sl := xlisp.New()
+	sl := spirit.New()
 	for _, fi := range di {
 		if !strings.HasSuffix(fi.Name(), ".lisp") ||
 			strings.HasSuffix(fi.Name(), "_test.lisp") {

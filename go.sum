@@ -11,6 +11,8 @@ github.com/gdamore/tcell v1.3.0 h1:r35w0JBADPZCVQijYebl6YMWWtHRqVEGt7kL2eBADRM=
 github.com/gdamore/tcell v1.3.0/go.mod h1:Hjvr+Ofd+gLglo7RYKxxnzCBmev3BzsS67MebKS4zMM=
 github.com/issadarkthing/sabre v0.3.4 h1:22OUrPkfRLBifDNJz0BWybMMZBcKHXmAP0cS6WB2N3A=
 github.com/issadarkthing/sabre v0.3.4/go.mod h1:I6st/cD1FBSbM/zRP7qomKbnS/dXIZC+JizQyW7L0ss=
+github.com/issadarkthing/xlisp v0.7.0 h1:jsvXy7LjBFXJUAq9QAbwClRSu23RizZpJtaA/D/lqrE=
+github.com/issadarkthing/xlisp v0.7.0/go.mod h1:/c7NcmPFWpJ/Y3bC3o+e/MmEu9gegTkQT2HWvXKOFSs=
 github.com/lucasb-eyer/go-colorful v1.0.2/go.mod h1:0MS4r+7BZKSJ5mw4/S5MPN+qHFF1fYclkSPilDOKW0s=
 github.com/lucasb-eyer/go-colorful v1.0.3 h1:QIbQXiugsb+q10B+MI+7DI1oQLdmnep86tWFlaaUAac=
 github.com/lucasb-eyer/go-colorful v1.0.3/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
@@ -21,6 +23,8 @@ github.com/rivo/tview v0.0.0-20200818120338-53d50e499bf9 h1:csnip7QsoiE2Ee0RkELN
 github.com/rivo/tview v0.0.0-20200818120338-53d50e499bf9/go.mod h1:xV4Aw4WIX8cmhg71U7MUHBdpIQ7zSEXdRruGHLaEAOc=
 github.com/rivo/uniseg v0.1.0 h1:+2KBaVoUmb9XzDsrx/Ct0W/EYOSFf/nWTauy++DprtY=
 github.com/rivo/uniseg v0.1.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
+github.com/spy16/sabre v0.3.3 h1:CJ2D8Kk/m6AJwLPcLDdwprGon9Xba5SR01LJFjutQsM=
+github.com/spy16/sabre v0.3.3/go.mod h1:I6st/cD1FBSbM/zRP7qomKbnS/dXIZC+JizQyW7L0ss=
 golang.org/x/sys v0.0.0-20190626150813-e07cf5db2756/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200817155316-9781c653f443 h1:X18bCaipMcoJGm27Nv7zr4XYPKGUy92GtqboKC2Hxaw=
 golang.org/x/sys v0.0.0-20200817155316-9781c653f443/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=

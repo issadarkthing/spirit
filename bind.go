@@ -1,133 +1,122 @@
-package xlisp
+package spirit
 
 import (
 	"math"
 	"strings"
 
-	"github.com/gdamore/tcell"
-	"github.com/rivo/tview"
-	"github.com/spy16/sabre"
+	"github.com/issadarkthing/spirit/internal"
 )
 
 // BindAll binds all core functions into the given scope.
-func BindAll(scope sabre.Scope) error {
-	core := map[string]sabre.Value{
-		// gui frontend
-		"tview/new-app":               sabre.ValueOf(tview.NewApplication),
-		"tview/app-set-before-draw":   sabre.ValueOf(AppSetBeforeDrawFunc(scope)),
-		"tview/new-form":              sabre.ValueOf(tview.NewForm),
-		"tview/new-box":               sabre.ValueOf(tview.NewBox),
-		"tview/new-textview":          sabre.ValueOf(tview.NewTextView),
-		"tview/new-list":              sabre.ValueOf(tview.NewList),
-		"tview/list-add-item":         sabre.ValueOf(ListAddItem(scope)),
-		"tview/color-default":         sabre.ValueOf(tcell.ColorDefault),
-		"tview/color-green":           sabre.ValueOf(tcell.ColorGreen),
-		"tview/color-red":             sabre.ValueOf(tcell.ColorRed),
-		"tview/app-set-input-capture": sabre.ValueOf(AppSetInputCapture(scope)),
+func BindAll(scope internal.Scope) error {
+	core := map[string]internal.Value{
 
 		// built-in
-		"core/range": sabre.ValueOf(slangRange),
-		"core/future*": &sabre.Fn{
+		"core/range": internal.ValueOf(slangRange),
+		"core/future*": &internal.Fn{
 			Args:     []string{"body"},
 			Variadic: true,
 			Func:     future,
 		},
 
-		"core/time": &sabre.Fn{
+		"core/time": &internal.Fn{
 			Args:     []string{"body"},
 			Variadic: true,
 			Func:     xlispTime,
 		},
-		"core/bounded?": sabre.ValueOf(bound(scope)),
-		"core/sleep":    sabre.ValueOf(sleep),
-		"core/deref*":   sabre.ValueOf(deref(scope)),
-		"core/doseq": &sabre.Fn{
+		"core/bounded?": internal.ValueOf(bound(scope)),
+		"core/sleep":    internal.ValueOf(sleep),
+		"core/deref*":   internal.ValueOf(deref(scope)),
+		"core/doseq": &internal.Fn{
 			Args:     []string{"vector", "exprs"},
 			Variadic: true,
 			Func:     doSeq,
 		},
 
-		"unsafe/swap": &sabre.Fn{
+		"unsafe/swap": &internal.Fn{
 			Args: []string{"vector", "exprs"},
 			Func: swap,
 		},
 
-		"core/atom": sabre.ValueOf(newAtom),
-		"core/swap!": &sabre.Fn{
+		"core/atom": internal.ValueOf(newAtom),
+		"core/swap!": &internal.Fn{
 			Args: []string{"atom", "fn"},
 			Func: safeSwap,
 		},
 
-		"core/and*": sabre.ValueOf(and),
-		"core/or*":  sabre.ValueOf(or),
-		"core/->": &sabre.Fn{
+		"core/and*": internal.ValueOf(and),
+		"core/or*":  internal.ValueOf(or),
+		"core/->": &internal.Fn{
 			Args:     []string{"exprs"},
 			Func:     ThreadFirst,
 			Variadic: true,
 		},
-		"core/->>": &sabre.Fn{
+		"core/->>": &internal.Fn{
 			Args:     []string{"exprs"},
 			Func:     ThreadLast,
 			Variadic: true,
 		},
-		"core/case": &sabre.Fn{
+		"core/case": &internal.Fn{
 			Args:     []string{"exprs", "clauses"},
 			Func:     Case,
 			Variadic: true,
 		},
-		"core/loop": sabre.SpecialForm{
+		"core/loop": internal.SpecialForm{
 			Name:  "loop",
 			Parse: parseLoop,
 		},
 
 		// special forms
-		"core/do":           sabre.Do,
-		"core/def":          sabre.Def,
-		"core/if":           sabre.If,
-		"core/fn*":          sabre.Lambda,
-		"core/macro*":       sabre.Macro,
-		"core/let":          sabre.Let,
-		"core/quote":        sabre.SimpleQuote,
-		"core/syntax-quote": sabre.SyntaxQuote,
-		"core/recur":        sabre.Recur,
+		"core/do":           internal.Do,
+		"core/def":          internal.Def,
+		"core/if":           internal.If,
+		"core/fn*":          internal.Lambda,
+		"core/macro*":       internal.Macro,
+		"core/let":          internal.Let,
+		"core/quote":        internal.SimpleQuote,
+		"core/syntax-quote": internal.SyntaxQuote,
+		"core/recur":        internal.Recur,
 
-		"core/macroexpand": sabre.ValueOf(MacroExpand),
-		"core/eval":        sabre.ValueOf(sabre.Eval),
-		"core/eval-string": sabre.ValueOf(sabre.ReadEvalStr),
-		"core/type":        sabre.ValueOf(TypeOf),
-		"core/to-type":     sabre.ValueOf(ToType),
-		"core/impl?":       sabre.ValueOf(Implements),
-		"core/realized*":   sabre.ValueOf(futureRealize),
-		"core/throw":       sabre.ValueOf(Throw),
-		"core/substring":   sabre.ValueOf(strings.Contains),
-		"core/trim-suffix": sabre.ValueOf(strings.TrimSuffix),
-		"core/resolve":     sabre.ValueOf(resolve(scope)),
+		"core/macroexpand": internal.ValueOf(MacroExpand),
+		"core/eval":        internal.ValueOf(internal.Eval),
+		"core/eval-string": internal.ValueOf(internal.ReadEvalStr),
+		"core/type":        internal.ValueOf(TypeOf),
+		"core/to-type":     internal.ValueOf(ToType),
+		"core/impl?":       internal.ValueOf(Implements),
+		"core/realized*":   internal.ValueOf(futureRealize),
+		"core/throw":       internal.ValueOf(Throw),
+		"core/substring":   internal.ValueOf(strings.Contains),
+		"core/trim-suffix": internal.ValueOf(strings.TrimSuffix),
+		"core/resolve":     internal.ValueOf(resolve(scope)),
 
 		// Type system functions
-		"core/str": sabre.ValueOf(MakeString),
+		"core/str": internal.ValueOf(MakeString),
 
 		// Math functions
-		"core/+":   sabre.ValueOf(Add),
-		"core/-":   sabre.ValueOf(Sub),
-		"core/*":   sabre.ValueOf(Multiply),
-		"core//":   sabre.ValueOf(Divide),
-		"core/mod": sabre.ValueOf(math.Mod),
-		"core/=":   sabre.ValueOf(sabre.Compare),
-		"core/>":   sabre.ValueOf(Gt),
-		"core/>=":  sabre.ValueOf(GtE),
-		"core/<":   sabre.ValueOf(Lt),
-		"core/<=":  sabre.ValueOf(LtE),
+		"core/+":   internal.ValueOf(Add),
+		"core/-":   internal.ValueOf(Sub),
+		"core/*":   internal.ValueOf(Multiply),
+		"core//":   internal.ValueOf(Divide),
+		"core/mod": internal.ValueOf(math.Mod),
+		"core/=":   internal.ValueOf(internal.Compare),
+		"core/>":   internal.ValueOf(Gt),
+		"core/>=":  internal.ValueOf(GtE),
+		"core/<":   internal.ValueOf(Lt),
+		"core/<=":  internal.ValueOf(LtE),
 
 		// io functions
-		"core/print":     sabre.ValueOf(Println),
-		"core/printf":    sabre.ValueOf(Printf),
-		"core/read*":     sabre.ValueOf(Read),
-		"core/random":    sabre.ValueOf(Random),
-		"core/shuffle":   sabre.ValueOf(Shuffle),
-		"core/read-file": sabre.ValueOf(ReadFile),
+		"core/$":         internal.ValueOf(Shell),
+		"core/print":     internal.ValueOf(Println),
+		"core/printf":    internal.ValueOf(Printf),
+		"core/read*":     internal.ValueOf(Read),
+		"core/random":    internal.ValueOf(Random),
+		"core/shuffle":   internal.ValueOf(Shuffle),
+		"core/read-file": internal.ValueOf(ReadFile),
 
-		"types/Seq":       TypeOf((*sabre.Seq)(nil)),
-		"types/Invokable": TypeOf((*sabre.Invokable)(nil)),
+		"string/split": internal.ValueOf(splitString),
+
+		"types/Seq":       TypeOf((*internal.Seq)(nil)),
+		"types/Invokable": TypeOf((*internal.Invokable)(nil)),
 	}
 
 	for sym, val := range core {

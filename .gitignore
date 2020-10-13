@@ -15,9 +15,7 @@ bin/
 .idea/
 expt/
 sabre.iml
-temp.lisp
-sample.clj
-
+sample.st
 .clj-kondo/*
 .lsp/*
 sample.lisp

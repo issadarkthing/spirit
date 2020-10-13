@@ -1,4 +1,4 @@
-package xlisp
+package spirit
 
 import "fmt"
 
