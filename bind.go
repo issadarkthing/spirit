@@ -8,7 +8,7 @@ import (
 )
 
 // BindAll binds all core functions into the given scope.
-func BindAll(scope internal.Scope) error {
+func bindAll(scope internal.Scope) error {
 	core := map[string]internal.Value{
 
 		// built-in
@@ -38,7 +38,7 @@ func BindAll(scope internal.Scope) error {
 			Func: swap,
 		},
 
-		"core/atom": internal.ValueOf(newAtom),
+		"core/atom": internal.ValueOf(internal.NewAtom),
 		"core/swap!": &internal.Fn{
 			Args: []string{"atom", "fn"},
 			Func: safeSwap,
@@ -48,17 +48,17 @@ func BindAll(scope internal.Scope) error {
 		"core/or*":  internal.ValueOf(or),
 		"core/->": &internal.Fn{
 			Args:     []string{"exprs"},
-			Func:     ThreadFirst,
+			Func:     threadFirst,
 			Variadic: true,
 		},
 		"core/->>": &internal.Fn{
 			Args:     []string{"exprs"},
-			Func:     ThreadLast,
+			Func:     threadLast,
 			Variadic: true,
 		},
 		"core/case": &internal.Fn{
 			Args:     []string{"exprs", "clauses"},
-			Func:     Case,
+			Func:     caseForm,
 			Variadic: true,
 		},
 		"core/loop": internal.SpecialForm{
@@ -77,46 +77,46 @@ func BindAll(scope internal.Scope) error {
 		"core/syntax-quote": internal.SyntaxQuote,
 		"core/recur":        internal.Recur,
 
-		"core/macroexpand": internal.ValueOf(MacroExpand),
+		"core/macroexpand": internal.ValueOf(macroExpand),
 		"core/eval":        internal.ValueOf(internal.Eval),
 		"core/eval-string": internal.ValueOf(internal.ReadEvalStr),
-		"core/type":        internal.ValueOf(TypeOf),
-		"core/to-type":     internal.ValueOf(ToType),
-		"core/impl?":       internal.ValueOf(Implements),
+		"core/type":        internal.ValueOf(typeOf),
+		"core/to-type":     internal.ValueOf(toType),
+		"core/impl?":       internal.ValueOf(implements),
 		"core/realized*":   internal.ValueOf(futureRealize),
-		"core/throw":       internal.ValueOf(Throw),
+		"core/throw":       internal.ValueOf(throw),
 		"core/substring":   internal.ValueOf(strings.Contains),
 		"core/trim-suffix": internal.ValueOf(strings.TrimSuffix),
 		"core/resolve":     internal.ValueOf(resolve(scope)),
 
 		// Type system functions
-		"core/str": internal.ValueOf(MakeString),
+		"core/str": internal.ValueOf(makeString),
 
 		// Math functions
-		"core/+":   internal.ValueOf(Add),
-		"core/-":   internal.ValueOf(Sub),
-		"core/*":   internal.ValueOf(Multiply),
-		"core//":   internal.ValueOf(Divide),
+		"core/+":   internal.ValueOf(add),
+		"core/-":   internal.ValueOf(sub),
+		"core/*":   internal.ValueOf(multiply),
+		"core//":   internal.ValueOf(divide),
 		"core/mod": internal.ValueOf(math.Mod),
 		"core/=":   internal.ValueOf(internal.Compare),
-		"core/>":   internal.ValueOf(Gt),
-		"core/>=":  internal.ValueOf(GtE),
-		"core/<":   internal.ValueOf(Lt),
-		"core/<=":  internal.ValueOf(LtE),
+		"core/>":   internal.ValueOf(gt),
+		"core/>=":  internal.ValueOf(gtE),
+		"core/<":   internal.ValueOf(lt),
+		"core/<=":  internal.ValueOf(ltE),
 
 		// io functions
-		"core/$":         internal.ValueOf(Shell),
-		"core/print":     internal.ValueOf(Println),
-		"core/printf":    internal.ValueOf(Printf),
-		"core/read*":     internal.ValueOf(Read),
-		"core/random":    internal.ValueOf(Random),
-		"core/shuffle":   internal.ValueOf(Shuffle),
-		"core/read-file": internal.ValueOf(ReadFile),
+		"core/$":         internal.ValueOf(shell),
+		"core/print":     internal.ValueOf(println),
+		"core/printf":    internal.ValueOf(printf),
+		"core/read*":     internal.ValueOf(read),
+		"core/random":    internal.ValueOf(random),
+		"core/shuffle":   internal.ValueOf(shuffle),
+		"core/read-file": internal.ValueOf(readFile),
 
 		"string/split": internal.ValueOf(splitString),
 
-		"types/Seq":       TypeOf((*internal.Seq)(nil)),
-		"types/Invokable": TypeOf((*internal.Invokable)(nil)),
+		"types/Seq":       typeOf((*internal.Seq)(nil)),
+		"types/Invokable": typeOf((*internal.Invokable)(nil)),
 	}
 
 	for sym, val := range core {

@@ -10,8 +10,9 @@ import (
 	"github.com/issadarkthing/spirit/internal"
 )
 
+
 // Case implements the switch case construct.
-func Case(scope internal.Scope, args []internal.Value) (internal.Value, error) {
+func caseForm(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
 	err := checkArityAtLeast(2, len(args))
 	if err != nil {
@@ -44,20 +45,20 @@ func Case(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
 // MacroExpand is a wrapper around the internal MacroExpand function that
 // ignores the expanded bool flag.
-func MacroExpand(scope internal.Scope, f internal.Value) (internal.Value, error) {
+func macroExpand(scope internal.Scope, f internal.Value) (internal.Value, error) {
 	f, _, err := internal.MacroExpand(scope, f)
 	return f, err
 }
 
 // Throw converts args to strings and returns an error with all the strings
 // joined.
-func Throw(scope internal.Scope, args ...internal.Value) error {
-	return errors.New(strings.Trim(MakeString(args...).String(), "\""))
+func throw(scope internal.Scope, args ...internal.Value) error {
+	return errors.New(strings.Trim(makeString(args...).String(), "\""))
 }
 
 // Realize realizes a sequence by continuously calling First() and Next()
 // until the sequence becomes nil.
-func Realize(seq internal.Seq) *internal.List {
+func realize(seq internal.Seq) *internal.List {
 	var vals []internal.Value
 
 	for seq != nil {
@@ -73,13 +74,13 @@ func Realize(seq internal.Seq) *internal.List {
 }
 
 // TypeOf returns the type information object for the given argument.
-func TypeOf(v interface{}) internal.Value {
+func typeOf(v interface{}) internal.Value {
 	return internal.ValueOf(reflect.TypeOf(v))
 }
 
 // Implements checks if given value implements the interface represented
 // by 't'. Returns error if 't' does not represent an interface type.
-func Implements(v interface{}, t internal.Type) (bool, error) {
+func implements(v interface{}, t internal.Type) (bool, error) {
 	if t.T.Kind() == reflect.Ptr {
 		t.T = t.T.Elem()
 	}
@@ -93,7 +94,7 @@ func Implements(v interface{}, t internal.Type) (bool, error) {
 
 // ToType attempts to convert given internal value to target type. Returns
 // error if conversion not possible.
-func ToType(to internal.Type, val internal.Value) (internal.Value, error) {
+func toType(to internal.Type, val internal.Value) (internal.Value, error) {
 	rv := reflect.ValueOf(val)
 	if rv.Type().ConvertibleTo(to.T) || rv.Type().AssignableTo(to.T) {
 		return internal.ValueOf(rv.Convert(to.T).Interface()), nil
@@ -104,18 +105,18 @@ func ToType(to internal.Type, val internal.Value) (internal.Value, error) {
 
 // ThreadFirst threads the expressions through forms by inserting result of
 // eval as first argument to next expr.
-func ThreadFirst(scope internal.Scope, args []internal.Value) (internal.Value, error) {
+func threadFirst(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 	return threadCall(scope, args, false)
 }
 
 // ThreadLast threads the expressions through forms by inserting result of
 // eval as last argument to next expr.
-func ThreadLast(scope internal.Scope, args []internal.Value) (internal.Value, error) {
+func threadLast(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 	return threadCall(scope, args, true)
 }
 
 // MakeString returns stringified version of all args.
-func MakeString(vals ...internal.Value) internal.Value {
+func makeString(vals ...internal.Value) internal.Value {
 	argc := len(vals)
 	switch argc {
 	case 0:
@@ -197,7 +198,7 @@ func isTruthy(v internal.Value) bool {
 	return true
 }
 
-func slangRange(args ...int) (Any, error) {
+func slangRange(args ...int) (any, error) {
 	var result []internal.Value
 
 	switch len(args) {
@@ -239,7 +240,7 @@ func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 		return nil, fmt.Errorf("Invalid type")
 	}
 
-	list := Realize(l)
+	list := realize(l)
 
 	symbol, ok := vecs.Values[0].(internal.Symbol)
 	if !ok {
@@ -323,9 +324,10 @@ func future(scope internal.Scope, args []internal.Value) (internal.Value, error)
 	return internal.ValueOf(ch), nil
 }
 
+type chanWrapper func(internal.Symbol, <-chan internal.Value) (internal.Value, error)
 // Deref chan from future to get the value. This call is blocking until future is resolved.
 // The result will be cached.
-func deref(scope internal.Scope) func(internal.Symbol, <-chan internal.Value) (internal.Value, error) {
+func deref(scope internal.Scope) chanWrapper {
 
 	return func(symbol internal.Symbol, ch <-chan internal.Value) (internal.Value, error) {
 
@@ -477,8 +479,13 @@ func or(x internal.Value, y internal.Value) bool {
 
 func safeSwap(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
+	err := checkArity(2, len(args))
+	if err != nil {
+		return nil, err
+	}
+
 	atom := args[0]
-	atom, err := atom.Eval(scope)
+	atom, err = atom.Eval(scope)
 	if err != nil {
 		return nil, fmt.Errorf("unable to resolve symbol")
 	}
@@ -488,7 +495,7 @@ func safeSwap(scope internal.Scope, args []internal.Value) (internal.Value, erro
 		return nil, fmt.Errorf("unable to resolve symbol")
 	}
 
-	return atom.(*Atom).UpdateState(scope, fn.(internal.Invokable))
+	return atom.(*internal.Atom).UpdateState(scope, fn.(internal.Invokable))
 }
 
 func bound(scope internal.Scope) func(internal.Symbol) bool {

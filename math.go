@@ -4,10 +4,10 @@ import (
 	"github.com/issadarkthing/spirit/internal"
 )
 
-type Any interface{}
+type any interface{}
 
 // Add adds given floating point numbers and returns the sum.
-func Add(args ...Any) Any {
+func add(args ...any) any {
 	switch args[0].(type) {
 	case internal.Int64:
 		var sum internal.Int64
@@ -27,7 +27,7 @@ func Add(args ...Any) Any {
 }
 
 // Sub subtracts args from 'x' and returns the final result.
-func Sub(x Any, args ...Any) Any {
+func sub(x any, args ...any) any {
 	switch x.(type) {
 	case internal.Float64:
 		var result internal.Float64 = x.(internal.Float64)
@@ -55,7 +55,7 @@ func Sub(x Any, args ...Any) Any {
 }
 
 // Multiply multiplies the given args to 1 and returns the result.
-func Multiply(first Any, args ...Any) Any {
+func multiply(first any, args ...any) any {
 	switch args[0].(type) {
 	case internal.Int64:
 		result := first.(internal.Int64)
@@ -75,7 +75,7 @@ func Multiply(first Any, args ...Any) Any {
 }
 
 // Divide returns the product of given numbers.
-func Divide(first Any, args ...Any) Any {
+func divide(first any, args ...any) any {
 
 	switch first.(type) {
 	case internal.Float64:
@@ -108,7 +108,7 @@ func Divide(first Any, args ...Any) Any {
 }
 
 // Lt returns true if the given args are monotonically increasing.
-func Lt(base float64, args ...float64) bool {
+func lt(base float64, args ...float64) bool {
 	inc := true
 	for _, arg := range args {
 		inc = inc && (arg > base)
@@ -118,7 +118,7 @@ func Lt(base float64, args ...float64) bool {
 
 // LtE returns true if the given args are monotonically increasing or
 // are all equal.
-func LtE(base float64, args ...float64) bool {
+func ltE(base float64, args ...float64) bool {
 	inc := true
 	for _, arg := range args {
 		inc = inc && (arg >= base)
@@ -127,7 +127,7 @@ func LtE(base float64, args ...float64) bool {
 }
 
 // Gt returns true if the given args are monotonically decreasing.
-func Gt(base float64, args ...float64) bool {
+func gt(base float64, args ...float64) bool {
 	inc := true
 	for _, arg := range args {
 		inc = inc && (arg < base)
@@ -137,7 +137,7 @@ func Gt(base float64, args ...float64) bool {
 
 // GtE returns true if the given args are monotonically decreasing or
 // all equal.
-func GtE(base float64, args ...float64) bool {
+func gtE(base float64, args ...float64) bool {
 	inc := true
 	for _, arg := range args {
 		inc = inc && (arg <= base)

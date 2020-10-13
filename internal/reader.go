@@ -341,6 +341,7 @@ func (rd *Reader) annotateErr(e error) error {
 func readString(rd *Reader, _ rune) (Value, error) {
 	var b strings.Builder
 
+
 	for {
 		r, err := rd.NextRune()
 		if err != nil {
@@ -368,6 +369,7 @@ func readString(rd *Reader, _ rune) (Value, error) {
 				return nil, err
 			}
 			r = escaped
+
 		} else if r == '"' {
 			break
 		}
@@ -377,6 +379,7 @@ func readString(rd *Reader, _ rune) (Value, error) {
 
 	return String(b.String()), nil
 }
+
 
 func readNumber(rd *Reader, init rune) (Value, error) {
 	numStr, err := readToken(rd, init)

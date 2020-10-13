@@ -34,6 +34,7 @@ func main() {
 		return
 	}
 
+
 	xl := spirit.New()
 	xl.BindGo("*version*", version)
 

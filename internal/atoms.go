@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"sync"
 )
 
 // Nil represents a nil value.
@@ -209,4 +210,41 @@ func resolveSpecial(scope Scope, v Value) (*SpecialForm, error) {
 	}
 
 	return &sf, nil
+}
+
+// Atom is a thread-safe reference type
+type Atom struct {
+	mu  sync.RWMutex
+	Val Value
+}
+
+func (a *Atom) UpdateState(scope Scope, fn Invokable) (Value, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	res, err := fn.Invoke(scope, a.Val)
+	if err != nil {
+		return nil, err
+	}
+
+	a.Val = res
+	return res, nil
+}
+
+func (a *Atom) GetVal() Value {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return a.Val
+}
+
+func (a *Atom) String() string {
+	return fmt.Sprintf("(atom %v)", a.GetVal())
+}
+
+func (a *Atom) Eval(_ Scope) (Value, error) {
+	return ValueOf(a), nil
+}
+
+func NewAtom(val Value) *Atom {
+	return &Atom{Val: val}
 }

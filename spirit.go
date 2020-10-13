@@ -21,7 +21,7 @@ func New() *Spirit {
 		bindings: map[nsSymbol]internal.Value{},
 	}
 
-	if err := BindAll(sl); err != nil {
+	if err := bindAll(sl); err != nil {
 		panic(err)
 	}
 	sl.checkNS = true
@@ -55,6 +55,7 @@ func (spirit *Spirit) ReadEval(r io.Reader) (internal.Value, error) {
 	}
 	return internal.Eval(spirit, mod)
 }
+
 
 // removes shebang line
 func readSheBang(rd *internal.Reader, _ rune) (internal.Value, error) {
