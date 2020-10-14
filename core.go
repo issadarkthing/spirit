@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/issadarkthing/spirit/internal"
+	"github.com/mediocregopher/seq"
 )
-
 
 // Case implements the switch case construct.
 func caseForm(scope internal.Scope, args []internal.Value) (internal.Value, error) {
@@ -520,3 +520,23 @@ func splitString(str, sep internal.String) *internal.List {
 	}
 	return &internal.List{Values: values}
 }
+
+
+func keyword(str string) internal.Keyword {
+	return internal.Keyword(str)
+}
+
+func assoc(hm *internal.PersistentMap, args ...internal.Value) (*internal.PersistentMap, error) {
+
+	if len(args)%2 != 0 {
+		return nil, fmt.Errorf("invalid number of arguments passed")
+	}
+
+	h := hm	
+	for i := 0; i < len(args); i += 2 {
+		h = h.Set(args[i], args[i+1])
+	}
+
+	return h, nil
+}
+
