@@ -18,6 +18,8 @@ func bindAll(scope internal.Scope) error {
 			Variadic: true,
 			Func:     future,
 		},
+		"core/assoc": internal.ValueOf(assoc),
+		"core/keyword": internal.ValueOf(keyword),
 
 		"core/time": &internal.Fn{
 			Args:     []string{"body"},
