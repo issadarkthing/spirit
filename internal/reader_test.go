@@ -896,19 +896,8 @@ func TestReader_One_Set(t *testing.T) {
 }
 
 func TestReader_One_HashMap(t *testing.T) {
+
 	executeReaderTests(t, []readerTestCase{
-		{
-			name: "SimpleKeywordMap",
-			src: `{:age 10
-				   :name "Bob"}`,
-			want: &internal.HashMap{
-				Position: internal.Position{File: "<string>", Line: 1, Column: 1},
-				Data: map[internal.Value]internal.Value{
-					internal.Keyword("age"):  internal.Int64(10),
-					internal.Keyword("name"): internal.String("Bob"),
-				},
-			},
-		},
 		{
 			name:    "NonHashableKey",
 			src:     `{[] 10}`,
