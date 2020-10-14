@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/tidwall/gjson"
 	"github.com/issadarkthing/spirit/internal"
 )
 
@@ -539,3 +540,25 @@ func assoc(hm *internal.PersistentMap, args ...internal.Value) (*internal.Persis
 	return h, nil
 }
 
+
+func parsejson(rawJson string) (*internal.PersistentMap, error) {
+
+	data, ok := gjson.Parse(rawJson).Value().(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("requires at least one object")
+	}
+
+	return convert(data), nil
+}
+
+func convert(data map[string]interface{}) *internal.PersistentMap {
+	pm := internal.NewPersistentMap()
+	for k, v := range data {
+		if nest, ok := v.(map[string]interface{}); ok {
+			pm = pm.Set(internal.Keyword(k), convert(nest))
+		} else {
+			pm = pm.Set(internal.Keyword(k), internal.ValueOf(v))
+		}
+	}
+	return pm
+}

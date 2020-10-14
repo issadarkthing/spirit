@@ -20,6 +20,7 @@ func bindAll(scope internal.Scope) error {
 		},
 		"core/assoc": internal.ValueOf(assoc),
 		"core/keyword": internal.ValueOf(keyword),
+		"core/parse-json": internal.ValueOf(parsejson),
 
 		"core/time": &internal.Fn{
 			Args:     []string{"body"},

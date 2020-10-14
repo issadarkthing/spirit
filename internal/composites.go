@@ -293,8 +293,8 @@ type PersistentMap struct {
 	Data hashmap.Map
 }
 
-func NewPersistentMap() PersistentMap {
-	return PersistentMap{Data: hashmap.New(compare, hasher)}
+func NewPersistentMap() *PersistentMap {
+	return &PersistentMap{Data: hashmap.New(compare, hasher)}
 }
 
 func (p *PersistentMap) Set(k, v Value) *PersistentMap {
