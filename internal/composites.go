@@ -2,10 +2,10 @@ package internal
 
 import (
 	"fmt"
-	"hash/fnv"
 	"reflect"
 	"strings"
 
+	"github.com/xiaq/persistent/hash"
 	"github.com/xiaq/persistent/hashmap"
 )
 
@@ -294,7 +294,7 @@ type PersistentMap struct {
 }
 
 func NewPersistentMap() PersistentMap {
-	return PersistentMap{Data: hashmap.New(compare, hash)}
+	return PersistentMap{Data: hashmap.New(compare, hasher)}
 }
 
 func (p *PersistentMap) Set(k, v Value) *PersistentMap {
@@ -306,7 +306,7 @@ func (p *PersistentMap) Delete(k Value) *PersistentMap {
 }
 
 func (p *PersistentMap) Eval(scope Scope) (Value, error) {
-	res := &PersistentMap{Data: hashmap.New(compare, hash)}
+	res := &PersistentMap{Data: hashmap.New(compare, hasher)}
 
 	for it := p.Data.Iterator(); it.HasElem(); it.Next() {
 		k, v := it.Elem()
@@ -348,10 +348,8 @@ func (p PersistentMap) String() string {
 	return str.String()
 }
 
-func hash(s interface{}) uint32 {
-	h := fnv.New32()
-	h.Write([]byte(s.(Value).String()))
-	return h.Sum32()
+func hasher(s interface{}) uint32 {
+	return hash.String(s.(Value).String())
 }
 
 func compare(k1, k2 interface{}) bool {

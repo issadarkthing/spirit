@@ -497,7 +497,7 @@ func readHashMap(rd *Reader, _ rune) (Value, error) {
 
 	hm := &PersistentMap{
 		Position: pi,
-		Data:     hashmap.New(compare, hash),
+		Data:     hashmap.New(compare, hasher),
 	}
 
 	for i := 0; i < len(forms); i += 2 {
