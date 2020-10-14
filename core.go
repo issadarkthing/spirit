@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/issadarkthing/spirit/internal"
-	"github.com/mediocregopher/seq"
 )
 
 // Case implements the switch case construct.
