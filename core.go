@@ -1,13 +1,13 @@
 package spirit
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
 	"strings"
 	"time"
 
-	"github.com/tidwall/gjson"
 	"github.com/issadarkthing/spirit/internal"
 )
 
@@ -543,9 +543,11 @@ func assoc(hm *internal.PersistentMap, args ...internal.Value) (*internal.Persis
 
 func parsejson(rawJson string) (*internal.PersistentMap, error) {
 
-	data, ok := gjson.Parse(rawJson).Value().(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("requires at least one object")
+	var data map[string]interface{}
+
+	err := json.Unmarshal([]byte(rawJson), &data)
+	if err != nil {
+		return nil, err
 	}
 
 	return convert(data), nil
