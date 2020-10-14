@@ -737,6 +737,7 @@ func defaultDispatchTable() map[rune]ReaderMacro {
 	return map[rune]ReaderMacro{
 		'{': readSet,
 		'}': unmatchedDelimiter,
+		'!': readComment,
 	}
 }
 

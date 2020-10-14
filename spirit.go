@@ -48,7 +48,6 @@ func (spirit *Spirit) Eval(v internal.Value) (internal.Value, error) {
 // obtained in spirit context.
 func (spirit *Spirit) ReadEval(r io.Reader) (internal.Value, error) {
 	internalReader := internal.NewReader(r)
-	internalReader.SetMacro('!', readSheBang, true)
 	mod, err := internalReader.All()
 	if err != nil {
 		return nil, err
@@ -56,22 +55,6 @@ func (spirit *Spirit) ReadEval(r io.Reader) (internal.Value, error) {
 	return internal.Eval(spirit, mod)
 }
 
-
-// removes shebang line
-func readSheBang(rd *internal.Reader, _ rune) (internal.Value, error) {
-	for {
-		r, err := rd.NextRune()
-		if err != nil {
-			return nil, err
-		}
-
-		if r == '\n' {
-			break
-		}
-	}
-
-	return nil, internal.ErrSkip
-}
 
 // ReadEvalStr reads the source and evaluates it in spirit context.
 func (spirit *Spirit) ReadEvalStr(src string) (internal.Value, error) {
