@@ -28,6 +28,9 @@ benchmark:
 	@echo "Running benchmarks..."
 	@go test -benchmem -run="none" -bench="Benchmark.*" -v ./...
 
-build:
+build: test
 	@mkdir -p ./bin
 	@go build -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" -o ./bin/spirit ./cmd/spirit/
+
+run: 
+	@./bin/spirit -p ./lib/core.st sample.st
