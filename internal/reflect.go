@@ -51,10 +51,24 @@ func ValueOf(v interface{}) Value {
 	case reflect.Bool:
 		return Bool(rv.Bool())
 
+	case reflect.Slice, reflect.Array:
+		return convertToList(rv)
+
 	default:
 		// TODO: handle array & slice as list/vector.
 		return Any{V: rv}
 	}
+}
+
+func convertToList(sl reflect.Value) *List {
+
+	list := make([]Value, 0, sl.Len())
+
+	for i := 0; i < sl.Len(); i++ {
+		list = append(list, ValueOf(sl.Index(i).Interface()))
+	}
+
+	return &List{Values: list}
 }
 
 // Any can be used to wrap arbitrary Go value into spirit scope.
