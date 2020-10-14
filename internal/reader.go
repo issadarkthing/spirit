@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/xiaq/persistent/hashmap"
 )
 
 const dispatchTrigger = '#'
@@ -493,9 +495,9 @@ func readHashMap(rd *Reader, _ rune) (Value, error) {
 		return nil, errors.New("expecting even number of forms within {}")
 	}
 
-	hm := &HashMap{
+	hm := &PersistentMap{
 		Position: pi,
-		Data:     map[Value]Value{},
+		Data:     hashmap.New(compare, hash),
 	}
 
 	for i := 0; i < len(forms); i += 2 {
@@ -504,7 +506,7 @@ func readHashMap(rd *Reader, _ rune) (Value, error) {
 				reflect.TypeOf(forms[i]))
 		}
 
-		hm.Data[forms[i]] = forms[i+1]
+		hm = hm.Set(forms[i], forms[i+1])
 	}
 
 	return hm, nil
@@ -523,6 +525,7 @@ func readVector(rd *Reader, _ rune) (Value, error) {
 		Position: pi,
 	}, nil
 }
+
 
 func readSet(rd *Reader, _ rune) (Value, error) {
 	pi := rd.Position()

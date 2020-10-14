@@ -2,8 +2,11 @@ package internal
 
 import (
 	"fmt"
+	"hash/fnv"
 	"reflect"
 	"strings"
+
+	"github.com/xiaq/persistent/hashmap"
 )
 
 // List represents an list of forms/vals. Evaluating a list leads to a
@@ -213,7 +216,8 @@ func (hm *HashMap) Get(key Value, def Value) Value {
 	return v
 }
 
-// Set sets/updates the value associated with the given key.
+// Set changes the value associated with the given key.
+// destructive update
 func (hm *HashMap) Set(key, val Value) error {
 	if !isHashable(key) {
 		return fmt.Errorf("value of type '%s' is not hashable", key)
@@ -222,6 +226,7 @@ func (hm *HashMap) Set(key, val Value) error {
 	hm.Data[key] = val
 	return nil
 }
+
 
 // Keys returns all the keys in the hashmap.
 func (hm *HashMap) Keys() Values {
@@ -282,6 +287,76 @@ func (mod Module) Compare(v Value) bool {
 }
 
 func (mod Module) String() string { return containerString(mod, "", "\n", "\n") }
+
+type PersistentMap struct {
+	Position
+	Data hashmap.Map
+}
+
+func NewPersistentMap() PersistentMap {
+	return PersistentMap{Data: hashmap.New(compare, hash)}
+}
+
+func (p *PersistentMap) Set(k, v Value) *PersistentMap {
+	return &PersistentMap{Data: p.Data.Assoc(k, v)}
+}
+
+func (p *PersistentMap) Delete(k Value) *PersistentMap {
+	return &PersistentMap{Data: p.Data.Dissoc(k)}
+}
+
+func (p *PersistentMap) Eval(scope Scope) (Value, error) {
+	res := &PersistentMap{Data: hashmap.New(compare, hash)}
+
+	for it := p.Data.Iterator(); it.HasElem(); it.Next() {
+		k, v := it.Elem()
+
+		key, err := k.(Value).Eval(scope)
+		if err != nil {
+			return nil, err
+		}
+
+		value, err := v.(Value).Eval(scope)
+		if err != nil {
+			return nil, err
+		}
+
+		res.Data = res.Data.Assoc(key, value)
+	}
+
+	return res, nil
+}
+
+func (p PersistentMap) String() string {
+	m := p.Data
+	var str strings.Builder
+	str.WriteRune('{')
+	length := m.Len()
+	i := 0
+	for it := m.Iterator(); it.HasElem(); it.Next() {
+		k, v := it.Elem()
+		if i != 0 {
+			str.WriteRune(' ')
+		} 		
+		str.WriteString(fmt.Sprintf("%v %v", k, v))
+		if i != length-1 {
+			str.WriteRune(',')
+		}
+		i++
+	}
+	str.WriteRune('}')
+	return str.String()
+}
+
+func hash(s interface{}) uint32 {
+	h := fnv.New32()
+	h.Write([]byte(s.(Value).String()))
+	return h.Sum32()
+}
+
+func compare(k1, k2 interface{}) bool {
+	return Compare(k1.(Value), k2.(Value))
+}
 
 func containerString(vals []Value, begin, end, sep string) string {
 	parts := make([]string, len(vals))
