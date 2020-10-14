@@ -221,8 +221,7 @@
 
 ; source a file. Beware of circular dependency
 (defn source [filename]
-  (let [target (str filename ".lisp")
-        content (read-file target)]
+  (let [content (read-file target)]
     (eval-string content)))
 
 
