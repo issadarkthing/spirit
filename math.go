@@ -4,7 +4,6 @@ import (
 	"github.com/issadarkthing/spirit/internal"
 )
 
-
 // Add adds given floating point numbers and returns the sum.
 func add(args ...internal.Number) internal.Number {
 	var result internal.Number

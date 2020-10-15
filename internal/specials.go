@@ -61,7 +61,7 @@ var (
 	}
 
 	Recur = SpecialForm{
-		Name: "recur",
+		Name:  "recur",
 		Parse: parseRecur,
 	}
 )

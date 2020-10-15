@@ -30,10 +30,9 @@ type Number float64
 // Eval simply returns itself since Floats evaluate to themselves.
 func (n Number) Eval(_ Scope) (Value, error) { return n, nil }
 
-func (n Number) String() string { 
-	return strconv.FormatFloat(float64(n), 'f', -1, 64) 
+func (n Number) String() string {
+	return strconv.FormatFloat(float64(n), 'f', -1, 64)
 }
-
 
 // String represents double-quoted string literals. String Form represents
 // the true string value obtained from the reader. Escape sequences are not

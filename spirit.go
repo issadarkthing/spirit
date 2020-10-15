@@ -55,7 +55,6 @@ func (spirit *Spirit) ReadEval(r io.Reader) (internal.Value, error) {
 	return internal.Eval(spirit, mod)
 }
 
-
 // ReadEvalStr reads the source and evaluates it in spirit context.
 func (spirit *Spirit) ReadEvalStr(src string) (internal.Value, error) {
 	return spirit.ReadEval(strings.NewReader(src))

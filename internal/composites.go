@@ -7,6 +7,7 @@ import (
 
 	"github.com/xiaq/persistent/hash"
 	"github.com/xiaq/persistent/hashmap"
+	"github.com/xiaq/persistent/vector"
 )
 
 // List represents an list of forms/vals. Evaluating a list leads to a
@@ -89,6 +90,10 @@ func (lf *List) parse(scope Scope) error {
 type Vector struct {
 	Values
 	Position
+}
+
+func (vf Vector) Conj(vals ...Value) Seq {
+	return *&Vector{Values: append(vf.Values, vals...)}
 }
 
 // Eval evaluates each value in the vector form and returns the resultant
@@ -227,7 +232,6 @@ func (hm *HashMap) Set(key, val Value) error {
 	return nil
 }
 
-
 // Keys returns all the keys in the hashmap.
 func (hm *HashMap) Keys() Values {
 	var res []Value
@@ -318,7 +322,7 @@ func (p *PersistentMap) Delete(k Value) *PersistentMap {
 }
 
 func (p *PersistentMap) Compare(other Value) bool {
-	
+
 	otherMap, ok := other.(*PersistentMap)
 	if !ok {
 		return false
@@ -377,7 +381,7 @@ func (p PersistentMap) String() string {
 		k, v := it.Elem()
 		if i != 0 {
 			str.WriteRune(' ')
-		} 		
+		}
 		str.WriteString(fmt.Sprintf("%v %v", k, v))
 		if i != length-1 {
 			str.WriteRune(',')
@@ -386,6 +390,14 @@ func (p PersistentMap) String() string {
 	}
 	str.WriteRune('}')
 	return str.String()
+}
+
+type PersistentVector struct {
+	Vec vector.Vector
+}
+
+func NewPersistenVector() *PersistentVector {
+	return &PersistentVector{Vec: vector.Empty}
 }
 
 func hasher(s interface{}) uint32 {

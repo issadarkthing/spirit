@@ -210,7 +210,7 @@ func executeEvalTests(t *testing.T, tests []evalTestCase) {
 				t.Errorf("Eval() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			
+
 			if c, ok := got.(internal.Comparable); ok {
 				isEqual := c.Compare(tt.want)
 				if isEqual {
