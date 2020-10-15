@@ -65,17 +65,16 @@ func readFile(name string) (string, error) {
 	return string(content), nil
 }
 
-func createShellOutput(out, err string, exit int) *internal.HashMap {
-	return &internal.HashMap{
-		Data: map[internal.Value]internal.Value{
-			internal.Keyword("exit"): internal.Number(exit),
-			internal.Keyword("out"):  internal.String(out),
-			internal.Keyword("err"):  internal.String(err),
-		},
-	}
+func createShellOutput(out, err string, exit int) *internal.PersistentMap {
+	m := internal.NewPersistentMap()
+
+	return m.
+		Set(internal.Keyword("exit"), internal.Number(exit)).
+		Set(internal.Keyword("out"), internal.String(out)).
+		Set(internal.Keyword("err"), internal.String(err))
 }
 
-func shell(command string) (*internal.HashMap, error) {
+func shell(command string) (*internal.PersistentMap, error) {
 
 	cmd := exec.Command("bash", "-c", command)
 	var cmdout, cmderr bytes.Buffer
@@ -88,7 +87,7 @@ func shell(command string) (*internal.HashMap, error) {
 		errMsg := strings.TrimSpace(cmderr.String())
 		return createShellOutput("", errMsg, exitErr.ExitCode()), nil
 	} else if err != nil {
-		return &internal.HashMap{}, err
+		return internal.NewPersistentMap(), err
 	}
 
 	output := strings.TrimSpace(cmdout.String())
