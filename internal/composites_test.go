@@ -281,16 +281,10 @@ func TestHashMap_Eval(t *testing.T) {
 	executeEvalTests(t, []evalTestCase{
 		{
 			name: "Simple",
-			value: &internal.HashMap{
-				Data: map[internal.Value]internal.Value{
-					internal.Keyword("name"): internal.String("Bob"),
-				},
-			},
-			want: &internal.HashMap{
-				Data: map[internal.Value]internal.Value{
-					internal.Keyword("name"): internal.String("Bob"),
-				},
-			},
+			value: internal.NewPersistentMap().
+				Set(internal.Keyword("name"), internal.String("Bob")),
+			want: internal.NewPersistentMap().
+				Set(internal.Keyword("name"), internal.String("Bob")),
 		},
 	})
 }
@@ -298,11 +292,8 @@ func TestHashMap_Eval(t *testing.T) {
 func TestHashMap_String(t *testing.T) {
 	executeStringTestCase(t, []stringTestCase{
 		{
-			value: &internal.HashMap{
-				Data: map[internal.Value]internal.Value{
-					internal.Keyword("name"): internal.String("Bob"),
-				},
-			},
+			value: internal.NewPersistentMap().
+				Set(internal.Keyword("name"), internal.String("Bob")),
 			want: `{:name "Bob"}`,
 		},
 	})
