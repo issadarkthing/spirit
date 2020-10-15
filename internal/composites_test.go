@@ -38,7 +38,7 @@ func TestList_Eval(t *testing.T) {
 		{
 			name: "NonInvokable",
 			value: &internal.List{
-				Values: []internal.Value{internal.Int64(10), internal.Keyword("hello")},
+				Values: []internal.Value{internal.Number(10), internal.Keyword("hello")},
 			},
 			wantErr: true,
 		},
@@ -69,13 +69,13 @@ func TestModule_Eval(t *testing.T) {
 		},
 		{
 			name:  "SingleForm",
-			value: internal.Module{internal.Int64(10)},
-			want:  internal.Int64(10),
+			value: internal.Module{internal.Number(10)},
+			want:  internal.Number(10),
 		},
 		{
 			name: "MultiForm",
 			value: internal.Module{
-				internal.Int64(10),
+				internal.Number(10),
 				internal.String("hello"),
 			},
 			want: internal.String("hello"),
@@ -234,12 +234,12 @@ func TestVector_Invoke(t *testing.T) {
 		},
 		{
 			name:    "InvalidIndex",
-			args:    []internal.Value{internal.Int64(10)},
+			args:    []internal.Value{internal.Number(10)},
 			wantErr: true,
 		},
 		{
 			name:    "ValidIndex",
-			args:    []internal.Value{internal.Int64(0)},
+			args:    []internal.Value{internal.Number(0)},
 			want:    internal.Keyword("hello"),
 			wantErr: false,
 		},

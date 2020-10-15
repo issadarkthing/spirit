@@ -4,111 +4,56 @@ import (
 	"github.com/issadarkthing/spirit/internal"
 )
 
-type any interface{}
 
 // Add adds given floating point numbers and returns the sum.
-func add(args ...any) any {
-	switch args[0].(type) {
-	case internal.Int64:
-		var sum internal.Int64
-		for _, a := range args {
-			sum += a.(internal.Int64)
-		}
-		return sum
-	case internal.Float64:
-		var sum internal.Float64
-		for _, a := range args {
-			sum += a.(internal.Float64)
-		}
-		return sum
-	default:
-		return nil
+func add(args ...internal.Number) internal.Number {
+	var result internal.Number
+	for _, v := range args {
+		result += v
 	}
+	return result
 }
 
 // Sub subtracts args from 'x' and returns the final result.
-func sub(x any, args ...any) any {
-	switch x.(type) {
-	case internal.Float64:
-		var result internal.Float64 = x.(internal.Float64)
-		if len(args) == 0 {
-			return -1 * x.(internal.Float64)
-		}
-
-		for _, a := range args {
-			result -= a.(internal.Float64)
-		}
-		return result
-	case internal.Int64:
-		var result internal.Int64 = x.(internal.Int64)
-		if len(args) == 0 {
-			return -1 * x.(internal.Int64)
-		}
-
-		for _, a := range args {
-			result -= a.(internal.Int64)
-		}
-		return result
-	default:
-		return nil
+func sub(x internal.Number, args ...internal.Number) internal.Number {
+	result := x
+	if len(args) == 0 {
+		return -1 * result
 	}
+
+	for _, v := range args {
+		result -= v
+	}
+	return result
 }
 
 // Multiply multiplies the given args to 1 and returns the result.
-func multiply(first any, args ...any) any {
-	switch args[0].(type) {
-	case internal.Int64:
-		result := first.(internal.Int64)
-		for _, a := range args {
-			result *= a.(internal.Int64)
-		}
-		return result
-	case internal.Float64:
-		result := first.(internal.Float64)
-		for _, a := range args {
-			result *= a.(internal.Float64)
-		}
-		return result
-	default:
-		return nil
+func multiply(first internal.Number, args ...internal.Number) internal.Number {
+	result := first
+	for _, v := range args {
+		result *= v
 	}
+	return result
 }
 
 // Divide returns the product of given numbers.
-func divide(first any, args ...any) any {
+func divide(first internal.Number, args ...internal.Number) internal.Number {
 
-	switch first.(type) {
-	case internal.Float64:
-		var result internal.Float64 = first.(internal.Float64)
+	result := first
 
-		if len(args) == 0 {
-			return 1 / first.(internal.Float64)
-		}
-
-		for _, a := range args {
-			result /= a.(internal.Float64)
-		}
-		return result
-
-	case internal.Int64:
-		var result internal.Int64 = first.(internal.Int64)
-
-		if len(args) == 0 {
-			return 1 / internal.Float64(first.(internal.Int64))
-		}
-
-		for _, a := range args {
-			result /= a.(internal.Int64)
-		}
-		return result
-	default:
-		return nil
+	if len(args) == 0 {
+		return 1 / first
 	}
+
+	for _, v := range args {
+		result /= v
+	}
+	return result
 
 }
 
 // Lt returns true if the given args are monotonically increasing.
-func lt(base float64, args ...float64) bool {
+func lt(base internal.Number, args ...internal.Number) bool {
 	inc := true
 	for _, arg := range args {
 		inc = inc && (arg > base)
@@ -118,7 +63,7 @@ func lt(base float64, args ...float64) bool {
 
 // LtE returns true if the given args are monotonically increasing or
 // are all equal.
-func ltE(base float64, args ...float64) bool {
+func ltE(base internal.Number, args ...internal.Number) bool {
 	inc := true
 	for _, arg := range args {
 		inc = inc && (arg >= base)
@@ -127,7 +72,7 @@ func ltE(base float64, args ...float64) bool {
 }
 
 // Gt returns true if the given args are monotonically decreasing.
-func gt(base float64, args ...float64) bool {
+func gt(base internal.Number, args ...internal.Number) bool {
 	inc := true
 	for _, arg := range args {
 		inc = inc && (arg < base)
@@ -137,7 +82,7 @@ func gt(base float64, args ...float64) bool {
 
 // GtE returns true if the given args are monotonically decreasing or
 // all equal.
-func gtE(base float64, args ...float64) bool {
+func gtE(base internal.Number, args ...internal.Number) bool {
 	inc := true
 	for _, arg := range args {
 		inc = inc && (arg <= base)

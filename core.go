@@ -198,7 +198,7 @@ func isTruthy(v internal.Value) bool {
 	return true
 }
 
-func slangRange(args ...int) (any, error) {
+func slangRange(args ...int) (*internal.List, error) {
 	var result []internal.Value
 
 	switch len(args) {
@@ -217,7 +217,7 @@ func createRange(min, max, step int) []internal.Value {
 
 	result := make([]internal.Value, 0, max-min)
 	for i := min; i < max; i += step {
-		result = append(result, internal.Int64(i))
+		result = append(result, internal.Number(i))
 	}
 	return result
 }

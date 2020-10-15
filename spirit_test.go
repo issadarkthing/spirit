@@ -59,7 +59,7 @@ func TestSpirit_Bind(t *testing.T) {
 
 func TestSpirit_Resolve(t *testing.T) {
 	sl := spirit.New()
-	sl.Bind("pi", internal.Float64(3.1412))
+	sl.Bind("pi", internal.Number(3.1412))
 
 	tests := []struct {
 		name    string

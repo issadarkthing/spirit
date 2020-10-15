@@ -32,10 +32,10 @@ func TestMapScope_Resolve(t *testing.T) {
 			symbol: "pi",
 			getScope: func() *internal.MapScope {
 				parent := internal.NewScope(nil)
-				_ = parent.Bind("pi", internal.Float64(3.1412))
+				_ = parent.Bind("pi", internal.Number(3.1412))
 				return internal.NewScope(parent)
 			},
-			want: internal.Float64(3.1412),
+			want: internal.Number(3.1412),
 		},
 		{
 			name:   "WithNoBinding",

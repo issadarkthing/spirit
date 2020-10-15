@@ -21,14 +21,14 @@ func TestValueOf(t *testing.T) {
 		want Value
 	}{
 		{
-			name: "int64",
+			name: "Number",
 			v:    int64(10),
-			want: Int64(10),
+			want: Number(10),
 		},
 		{
-			name: "float",
+			name: "Number",
 			v:    float32(10.),
-			want: Float64(10.),
+			want: Number(10.),
 		},
 		{
 			name: "uint8",
@@ -42,8 +42,8 @@ func TestValueOf(t *testing.T) {
 		},
 		{
 			name: "Value",
-			v:    Int64(10),
-			want: Int64(10),
+			v:    Number(10),
+			want: Number(10),
 		},
 		{
 			name: "Nil",
@@ -87,11 +87,11 @@ func Test_strictFn_Invoke(t *testing.T) {
 			name: "WithScopeArgNoBinding",
 			getScope: func() Scope {
 				sc := NewScope(nil)
-				sc.Bind("hello", Int64(10))
+				sc.Bind("hello", Number(10))
 				return sc
 			},
 			v:       func(sc Scope) (Value, error) { return sc.Resolve("hello") },
-			want:    Int64(10),
+			want:    Number(10),
 			wantErr: false,
 		},
 		{
@@ -102,7 +102,7 @@ func Test_strictFn_Invoke(t *testing.T) {
 		{
 			name: "SimpleNoArg",
 			v:    func() int { return 10 },
-			want: Int64(10),
+			want: Number(10),
 		},
 		{
 			name:    "NoArgSingleErrorReturn",
@@ -117,21 +117,21 @@ func Test_strictFn_Invoke(t *testing.T) {
 		},
 		{
 			name: "SimpleNoReturn",
-			v:    func(arg Int64) {},
-			args: []Value{Int64(10)},
+			v:    func(arg Number) {},
+			args: []Value{Number(10)},
 			want: Nil{},
 		},
 		{
 			name: "SimpleSingleReturn",
-			v:    func(arg Int64) int64 { return 10 },
-			args: []Value{Int64(10)},
-			want: Int64(10),
+			v:    func(arg Number) int64 { return 10 },
+			args: []Value{Number(10)},
+			want: Number(10),
 		},
 		{
 			name: "MultiReturn",
-			v:    func(arg Int64) (int64, string) { return 10, "hello" },
-			args: []Value{Int64(10)},
-			want: Values([]Value{Int64(10), String("hello")}),
+			v:    func(arg Number) (int64, string) { return 10, "hello" },
+			args: []Value{Number(10)},
+			want: Values([]Value{Number(10), String("hello")}),
 		},
 		{
 			name:    "NoArgMultiReturnWithError",
@@ -141,35 +141,35 @@ func Test_strictFn_Invoke(t *testing.T) {
 		{
 			name: "NoArgMultiReturnWithoutError",
 			v:    func() (int, error) { return 10, nil },
-			want: Int64(10),
+			want: Number(10),
 		},
 		{
 			name: "PureVariadicNoCallArgs",
-			v: func(args ...Int64) int64 {
+			v: func(args ...Number) int64 {
 				sum := int64(0)
 				for _, arg := range args {
 					sum += int64(arg)
 				}
 				return sum
 			},
-			want: Int64(0),
+			want: Number(0),
 		},
 		{
 			name: "PureVariadicWithCallArgs",
-			v: func(args ...Int64) int64 {
+			v: func(args ...Number) int64 {
 				sum := int64(0)
 				for _, arg := range args {
 					sum += int64(arg)
 				}
 				return sum
 			},
-			args: []Value{Int64(1), Int64(10)},
-			want: Int64(11),
+			args: []Value{Number(1), Number(10)},
+			want: Number(11),
 		},
 		{
 			name:    "ArityErrorNonVariadic",
 			v:       func() {},
-			args:    []Value{Int64(10)},
+			args:    []Value{Number(10)},
 			want:    nil,
 			wantErr: true,
 		},

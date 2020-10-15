@@ -68,7 +68,7 @@ func readFile(name string) (string, error) {
 func createShellOutput(out, err string, exit int) *internal.HashMap {
 	return &internal.HashMap{
 		Data: map[internal.Value]internal.Value{
-			internal.Keyword("exit"): internal.Int64(exit),
+			internal.Keyword("exit"): internal.Number(exit),
 			internal.Keyword("out"):  internal.String(out),
 			internal.Keyword("err"):  internal.String(err),
 		},

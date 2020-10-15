@@ -392,6 +392,7 @@ func readNumber(rd *Reader, init rune) (Value, error) {
 	decimalPoint := strings.ContainsRune(numStr, '.')
 	isRadix := strings.ContainsRune(numStr, 'r')
 	isScientific := strings.ContainsRune(numStr, 'e')
+	isNotDecimal := hasBase(numStr) && !decimalPoint
 
 	switch {
 	case isRadix && (decimalPoint || isScientific):
@@ -400,24 +401,42 @@ func readNumber(rd *Reader, init rune) (Value, error) {
 	case isScientific:
 		return parseScientific(numStr)
 
-	case decimalPoint:
-		v, err := strconv.ParseFloat(numStr, 64)
-		if err != nil {
-			return nil, fmt.Errorf("illegal number format: '%s'", numStr)
-		}
-		return Float64(v), nil
-
 	case isRadix:
 		return parseRadix(numStr)
 
-	default:
+	case isNotDecimal:
 		v, err := strconv.ParseInt(numStr, 0, 64)
+		if err != nil {
+			return nil, err
+		}
+		return Number(v), nil
+
+	default:
+		v, err := strconv.ParseFloat(numStr, 64)
 		if err != nil {
 			return nil, fmt.Errorf("illegal number format '%s'", numStr)
 		}
 
-		return Int64(v), nil
+		return Number(v), nil
 	}
+}
+
+func hasBase(str string) bool {
+
+	if len(str) <= 1 {
+		return false
+	}
+
+	runes := []rune(str)
+	firstRune := runes[0]
+	secondRune := runes[1]
+
+	isBinary := secondRune == 'b'
+	isHex := secondRune == 'x'
+	isOctal := firstRune == '0'
+	isNegativeOctal := (firstRune == '-' || firstRune == '+') && secondRune == '0'
+
+	return isBinary || isHex || isOctal || isNegativeOctal
 }
 
 func readSymbol(rd *Reader, init rune) (Value, error) {
@@ -595,7 +614,7 @@ func quoteFormReader(expandFunc string) ReaderMacro {
 	}
 }
 
-func parseRadix(numStr string) (Int64, error) {
+func parseRadix(numStr string) (Number, error) {
 	parts := strings.Split(numStr, "r")
 	if len(parts) != 2 {
 		return 0, fmt.Errorf("illegal radix notation '%s'", numStr)
@@ -617,10 +636,10 @@ func parseRadix(numStr string) (Int64, error) {
 		return 0, fmt.Errorf("illegal radix notation '%s'", numStr)
 	}
 
-	return Int64(v), nil
+	return Number(v), nil
 }
 
-func parseScientific(numStr string) (Float64, error) {
+func parseScientific(numStr string) (Number, error) {
 	parts := strings.Split(numStr, "e")
 	if len(parts) != 2 {
 		return 0, fmt.Errorf("illegal scientific notation '%s'", numStr)
@@ -636,7 +655,7 @@ func parseScientific(numStr string) (Float64, error) {
 		return 0, fmt.Errorf("illegal scientific notation '%s'", numStr)
 	}
 
-	return Float64(base * math.Pow(10, float64(pow))), nil
+	return Number(base * math.Pow(10, float64(pow))), nil
 }
 
 func getEscape(r rune) (rune, error) {
@@ -743,7 +762,7 @@ func defaultDispatchTable() map[rune]ReaderMacro {
 
 func isHashable(v Value) bool {
 	switch v.(type) {
-	case String, Int64, Float64, Nil, Character, Keyword:
+	case String, Number, Nil, Character, Keyword:
 		return true
 
 	default:

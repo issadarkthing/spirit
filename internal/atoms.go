@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -23,23 +24,16 @@ func (b Bool) Eval(_ Scope) (Value, error) { return b, nil }
 
 func (b Bool) String() string { return fmt.Sprintf("%t", b) }
 
-// Float64 represents double precision floating point numbers represented
-// using decimal or scientific number formats.
-type Float64 float64
+// Number represents double precision floating point numbers
+type Number float64
 
 // Eval simply returns itself since Floats evaluate to themselves.
-func (f64 Float64) Eval(_ Scope) (Value, error) { return f64, nil }
+func (n Number) Eval(_ Scope) (Value, error) { return n, nil }
 
-func (f64 Float64) String() string { return fmt.Sprintf("%f", f64) }
+func (n Number) String() string { 
+	return strconv.FormatFloat(float64(n), 'f', -1, 64) 
+}
 
-// Int64 represents integer values represented using decimal, octal, radix
-// and hexadecimal formats.
-type Int64 int64
-
-// Eval simply returns itself since Integers evaluate to themselves.
-func (i64 Int64) Eval(_ Scope) (Value, error) { return i64, nil }
-
-func (i64 Int64) String() string { return fmt.Sprintf("%d", i64) }
 
 // String represents double-quoted string literals. String Form represents
 // the true string value obtained from the reader. Escape sequences are not

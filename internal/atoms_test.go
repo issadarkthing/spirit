@@ -93,11 +93,11 @@ func TestNil_String(t *testing.T) {
 func TestInt64_String(t *testing.T) {
 	executeStringTestCase(t, []stringTestCase{
 		{
-			value: internal.Int64(10),
+			value: internal.Number(10),
 			want:  "10",
 		},
 		{
-			value: internal.Int64(-10),
+			value: internal.Number(-10),
 			want:  "-10",
 		},
 	})
@@ -106,12 +106,12 @@ func TestInt64_String(t *testing.T) {
 func TestFloat64_String(t *testing.T) {
 	executeStringTestCase(t, []stringTestCase{
 		{
-			value: internal.Float64(10.3),
-			want:  "10.300000",
+			value: internal.Number(10.3),
+			want:  "10.3",
 		},
 		{
-			value: internal.Float64(-10.3),
-			want:  "-10.300000",
+			value: internal.Number(-10.3),
+			want:  "-10.3",
 		},
 	})
 }

@@ -44,7 +44,7 @@ func BenchmarkEval(b *testing.B) {
 	f := &internal.List{
 		Values: internal.Values{
 			internal.Symbol{Value: "inc"},
-			internal.Int64(10),
+			internal.Number(10),
 		},
 	}
 
@@ -81,7 +81,7 @@ func TestEval(t *testing.T) {
 		{
 			name: "SingleForm",
 			src:  "123",
-			want: internal.Int64(123),
+			want: internal.Number(123),
 		},
 		{
 			name: "MultiForm",
@@ -95,7 +95,7 @@ func TestEval(t *testing.T) {
 			name: "WithFunctionCalls",
 			getScope: func() internal.Scope {
 				scope := internal.NewScope(nil)
-				_ = scope.BindGo("ten?", func(i internal.Int64) bool {
+				_ = scope.BindGo("ten?", func(i internal.Number) bool {
 					return i == 10
 				})
 				return scope
@@ -112,7 +112,7 @@ func TestEval(t *testing.T) {
 		{
 			name: "Program",
 			src:  sampleProgram,
-			want: internal.Float64(3.1412),
+			want: internal.Number(3.1412),
 		},
 	}
 

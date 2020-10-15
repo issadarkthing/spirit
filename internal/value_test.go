@@ -32,9 +32,9 @@ func TestValues_First(t *testing.T) {
 	})
 
 	t.Run("NonEmpty", func(t *testing.T) {
-		vals := internal.Values{internal.Int64(10)}
+		vals := internal.Values{internal.Number(10)}
 
-		want := internal.Int64(10)
+		want := internal.Number(10)
 		got := vals.First()
 
 		if !reflect.DeepEqual(got, want) {
@@ -63,12 +63,12 @@ func TestValues_Next(t *testing.T) {
 		},
 		{
 			name: "SingleItem",
-			vals: []internal.Value{internal.Int64(10)},
+			vals: []internal.Value{internal.Number(10)},
 			want: nil,
 		},
 		{
 			name: "MultiItem",
-			vals: []internal.Value{internal.Int64(10), internal.String("hello"), internal.Bool(true)},
+			vals: []internal.Value{internal.Number(10), internal.String("hello"), internal.Bool(true)},
 			want: &internal.List{Values: internal.Values{internal.String("hello"), internal.Bool(true)}},
 		},
 	}
@@ -96,26 +96,26 @@ func TestValues_Cons(t *testing.T) {
 		{
 			name: "Nil",
 			vals: []internal.Value(nil),
-			item: internal.Int64(10),
-			want: internal.Values{internal.Int64(10)},
+			item: internal.Number(10),
+			want: internal.Values{internal.Number(10)},
 		},
 		{
 			name: "Empty",
 			vals: []internal.Value{},
-			item: internal.Int64(10),
-			want: internal.Values{internal.Int64(10)},
+			item: internal.Number(10),
+			want: internal.Values{internal.Number(10)},
 		},
 		{
 			name: "SingleItem",
-			vals: []internal.Value{internal.Int64(10)},
+			vals: []internal.Value{internal.Number(10)},
 			item: internal.String("hello"),
-			want: internal.Values{internal.String("hello"), internal.Int64(10)},
+			want: internal.Values{internal.String("hello"), internal.Number(10)},
 		},
 		{
 			name: "MultiItem",
-			vals: []internal.Value{internal.Int64(10), internal.String("hello")},
+			vals: []internal.Value{internal.Number(10), internal.String("hello")},
 			item: internal.Bool(true),
-			want: internal.Values{internal.Bool(true), internal.Int64(10), internal.String("hello")},
+			want: internal.Values{internal.Bool(true), internal.Number(10), internal.String("hello")},
 		},
 	}
 

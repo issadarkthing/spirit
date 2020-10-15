@@ -93,12 +93,12 @@ func TestMultiFn_Invoke(t *testing.T) {
 				Methods: []internal.Fn{
 					{
 						Args: []string{"arg1"},
-						Body: internal.Int64(10),
+						Body: internal.Number(10),
 					},
 				},
 			},
 			args: []internal.Value{internal.Symbol{Value: "argVal"}},
-			want: internal.Int64(10),
+			want: internal.Number(10),
 		},
 	}
 
@@ -136,10 +136,10 @@ func TestFn_Invoke(t *testing.T) {
 			name: "GoFuncWrap",
 			fn: internal.Fn{
 				Func: func(scope internal.Scope, args []internal.Value) (internal.Value, error) {
-					return internal.Int64(10), nil
+					return internal.Number(10), nil
 				},
 			},
-			want: internal.Int64(10),
+			want: internal.Number(10),
 		},
 		{
 			name: "NoBody",
@@ -164,7 +164,7 @@ func TestFn_Invoke(t *testing.T) {
 				Args:     []string{"test"},
 				Variadic: true,
 			},
-			args: []internal.Value{internal.Int64(10), internal.Bool(true)},
+			args: []internal.Value{internal.Number(10), internal.Bool(true)},
 			want: internal.Nil{},
 		},
 	}

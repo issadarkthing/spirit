@@ -37,10 +37,10 @@ func ValueOf(v interface{}) Value {
 		return reflectFn(rv)
 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return Int64(rv.Int())
+		return Number(rv.Int())
 
 	case reflect.Float32, reflect.Float64:
-		return Float64(rv.Float())
+		return Number(rv.Float())
 
 	case reflect.String:
 		return String(rv.String())

@@ -114,7 +114,7 @@ func (vf Vector) Invoke(scope Scope, args ...Value) (Value, error) {
 		return nil, fmt.Errorf("call requires exactly 1 argument, got %d", len(vals))
 	}
 
-	index, isInt := vals[0].(Int64)
+	index, isInt := vals[0].(Number)
 	if !isInt {
 		return nil, fmt.Errorf("key must be integer")
 	}
@@ -123,7 +123,7 @@ func (vf Vector) Invoke(scope Scope, args ...Value) (Value, error) {
 		return nil, fmt.Errorf("index out of bounds")
 	}
 
-	return vf.Values[index], nil
+	return vf.Values[int(index)], nil
 }
 
 func (vf Vector) String() string {
