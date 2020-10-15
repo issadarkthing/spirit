@@ -301,6 +301,14 @@ func (p *PersistentMap) Set(k, v Value) *PersistentMap {
 	return &PersistentMap{Data: p.Data.Assoc(k, v)}
 }
 
+func (p *PersistentMap) Get(key, defValue Value) Value {
+	val, ok := p.Data.Index(key)
+	if !ok {
+		return defValue
+	}
+	return val.(Value)
+}
+
 func (p *PersistentMap) Delete(k Value) *PersistentMap {
 	return &PersistentMap{Data: p.Data.Dissoc(k)}
 }

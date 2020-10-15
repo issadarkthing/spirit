@@ -103,7 +103,7 @@ func (kw Keyword) Invoke(scope Scope, args ...Value) (Value, error) {
 		return nil, err
 	}
 
-	hm, ok := argVals[0].(*HashMap)
+	hm, ok := argVals[0].(*PersistentMap)
 	if !ok {
 		return Nil{}, nil
 	}
