@@ -288,6 +288,8 @@ func (mod Module) Compare(v Value) bool {
 
 func (mod Module) String() string { return containerString(mod, "", "\n", "\n") }
 
+// PersistentMap is persistant and does not mutate on change
+// under the hood, it uses structural sharing to reduce the cost of copying
 type PersistentMap struct {
 	Position
 	Data hashmap.Map
@@ -298,7 +300,9 @@ func NewPersistentMap() *PersistentMap {
 }
 
 func (p *PersistentMap) Set(k, v Value) *PersistentMap {
-	return &PersistentMap{Data: p.Data.Assoc(k, v)}
+	return &PersistentMap{
+		Data: p.Data.Assoc(k, v),
+	}
 }
 
 func (p *PersistentMap) Get(key, defValue Value) Value {
@@ -311,6 +315,34 @@ func (p *PersistentMap) Get(key, defValue Value) Value {
 
 func (p *PersistentMap) Delete(k Value) *PersistentMap {
 	return &PersistentMap{Data: p.Data.Dissoc(k)}
+}
+
+func (p *PersistentMap) Compare(other Value) bool {
+	
+	otherMap, ok := other.(*PersistentMap)
+	if !ok {
+		return false
+	}
+
+	if otherMap.Data.Len() != p.Data.Len() {
+		return false
+	}
+
+	for it := p.Data.Iterator(); it.HasElem(); it.Next() {
+
+		k1, v1 := it.Elem()
+
+		v2, ok := otherMap.Data.Index(k1)
+		if !ok {
+			return false
+		}
+
+		if v1 != v2 {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (p *PersistentMap) Eval(scope Scope) (Value, error) {

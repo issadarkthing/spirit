@@ -45,16 +45,16 @@ func Compare(v1, v2 Value) bool {
 		return true
 	}
 
-	if cmp, ok := v1.(comparable); ok {
+	if cmp, ok := v1.(Comparable); ok {
 		return cmp.Compare(v2)
 	}
 
 	return reflect.DeepEqual(v1, v2)
 }
 
-// comparable can be implemented by Value types to support comparison.
+// Comparable can be implemented by Value types to support comparison.
 // See Compare().
-type comparable interface {
+type Comparable interface {
 	Value
 	Compare(other Value) bool
 }
