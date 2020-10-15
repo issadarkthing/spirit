@@ -1,6 +1,10 @@
 package spirit
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/issadarkthing/spirit/internal"
+)
 
 func checkArity(expected, got int) error {
 
@@ -11,6 +15,14 @@ func checkArity(expected, got int) error {
 	}
 
 	return nil
+}
+
+func invalidType(expected, got internal.Value) error {
+	return fmt.Errorf("invalid type; expected %T instead got %T", expected, got)
+}
+
+func doesNotImplementSeq(got internal.Value) error {
+	return fmt.Errorf("%v does not implement Seq interface", got)
 }
 
 func checkArityAtLeast(atLeast, got int) error {

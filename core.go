@@ -227,7 +227,7 @@ func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 	arg1 := args[0]
 	vecs, ok := arg1.(internal.Vector)
 	if !ok {
-		return nil, fmt.Errorf("Invalid type")
+		return nil, invalidType(internal.Vector{}, arg1)
 	}
 
 	coll, err := vecs.Values[1].Eval(scope)
@@ -237,7 +237,7 @@ func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 
 	l, ok := coll.(internal.Seq)
 	if !ok {
-		return nil, fmt.Errorf("Invalid type")
+		return nil, doesNotImplementSeq(l)
 	}
 
 	list := realize(l)
@@ -325,6 +325,7 @@ func future(scope internal.Scope, args []internal.Value) (internal.Value, error)
 }
 
 type chanWrapper func(internal.Symbol, <-chan internal.Value) (internal.Value, error)
+
 // Deref chan from future to get the value. This call is blocking until future is resolved.
 // The result will be cached.
 func deref(scope internal.Scope) chanWrapper {
@@ -521,7 +522,6 @@ func splitString(str, sep internal.String) *internal.List {
 	return &internal.List{Values: values}
 }
 
-
 func keyword(str string) internal.Keyword {
 	return internal.Keyword(str)
 }
@@ -532,14 +532,13 @@ func assoc(hm *internal.PersistentMap, args ...internal.Value) (*internal.Persis
 		return nil, fmt.Errorf("invalid number of arguments passed")
 	}
 
-	h := hm	
+	h := hm
 	for i := 0; i < len(args); i += 2 {
 		h = h.Set(args[i], args[i+1])
 	}
 
 	return h, nil
 }
-
 
 func parsejson(rawJson string) (*internal.PersistentMap, error) {
 
