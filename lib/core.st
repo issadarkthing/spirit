@@ -43,6 +43,18 @@
 ; sequence operations -------------------------------
 (defn seq? [arg] (impl? arg types/Seq))
 
+(defn range-vec
+  ([max]
+   (range-vec 0 max 1))
+  ([min max]
+   (range-vec min max 1))
+  ([min max step]
+   (loop [coll []
+          index min]
+     (if (= index max)
+       coll
+       (recur (cons index coll) (+ step index))))))
+
 (defn first [coll]
     (if (nil? coll)
         nil
