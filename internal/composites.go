@@ -432,7 +432,7 @@ func (p *PersistentVector) String() string {
 }
 
 func (p *PersistentVector) Next() Seq {
-	if p.Vec.Len() == 0 {
+	if p.Vec.Len() == 1 {
 		return nil
 	}
 	return &PersistentVector{
