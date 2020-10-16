@@ -105,6 +105,18 @@ func TestVector_Eval(t *testing.T) {
 			value:   internal.NewPersistentVector().Cons(internal.Symbol{Value: "hello"}),
 			wantErr: true,
 		},
+		{
+			name: "Immutability",
+			getScope: func() internal.Scope {
+				list := internal.NewPersistentVector()
+				list.Cons(internal.Keyword("hello"))
+				scope := internal.NewScope(nil)
+				scope.Bind("ls", list)
+				return scope
+			},
+			value: internal.Symbol{Value: "ls"},
+			want: internal.NewPersistentVector(),
+		},
 	})
 }
 
@@ -287,6 +299,18 @@ func TestHashMap_Eval(t *testing.T) {
 				Set(internal.Keyword("name"), internal.String("Bob")),
 			want: internal.NewPersistentMap().
 				Set(internal.Keyword("name"), internal.String("Bob")),
+		},
+		{
+			name: "Immutability",
+			getScope: func() internal.Scope {
+				scope := internal.NewScope(nil)
+				hm := internal.NewPersistentMap()
+				hm.Set(internal.Keyword("bob"), internal.Number(12))
+				scope.Bind("my-hashmap", hm)
+				return scope
+			},
+			value: internal.Symbol{Value: "my-hashmap"},
+			want: internal.NewPersistentMap(),
 		},
 	})
 }
