@@ -10,7 +10,6 @@ import (
 
 var (
 	_ internal.Seq = &internal.List{}
-	_ internal.Seq = internal.Vector{}
 	_ internal.Seq = internal.Set{}
 )
 
@@ -95,15 +94,15 @@ func TestVector_Eval(t *testing.T) {
 	executeEvalTests(t, []evalTestCase{
 		{
 			name:  "EmptyVector",
-			value: internal.Vector{},
-			want:  internal.Vector{},
+			value: internal.NewPersistentVector(),
+			want:  internal.NewPersistentVector(),
 		},
 		{
 			name: "EvalFailure",
 			getScope: func() internal.Scope {
 				return internal.NewScope(nil)
 			},
-			value:   internal.Vector{Values: []internal.Value{internal.Symbol{Value: "hello"}}},
+			value:   internal.NewPersistentVector().Cons(internal.Symbol{Value: "hello"}),
 			wantErr: true,
 		},
 	})
@@ -184,15 +183,18 @@ func TestList_String(t *testing.T) {
 func TestVector_String(t *testing.T) {
 	executeStringTestCase(t, []stringTestCase{
 		{
-			value: internal.Vector{},
+			value: internal.NewPersistentVector(),
 			want:  "[]",
 		},
 		{
-			value: internal.Vector{Values: []internal.Value{internal.Keyword("hello")}},
+			value: internal.NewPersistentVector().
+			Cons(internal.Keyword("hello")),
 			want:  "[:hello]",
 		},
 		{
-			value: internal.Vector{Values: []internal.Value{internal.Keyword("hello"), &internal.List{}}},
+			value: internal.NewPersistentVector().
+			Cons(internal.Keyword("hello")).
+			Cons(&internal.List{}),
 			want:  "[:hello ()]",
 		},
 	})
@@ -218,7 +220,7 @@ func TestModule_String(t *testing.T) {
 func TestVector_Invoke(t *testing.T) {
 	t.Parallel()
 
-	vector := internal.Vector{Values: []internal.Value{internal.Keyword("hello")}}
+	vector := internal.NewPersistentVector().Cons(internal.Keyword("hello"))
 
 	table := []struct {
 		name     string
@@ -265,7 +267,7 @@ func TestVector_Invoke(t *testing.T) {
 				scope = tt.getScope()
 			}
 
-			got, err := vector.Invoke(scope, tt.args...)
+			got, err := vector.(*internal.PersistentVector).Invoke(scope, tt.args...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Eval() error = %v, wantErr %v", err, tt.wantErr)
 				return

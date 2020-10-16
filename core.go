@@ -225,12 +225,12 @@ func createRange(min, max, step int) []internal.Value {
 func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
 	arg1 := args[0]
-	vecs, ok := arg1.(internal.Vector)
+	vecs, ok := arg1.(*internal.PersistentVector)
 	if !ok {
-		return nil, invalidType(internal.Vector{}, arg1)
+		return nil, invalidType(internal.NewPersistentVector(), arg1)
 	}
 
-	coll, err := vecs.Values[1].Eval(scope)
+	coll, err := vecs.Index(1).Eval(scope)
 	if err != nil {
 		return nil, err
 	}
@@ -240,14 +240,10 @@ func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 		return nil, doesNotImplementSeq(l)
 	}
 
-	list := realize(l)
-
-	symbol, ok := vecs.Values[0].(internal.Symbol)
-	if !ok {
-		return nil, fmt.Errorf("invalid type; expected symbol")
-	}
-
+	symbol, ok := vecs.Index(0).(internal.Symbol)
 	var result internal.Value
+
+	list := realize(l)
 	for _, v := range list.Values {
 		scope.Bind(symbol.Value, v)
 		for _, body := range args[1:] {
@@ -384,7 +380,7 @@ func parseLoop(scope internal.Scope, args []internal.Value) (*internal.Fn, error
 		return nil, fmt.Errorf("call requires at-least bindings argument")
 	}
 
-	vec, isVector := args[0].(internal.Vector)
+	vec, isVector := args[0].(*internal.PersistentVector)
 	if !isVector {
 		return nil, fmt.Errorf(
 			"first argument to let must be bindings vector, not %v",
@@ -392,23 +388,23 @@ func parseLoop(scope internal.Scope, args []internal.Value) (*internal.Fn, error
 		)
 	}
 
-	if len(vec.Values)%2 != 0 {
+	if vec.Size()%2 != 0 {
 		return nil, fmt.Errorf("bindings must contain event forms")
 	}
 
 	var bindings []binding
-	for i := 0; i < len(vec.Values); i += 2 {
-		sym, isSymbol := vec.Values[i].(internal.Symbol)
+	for i := 0; i < vec.Size(); i += 2 {
+		sym, isSymbol := vec.Index(i).(internal.Symbol)
 		if !isSymbol {
 			return nil, fmt.Errorf(
 				"item at %d must be symbol, not %s",
-				i, vec.Values[i],
+				i, vec.Index(i),
 			)
 		}
 
 		bindings = append(bindings, binding{
 			Name: sym.Value,
-			Expr: vec.Values[i+1],
+			Expr: vec.Index(i+1),
 		})
 	}
 

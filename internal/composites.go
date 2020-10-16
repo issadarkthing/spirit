@@ -393,12 +393,161 @@ func (p PersistentMap) String() string {
 }
 
 type PersistentVector struct {
+	Position
 	Vec vector.Vector
 }
 
-func NewPersistenVector() *PersistentVector {
+
+func NewPersistentVector() *PersistentVector {
 	return &PersistentVector{Vec: vector.Empty}
 }
+
+func (p *PersistentVector) First() Value {
+	v, ok := p.Vec.Index(0)
+	if !ok {
+		return nil
+	}
+	return v.(Value)
+}
+
+func (p *PersistentVector) Eval(scope Scope) (Value, error) {
+	var pv Seq = NewPersistentVector()
+	for it := p.Vec.Iterator(); it.HasElem(); it.Next() {
+		v := it.Elem()
+		val, err := v.(Value).Eval(scope)
+		if err != nil {
+			return nil, err
+		}
+		pv = pv.Cons(val)
+	}
+	return pv, nil
+}
+
+func (p *PersistentVector) String() string {
+	vals := make([]Value, 0, p.Vec.Len())
+	for it := p.Vec.Iterator(); it.HasElem(); it.Next() {
+		vals = append(vals, it.Elem().(Value))
+	}
+	return containerString(vals, "[", "]", " ")
+}
+
+func (p *PersistentVector) Next() Seq {
+	if p.Vec.Len() == 0 {
+		return nil
+	}
+	return &PersistentVector{
+		Vec: p.Vec.SubVector(1, p.Vec.Len()),
+		Position: p.Position,
+	}
+}
+
+func (p *PersistentVector) Conj(vals ...Value) Seq {
+	pv := &PersistentVector{
+		Vec: p.Vec,
+		Position: p.Position,
+	}
+	for _, v := range vals {
+		pv.Vec = pv.Vec.Cons(v)
+	}
+	return pv
+}
+
+func (p *PersistentVector) Cons(v Value) Seq {
+	return &PersistentVector{
+		Vec: p.Vec.Cons(v), 
+		Position: p.Position,
+	}
+}
+
+func (p *PersistentVector) Update(i int, v Value) Seq {
+	return &PersistentVector{
+		Vec: p.Vec.Assoc(i, v),
+		Position: p.Position,
+	}
+}
+
+func (p *PersistentVector) SubVector(i, j int) Seq {
+	return &PersistentVector{
+		Vec: p.Vec.SubVector(i, j),
+		Position: p.Position,
+	}
+}
+
+func (p *PersistentVector) Index(i int) Value {
+	val, ok := p.Vec.Index(i)
+	if !ok {
+		panic("error out of bound")
+	}
+	return val.(Value)
+}
+
+func (p *PersistentVector) SetPosition(pos Position) *PersistentVector {
+	p.Position = pos
+	return p
+}
+
+func (p *PersistentVector) Compare(other Value) bool {
+
+	pv2, ok := other.(*PersistentVector)
+	if !ok {
+		return false
+	}
+
+	if p.Size() != pv2.Size() {
+		return false
+	}
+
+	i := 0
+	for it := p.Vec.Iterator(); it.HasElem(); it.Next() {
+		v1 := it.Elem()
+		v2 := pv2.Index(i)
+
+		if !Compare(v1.(Value), v2.(Value)) {
+			return false
+		}
+
+		i++
+	}
+
+	return true
+}
+
+func (p *PersistentVector) Size() int {
+	return p.Vec.Len()
+}
+
+func (p *PersistentVector) GetValues() []Value {
+	vals := make([]Value, 0, p.Size())
+	for it := p.Vec.Iterator(); it.HasElem(); it.Next() {
+		vals = append(vals, it.Elem().(Value))
+	}
+	return vals
+}
+
+func (p *PersistentVector) Invoke(scope Scope, args ...Value) (Value, error) {
+	vals, err := evalValueList(scope, args)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(vals) != 1 {
+		return nil, fmt.Errorf("call requires exactly 1 argument, got %d", len(vals))
+	}
+
+	index, isInt := vals[0].(Number)
+	if !isInt {
+		return nil, fmt.Errorf("key must be integer")
+	}
+
+	i := int(index)
+
+	if i >= p.Size() {
+		return nil, fmt.Errorf("index out of bounds")
+	}
+
+	return p.Index(i), nil
+}
+
 
 func hasher(s interface{}) uint32 {
 	return hash.String(s.(Value).String())

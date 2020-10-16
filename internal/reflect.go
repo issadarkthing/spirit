@@ -60,15 +60,15 @@ func ValueOf(v interface{}) Value {
 	}
 }
 
-func convertToVector(sl reflect.Value) *Vector {
+func convertToVector(sl reflect.Value) *PersistentVector {
 
-	list := make([]Value, 0, sl.Len())
+	pv := NewPersistentVector()
 
 	for i := 0; i < sl.Len(); i++ {
-		list = append(list, ValueOf(sl.Index(i).Interface()))
+		pv = pv.Cons(ValueOf(sl.Index(i).Interface())).(*PersistentVector)
 	}
 
-	return &Vector{Values: list}
+	return pv
 }
 
 // Any can be used to wrap arbitrary Go value into spirit scope.
@@ -103,8 +103,12 @@ func (t Type) Invoke(scope Scope, args ...Value) (Value, error) {
 	case reflect.TypeOf((*List)(nil)):
 		return &List{Values: argVals}, nil
 
-	case reflect.TypeOf(Vector{}):
-		return Vector{Values: argVals}, nil
+	case reflect.TypeOf(PersistentVector{}):
+		pv := NewPersistentVector()
+		for _, v := range argVals {
+			pv = pv.Cons(v).(*PersistentVector)
+		}
+		return pv, nil
 
 	case reflect.TypeOf(Set{}):
 		return Set{Values: Values(argVals).Uniq()}, nil

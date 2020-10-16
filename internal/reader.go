@@ -537,10 +537,14 @@ func readVector(rd *Reader, _ rune) (Value, error) {
 		return nil, err
 	}
 
-	return Vector{
-		Values:   forms,
-		Position: pi,
-	}, nil
+	pv := NewPersistentVector()
+	pv.Position = pi
+
+	for _, v := range forms {
+		pv.Vec = pv.Vec.Cons(v)
+	}
+
+	return pv, nil
 }
 
 func readSet(rd *Reader, _ rune) (Value, error) {

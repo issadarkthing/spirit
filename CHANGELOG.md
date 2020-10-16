@@ -6,6 +6,13 @@ PersistentHashMap implements structural sharing.
 - Added shebang support
 - Added pre-load flag to pre-load any source file before evaluating
 file or expression.
+- Replaced Vector with PersistentVector with crazy amount performance gained when
+updating Vector
+```
+Performance in updating a value at the middle of the vector with 10000 elements
+Vector           Elapsed time: 1.108098484s
+PersistentVector Elapsed time: 13.867µs
+```
 
 v0.7.0
 - Added Atom type
