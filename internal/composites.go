@@ -30,8 +30,25 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 		return nil, err
 	}
 
+	fnCall := Call{
+		Name: lf.Values[0].String(),
+		Position: lf.Position,
+	}
+
 	if lf.special != nil {
-		return lf.special.Invoke(scope, lf.Values[1:]...)
+		scope.Push(fnCall)
+		val, err := lf.special.Invoke(scope, lf.Values[1:]...)
+		if err != nil {
+			if evalErr, ok := err.(EvalError); ok {
+				return nil, fmt.Errorf(
+					"%v%s", evalErr.Cause, scope.StackTrace(),
+				)
+			}
+			return nil, fmt.Errorf("%v%s", err, scope.StackTrace())
+			// return nil, err
+		}
+		scope.Pop()
+		return val, nil
 	}
 
 	target, err := Eval(scope, lf.Values[0])
@@ -41,12 +58,29 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 
 	invokable, ok := target.(Invokable)
 	if !ok {
-		return nil, fmt.Errorf(
+		err = fmt.Errorf(
 			"cannot invoke value of type '%s'", reflect.TypeOf(target),
 		)
+
+		return nil, fmt.Errorf("%v%s\n", err, scope.StackTrace())
+		// return nil, err
 	}
 
-	return invokable.Invoke(scope, lf.Values[1:]...)
+
+	scope.Push(fnCall)
+	val, err := invokable.Invoke(scope, lf.Values[1:]...)
+	if err != nil {
+
+		if evalErr, ok := err.(EvalError); ok {
+			return nil, fmt.Errorf(
+				"%v%s", evalErr.Cause, scope.StackTrace(),
+			)
+		}
+
+		return nil, err
+	}
+	scope.Pop()
+	return val, nil
 }
 
 func (lf List) String() string {
@@ -418,7 +452,7 @@ func (p *PersistentVector) Eval(scope Scope) (Value, error) {
 		if err != nil {
 			return nil, err
 		}
-		pv = pv.Cons(val)
+		pv = pv.Conj(val)
 	}
 	return pv, nil
 }
@@ -432,7 +466,7 @@ func (p *PersistentVector) String() string {
 }
 
 func (p *PersistentVector) Next() Seq {
-	if p.Vec.Len() == 1 {
+	if p.Vec.Len() == 1 || p.Vec.Len() == 0 {
 		return nil
 	}
 	return &PersistentVector{
@@ -453,10 +487,16 @@ func (p *PersistentVector) Conj(vals ...Value) Seq {
 }
 
 func (p *PersistentVector) Cons(v Value) Seq {
-	return &PersistentVector{
-		Vec: p.Vec.Cons(v), 
-		Position: p.Position,
+
+	pv := NewPersistentVector()
+	pv.Vec = pv.Vec.Cons(v)
+	pv.SetPosition(p.Position)
+	for it := p.Vec.Iterator(); it.HasElem(); it.Next() {
+		val := it.Elem()
+		pv.Vec = pv.Vec.Cons(val.(Value))
 	}
+
+	return pv
 }
 
 func (p *PersistentVector) Update(i int, v Value) Seq {
@@ -548,6 +588,51 @@ func (p *PersistentVector) Invoke(scope Scope, args ...Value) (Value, error) {
 	return p.Index(i), nil
 }
 
+type Call struct {
+	Position
+	Name string
+}
+
+// Stack contains function call. When fn is called, Call will be pushed in Stack,
+// when the fn exits, the stack is popped
+type Stack []Call
+
+// Add function call to stack
+func (s *Stack) Push(call Call) {
+	*s = append(*s, call)
+}
+
+func (s Stack) Size() int {
+	return len(s)
+}
+
+// Pops removes function call from Stack
+func (s *Stack) Pop() Call {
+
+	if s.Size() == 0 {
+		return Call{}
+	}
+
+	last := (*s)[s.Size()-1]
+	*s = (*s)[:s.Size()-1]
+	return last
+}
+
+func (s *Stack) StackTrace() string {
+
+	var str strings.Builder
+	size := s.Size()
+
+	for i := 0; i < size; i++ {
+		call := s.Pop()
+		file, line, col := call.GetPos()
+		str.WriteString(
+			fmt.Sprintf("\nat %s (%s:%d:%d)", call.Name, file, line, col),
+		)
+	}
+
+	return str.String()
+}
 
 func hasher(s interface{}) uint32 {
 	return hash.String(s.(Value).String())
