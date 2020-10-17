@@ -60,11 +60,9 @@
        (recur (cons index coll) (+ step index))))))
 
 (defn first [coll]
-    (if (nil? coll)
-        nil
-        (if (not (seq? coll))
-            (throw "argument must be a collection, not " (type coll))
-            (coll.First))))
+  (if (not (seq? coll))
+    (throw "argument must be a collection, not " (type coll))
+    (coll.First)))
 
 (defn second [coll]
     (first (next coll)))
