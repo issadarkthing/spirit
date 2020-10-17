@@ -559,3 +559,41 @@ func convert(data map[string]interface{}) *internal.PersistentMap {
 	}
 	return pm
 }
+
+func apply(scope internal.Scope, args []internal.Value) (internal.Value, error) {
+	
+	err := checkArityAtLeast(2, len(args))
+	if err != nil {
+		return nil, err
+	}
+
+
+	args, err = evalValueList(scope, args)
+	if err != nil {
+		return nil, err
+	}
+
+	fn, ok := args[0].(internal.Invokable)
+	if !ok {
+		return nil, doesNotImplementInvokable(args[0])
+	}
+
+	fnArgs := args[1:len(args)-1]
+	lastArg, ok := args[len(args)-1].(internal.Seq)
+	if !ok {
+		return nil, doesNotImplementSeq(lastArg)
+	}
+
+	if lastArg.Size() != 0 {
+		for it := lastArg; it != nil; it = it.Next() {
+			fnArgs = append(fnArgs, it.First())
+		}
+	}
+
+	val, err := fn.Invoke(scope, fnArgs...)
+	if err != nil {
+		return nil, err
+	}
+
+	return val, nil
+}
