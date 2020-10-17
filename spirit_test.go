@@ -105,7 +105,7 @@ func TestSpirit(t *testing.T) {
 	}
 
 	for _, fi := range files {
-		if !strings.HasSuffix(fi.Name(), "_test.lisp") {
+		if !strings.HasSuffix(fi.Name(), "_test.st") {
 			continue
 		}
 
@@ -141,8 +141,8 @@ func initspirit() (*spirit.Spirit, error) {
 
 	sl := spirit.New()
 	for _, fi := range di {
-		if !strings.HasSuffix(fi.Name(), ".lisp") ||
-			strings.HasSuffix(fi.Name(), "_test.lisp") {
+		if !strings.HasSuffix(fi.Name(), ".st") ||
+			strings.HasSuffix(fi.Name(), "_test.st") {
 			continue
 		}
 
