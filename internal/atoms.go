@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"unicode/utf8"
 )
 
 // Nil represents a nil value.
@@ -64,6 +65,8 @@ func (se String) Cons(v Value) Seq { return se.chars().Cons(v) }
 // Conj joins the given values to list of characters of the string and returns
 // the new sequence.
 func (se String) Conj(vals ...Value) Seq { return se.chars().Conj(vals...) }
+
+func (se String) Size() int { return utf8.RuneCountInString(string(se)) }
 
 func (se String) chars() Values {
 	var vals Values
