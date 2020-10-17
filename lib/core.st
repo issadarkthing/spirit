@@ -39,6 +39,10 @@
   ([prompt]
    (read* prompt)))
 
+; math operations -------------------------------
+
+(defn positive? [x]
+  (> x 0))
 
 ; sequence operations -------------------------------
 (defn seq? [arg] (impl? arg types/Seq))
@@ -94,6 +98,16 @@
 
 ; (defn swap! [atom f]
 ;   (atom.UpdateState f))
+
+(defn drop [n coll]
+  (if (zero? n)
+    coll
+    (recur (dec n) (next coll))))
+
+(defn into [to from]
+  (if (empty? from)
+    to
+    (recur (cons (first from) to) (next from))))
 
 (defn empty? [coll]
     (if (nil? coll)
@@ -155,6 +169,12 @@
       (throw "argument must be a Seq"))
     (coll.Size))
 
+(defn empty [coll]
+  (if (not (seq? coll))
+    (throw "argument must be a Seq"))
+  (if (list? coll)
+    '()
+    []))
 
 (defn take
   ([n coll]
@@ -188,6 +208,7 @@
     (doseq [x coll]
       (unsafe/swap z (conj z (f x))))
     z))
+
 
 (defn map-indexed [f coll]
   (let [z '() i 0]
@@ -240,8 +261,9 @@
 ; important macros -----------------------------------
 
 
-(defmacro apply [callable args]
-    `(eval (cons ~callable ~args)))
+; (defmacro apply [callable args]
+;   `(eval (cons ~callable ~args)))
+    
 
 (defmacro when [expr & body]
     (let [body (cons 'do body)]
@@ -287,7 +309,7 @@
 
 ; Type initialization functions ---------------------
 (defn set [coll] (apply (type #{}) coll))
-(defn list [& coll] (apply (type ()) coll))
+(defn list [& coll] (apply (type '()) coll))
 (defn vector [& coll] (apply (type []) coll))
 (defn int [arg] (to-type (type 0) arg))
 (defn float [arg] (to-type (type 0.0) arg))
