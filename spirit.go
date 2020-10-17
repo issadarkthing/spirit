@@ -33,6 +33,7 @@ func New() *Spirit {
 
 // Spirit instance
 type Spirit struct {
+	internal.Stack
 	mu        *sync.RWMutex
 	currentNS string
 	checkNS   bool
