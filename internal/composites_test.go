@@ -39,6 +39,9 @@ func TestList_Eval(t *testing.T) {
 			value: &internal.List{
 				Values: []internal.Value{internal.Number(10), internal.Keyword("hello")},
 			},
+			getScope: func() internal.Scope {
+				return internal.NewScope(nil)
+			},
 			wantErr: true,
 		},
 		{
@@ -177,7 +180,10 @@ func TestList_String(t *testing.T) {
 		},
 		{
 			value: &internal.List{
-				Values: []internal.Value{internal.Symbol{Value: "quote"}, internal.Symbol{Value: "hello"}},
+				Values: []internal.Value{
+					internal.Symbol{Value: "quote"}, 
+					internal.Symbol{Value: "hello"},
+				},
 			},
 			want: "(quote hello)",
 		},
@@ -185,7 +191,13 @@ func TestList_String(t *testing.T) {
 			value: &internal.List{
 				Values: []internal.Value{
 					internal.Symbol{Value: "quote"},
-					&internal.List{Values: []internal.Value{internal.Symbol{Value: "hello"}}}},
+					&internal.List{
+						Values: []internal.Value{
+							internal.Symbol{
+								Value: "hello",
+							},
+						},
+					}},
 			},
 			want: "(quote (hello))",
 		},
@@ -205,8 +217,8 @@ func TestVector_String(t *testing.T) {
 		},
 		{
 			value: internal.NewPersistentVector().
-			Cons(internal.Keyword("hello")).
-			Cons(&internal.List{}),
+			Cons(&internal.List{}).
+			Cons(internal.Keyword("hello")),
 			want:  "[:hello ()]",
 		},
 	})
