@@ -540,8 +540,8 @@ func readVector(rd *Reader, _ rune) (Value, error) {
 	pv := NewPersistentVector()
 	pv.Position = pi
 
-	for _, v := range forms {
-		pv.Vec = pv.Vec.Cons(v)
+	for _, form := range forms {
+		pv.Vec = pv.Vec.Cons(form)
 	}
 
 	return pv, nil

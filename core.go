@@ -225,9 +225,15 @@ func createRange(min, max, step int) []internal.Value {
 func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
 	arg1 := args[0]
+	// function arguments binding
 	vecs, ok := arg1.(*internal.PersistentVector)
 	if !ok {
 		return nil, invalidType(internal.NewPersistentVector(), arg1)
+	}
+
+	err := checkArityAtLeast(2, vecs.Size())
+	if err != nil {
+		return nil, err
 	}
 
 	coll, err := vecs.Index(1).Eval(scope)

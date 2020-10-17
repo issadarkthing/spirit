@@ -65,7 +65,7 @@ func convertToVector(sl reflect.Value) *PersistentVector {
 	pv := NewPersistentVector()
 
 	for i := 0; i < sl.Len(); i++ {
-		pv = pv.Cons(ValueOf(sl.Index(i).Interface())).(*PersistentVector)
+		pv = pv.Conj(ValueOf(sl.Index(i).Interface())).(*PersistentVector)
 	}
 
 	return pv
@@ -103,11 +103,9 @@ func (t Type) Invoke(scope Scope, args ...Value) (Value, error) {
 	case reflect.TypeOf((*List)(nil)):
 		return &List{Values: argVals}, nil
 
-	case reflect.TypeOf(PersistentVector{}):
+	case reflect.TypeOf(&PersistentVector{}):
 		pv := NewPersistentVector()
-		for _, v := range argVals {
-			pv = pv.Cons(v).(*PersistentVector)
-		}
+		pv = pv.Conj(argVals...).(*PersistentVector)
 		return pv, nil
 
 	case reflect.TypeOf(Set{}):
