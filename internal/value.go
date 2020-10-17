@@ -34,6 +34,8 @@ type Seq interface {
 	// Conj should join the given values to the sequence and return a
 	// new sequence.
 	Conj(vals ...Value) Seq
+
+	Size() int
 }
 
 // Compare compares two values in an identity independent manner. If
