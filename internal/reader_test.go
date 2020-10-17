@@ -190,6 +190,11 @@ func TestReader_All(t *testing.T) {
 			src:     `())`,
 			wantErr: true,
 		},
+		{
+			name:    "ShebangRemoval",
+			src:     `#!/usr/bin/env spirit`,
+			want:    internal.Module(nil),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
