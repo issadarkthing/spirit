@@ -25,6 +25,10 @@ func doesNotImplementSeq(got internal.Value) error {
 	return fmt.Errorf("%v does not implement Seq interface", got)
 }
 
+func doesNotImplementInvokable(got internal.Value) error {
+	return fmt.Errorf("%v does not implement Invokable interface", got)
+}
+
 func checkArityAtLeast(atLeast, got int) error {
 
 	msg := "invalid number of arguments passed; expected at least %d instead got %d"
