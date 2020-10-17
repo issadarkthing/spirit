@@ -479,6 +479,9 @@ func accessMember(target reflect.Value, member string) (reflect.Value, error) {
 		return reflect.Value{}, fmt.Errorf("cannot access private member")
 	}
 
+	errNoMember := fmt.Errorf("value of type '%s' has no member named '%s'",
+		target.Type(), member)
+
 	if _, found := target.Type().MethodByName(member); found {
 		return target.MethodByName(member), nil
 	}
@@ -487,10 +490,13 @@ func accessMember(target reflect.Value, member string) (reflect.Value, error) {
 		target = target.Elem()
 	}
 
+	if target.Kind() != reflect.Struct {
+		return reflect.Value{}, errNoMember
+	}
+
 	if _, found := target.Type().FieldByName(member); found {
 		return target.FieldByName(member), nil
 	}
 
-	return reflect.Value{}, fmt.Errorf("value of type '%s' has no member named '%s'",
-		target.Type(), member)
+	return reflect.Value{}, errNoMember
 }
