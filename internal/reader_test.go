@@ -757,15 +757,15 @@ func TestReader_One_Vector(t *testing.T) {
 				Line:   1,
 				Column: 1,
 			}).
+			Cons(internal.Number(3.1413)).
+			Cons(internal.Number(15)).
 			Cons(internal.Symbol{
 				Value: "+",
 				Position: internal.Position{
 					File:   "<string>",
 					Line:   1,
 					Column: 2,
-				}}).
-			Cons(internal.Number(15)).
-			Cons(internal.Number(3.1413)),
+				}}),
 		},
 		{
 			name: "WithCommaSeparator",
@@ -776,21 +776,21 @@ func TestReader_One_Vector(t *testing.T) {
 				Line:   1,
 				Column: 1,
 			}).
+			Cons(internal.Number(3.1413)).
+			Cons(internal.Number(15)).
 			Cons(internal.Symbol{
 				Value: "+",
 				Position: internal.Position{
 					File:   "<string>",
 					Line:   1,
 					Column: 2,
-				}}).
-				Cons(internal.Number(15)).
-				Cons(internal.Number(3.1413)),
+				}}),
 		},
 		{
 			name: "MultiLine",
 			src: `[+
-                      0xF
-                      3.1413
+					  0xF
+					  3.1413
 					]`,
 					want: internal.NewPersistentVector().
 					SetPosition(internal.Position{
@@ -798,6 +798,8 @@ func TestReader_One_Vector(t *testing.T) {
 						Line:   1,
 						Column: 1,
 					}).
+					Cons(internal.Number(3.1413)).
+					Cons(internal.Number(15)).
 					Cons(internal.Symbol{
 						Value: "+",
 						Position: internal.Position{
@@ -805,22 +807,22 @@ func TestReader_One_Vector(t *testing.T) {
 							Line:   1,
 							Column: 2,
 						},
-					}).
-					Cons(internal.Number(15)).
-					Cons(internal.Number(3.1413)),
-			},
-			{
+					}),
+		},
+		{
 			name: "MultiLineWithComments",
 			src: `[+         ; plus operator adds numerical values
-                      0xF    ; hex representation of 15
-                      3.1413 ; value of math constant pi
-                  ]`,
+					  0xF    ; hex representation of 15
+					  3.1413 ; value of math constant pi
+				  ]`,
 				  want: internal.NewPersistentVector().
 				  SetPosition(internal.Position{
 					  File:   "<string>",
 					  Line:   1,
 					  Column: 1,
 				  }).
+				  Cons(internal.Number(3.1413)).
+				  Cons(internal.Number(15)).
 				  Cons(internal.Symbol{
 					  Value: "+",
 					  Position: internal.Position{
@@ -828,9 +830,7 @@ func TestReader_One_Vector(t *testing.T) {
 						  Line:   1,
 						  Column: 2,
 					  },
-				  }).
-				  Cons(internal.Number(15)).
-				  Cons(internal.Number(3.1413)),
+				  }),
 		  },
 		  {
 			  name:    "UnexpectedEOF",
