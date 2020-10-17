@@ -42,6 +42,9 @@ func ReadEvalStr(scope Scope, src string) (Value, error) {
 
 // Scope implementation is responsible for managing value bindings.
 type Scope interface {
+	Push(Call)
+	Pop() Call
+	StackTrace() string
 	Parent() Scope
 	Bind(symbol string, v Value) error
 	Resolve(symbol string) (Value, error)
@@ -72,7 +75,11 @@ type EvalError struct {
 func (ee EvalError) Unwrap() error { return ee.Cause }
 
 func (ee EvalError) Error() string {
-	return fmt.Sprintf("eval-error in '%s' (at line %d:%d): %v",
+	return fmt.Sprintf("in '%s' (at line %d:%d): \n%v",
 		ee.File, ee.Line, ee.Column, ee.Cause,
 	)
+
+	// return fmt.Sprintf("%v\n (%s:%d:%d)%v", 
+	// 	ee.Cause, ee.File, ee.Line, ee.Column, ee.Cause,
+	// )
 }

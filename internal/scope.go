@@ -49,6 +49,7 @@ func NewScope(parent Scope) *MapScope {
 
 // MapScope implements Scope using a Go native hash-map.
 type MapScope struct {
+	Stack
 	parent   Scope
 	mu       *sync.RWMutex
 	bindings map[string]Value
