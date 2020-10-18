@@ -78,8 +78,4 @@ func (ee EvalError) Error() string {
 	return fmt.Sprintf("in '%s' (at line %d:%d): \n%v",
 		ee.File, ee.Line, ee.Column, ee.Cause,
 	)
-
-	// return fmt.Sprintf("%v\n (%s:%d:%d)%v", 
-	// 	ee.Cause, ee.File, ee.Line, ee.Column, ee.Cause,
-	// )
 }

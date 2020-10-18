@@ -105,7 +105,8 @@ func TestVector_Eval(t *testing.T) {
 			getScope: func() internal.Scope {
 				return internal.NewScope(nil)
 			},
-			value:   internal.NewPersistentVector().Cons(internal.Symbol{Value: "hello"}),
+			value:   internal.NewPersistentVector().
+			Cons(internal.Symbol{Value: "hello"}),
 			wantErr: true,
 		},
 		{
@@ -159,6 +160,8 @@ func TestSet_Eval(t *testing.T) {
 		},
 	})
 }
+
+
 
 func TestList_String(t *testing.T) {
 	executeStringTestCase(t, []stringTestCase{
