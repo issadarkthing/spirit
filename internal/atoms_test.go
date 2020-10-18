@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/issadarkthing/spirit/internal"
+	"github.com/kr/pretty"
 )
 
 var _ internal.Seq = internal.String("")
@@ -189,7 +190,9 @@ func executeStringTestCase(t *testing.T, tests []stringTestCase) {
 		t.Run(reflect.TypeOf(tt.value).Name(), func(t *testing.T) {
 			got := strings.TrimSpace(tt.value.String())
 			if got != tt.want {
-				t.Errorf("String() got = %v, want %v", got, tt.want)
+				t.Errorf("String() \ngot \n%s, \nwant \n%s", 
+					pretty.Sprint(got), pretty.Sprint(tt.want),
+				)
 			}
 		})
 	}
@@ -207,7 +210,7 @@ func executeEvalTests(t *testing.T, tests []evalTestCase) {
 
 			got, err := internal.Eval(scope, tt.value)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Eval() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Eval() error %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
@@ -219,7 +222,9 @@ func executeEvalTests(t *testing.T, tests []evalTestCase) {
 			}
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Eval() got = %v, want %v", got, tt.want)
+				t.Errorf("Eval() got %s, want %s", 
+					pretty.Sprint(got), pretty.Sprint(tt.want),
+				)
 			}
 		})
 	}
