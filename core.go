@@ -557,8 +557,26 @@ func parsejson(rawJson string) (*internal.PersistentMap, error) {
 func convert(data map[string]interface{}) *internal.PersistentMap {
 	pm := internal.NewPersistentMap()
 	for k, v := range data {
+
+		// nested object
 		if nest, ok := v.(map[string]interface{}); ok {
 			pm = pm.Set(internal.Keyword(k), convert(nest))
+
+		// key with array value
+		} else if nestArr, ok := v.([]interface{}); ok {
+			vals := make([]internal.Value, 0, len(nestArr))
+
+			for _, n := range nestArr {
+				// nested object
+				if nested, ok := n.(map[string]interface{}); ok {
+					vals = append(vals, convert(nested))
+				} else {
+					vals = append(vals, internal.ValueOf(n))
+				}
+			}
+			pm = pm.Set(internal.Keyword(k), internal.ValueOf(vals))
+
+		// others can simply use ValueOf
 		} else {
 			pm = pm.Set(internal.Keyword(k), internal.ValueOf(v))
 		}

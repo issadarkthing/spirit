@@ -45,6 +45,7 @@ type Scope interface {
 	Push(Call)
 	Pop() Call
 	StackTrace() string
+	GetStack() Stack
 	Parent() Scope
 	Bind(symbol string, v Value) error
 	Resolve(symbol string) (Value, error)
