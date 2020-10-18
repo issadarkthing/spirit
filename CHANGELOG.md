@@ -13,6 +13,7 @@ Performance in updating a value at the middle of the vector with 10000 elements
 Vector           Elapsed time: 1.108098484s
 PersistentVector Elapsed time: 13.867µs
 ```
+- Added stack trace
 
 v0.7.0
 - Added Atom type

@@ -39,13 +39,13 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 		scope.Push(fnCall)
 		val, err := lf.special.Invoke(scope, lf.Values[1:]...)
 		if err != nil {
-			if evalErr, ok := err.(EvalError); ok {
-				return nil, fmt.Errorf(
-					"%v%s", evalErr.Cause, scope.StackTrace(),
-				)
-			}
-			return nil, fmt.Errorf("%v%s", err, scope.StackTrace())
-			// return nil, err
+			// if evalErr, ok := err.(EvalError); ok {
+			// 	return nil, fmt.Errorf(
+			// 		"%v%s", evalErr.Cause, scope.StackTrace(),
+			// 	)
+			// }
+			// return nil, fmt.Errorf("%v%s", err, scope.StackTrace())
+			return nil, err
 		}
 		scope.Pop()
 		return val, nil
@@ -621,10 +621,7 @@ func (s *Stack) Pop() Call {
 func (s *Stack) StackTrace() string {
 
 	var str strings.Builder
-	size := s.Size()
-
-	for i := 0; i < size; i++ {
-		call := s.Pop()
+	for _, call := range *s {
 		file, line, col := call.GetPos()
 		str.WriteString(
 			fmt.Sprintf("\nat %s (%s:%d:%d)", call.Name, file, line, col),

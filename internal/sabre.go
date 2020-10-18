@@ -17,7 +17,8 @@ func Eval(scope Scope, form Value) (Value, error) {
 
 	v, err := form.Eval(scope)
 	if err != nil {
-		return v, newEvalErr(form, err)
+		// return v, newEvalErr(form, err)
+		return v, err
 	}
 
 	return v, nil
@@ -45,7 +46,6 @@ type Scope interface {
 	Push(Call)
 	Pop() Call
 	StackTrace() string
-	GetStack() Stack
 	Parent() Scope
 	Bind(symbol string, v Value) error
 	Resolve(symbol string) (Value, error)
