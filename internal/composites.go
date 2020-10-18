@@ -39,13 +39,7 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 		scope.Push(fnCall)
 		val, err := lf.special.Invoke(scope, lf.Values[1:]...)
 		if err != nil {
-			if evalErr, ok := err.(EvalError); ok {
-				return nil, fmt.Errorf(
-					"%v%s", evalErr.Cause, scope.StackTrace(),
-				)
-			}
-			return nil, fmt.Errorf("%v%s", err, scope.StackTrace())
-			// return nil, err
+			return nil, addStackTrace(scope, err)
 		}
 		scope.Pop()
 		return val, nil
@@ -62,22 +56,14 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 			"cannot invoke value of type '%s'", reflect.TypeOf(target),
 		)
 
-		return nil, fmt.Errorf("%v%s\n", err, scope.StackTrace())
-		// return nil, err
+		return nil, err
 	}
 
 
 	scope.Push(fnCall)
 	val, err := invokable.Invoke(scope, lf.Values[1:]...)
 	if err != nil {
-
-		if evalErr, ok := err.(EvalError); ok {
-			return nil, fmt.Errorf(
-				"%v%s", evalErr.Cause, scope.StackTrace(),
-			)
-		}
-
-		return nil, err
+		return nil, addStackTrace(scope, err)
 	}
 	scope.Pop()
 	return val, nil
@@ -618,13 +604,15 @@ func (s *Stack) Pop() Call {
 	return last
 }
 
+// StackTrace returns string representing current stack trace
 func (s *Stack) StackTrace() string {
 
 	var str strings.Builder
-	size := s.Size()
-
-	for i := 0; i < size; i++ {
-		call := s.Pop()
+	// last index in slice
+	last := s.Size()-1
+	for i := range *s {
+		// iterate over slice in reverse
+		call := (*s)[last-i]
 		file, line, col := call.GetPos()
 		str.WriteString(
 			fmt.Sprintf("\nat %s (%s:%d:%d)", call.Name, file, line, col),
@@ -648,4 +636,15 @@ func containerString(vals []Value, begin, end, sep string) string {
 		parts[i] = fmt.Sprintf("%v", expr)
 	}
 	return begin + strings.Join(parts, sep) + end
+}
+
+// if an error occured when function is called, the error produced does not
+// contain stackTrace. This helper function will add stackTrace to the EvalError 
+// type, and return as is if it has stackTrace
+func addStackTrace(scope Scope, err error) error {
+	if evalErr, ok := err.(EvalError); ok && evalErr.StackTrace == "" {
+		evalErr.StackTrace = scope.StackTrace()
+		return evalErr
+	}
+	return err
 }

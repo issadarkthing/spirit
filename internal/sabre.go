@@ -17,7 +17,8 @@ func Eval(scope Scope, form Value) (Value, error) {
 
 	v, err := form.Eval(scope)
 	if err != nil {
-		return v, newEvalErr(form, err)
+		// return v, newEvalErr(form, err)
+		return v, err
 	}
 
 	return v, nil
@@ -45,7 +46,6 @@ type Scope interface {
 	Push(Call)
 	Pop() Call
 	StackTrace() string
-	GetStack() Stack
 	Parent() Scope
 	Bind(symbol string, v Value) error
 	Resolve(symbol string) (Value, error)
@@ -68,15 +68,16 @@ func newEvalErr(v Value, err error) EvalError {
 // EvalError represents error during evaluation.
 type EvalError struct {
 	Position
-	Cause error
-	Form  Value
+	Cause         error
+	StackTrace    string
+	Form          Value
 }
 
 // Unwrap returns the underlying cause of this error.
 func (ee EvalError) Unwrap() error { return ee.Cause }
 
 func (ee EvalError) Error() string {
-	return fmt.Sprintf("in '%s' (at line %d:%d): \n%v",
-		ee.File, ee.Line, ee.Column, ee.Cause,
+	return fmt.Sprintf("%s\nin '%s' (at line %d:%d) %v",
+		ee.Cause, ee.File, ee.Line, ee.Column, ee.StackTrace,
 	)
 }
