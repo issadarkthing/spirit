@@ -35,8 +35,8 @@ func bindAll(scope internal.Scope) error {
 			Variadic: true,
 			Func:     doSeq,
 		},
-		"core/apply": &internal.Fn{
-			Args: []string{"fn", "args"},
+		"core/<>": &internal.Fn{
+			Args: []string{"fn"},
 			Variadic: true,
 			Func: apply,
 		},

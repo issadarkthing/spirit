@@ -116,7 +116,7 @@
            (let [name "Bob"]
              (str "Hello " name "!"))))
 
-(def sum-through-let (apply + [1 2 3 4 5]))
+(def sum-through-let (<> + [1 2 3 4 5]))
 (assert (= (+ 1 2 3 4 5) sum-through-let))
 
 
@@ -127,7 +127,7 @@
 (assert (= '(4 5 6 7 8) (range 4 9)))
 (assert (= '(4 6 8) (range 4 9 2)))
 
-; (assert (= [1 4 9 25] (map square [1 2 3 5])))
+(assert (= [1 4 9 25] (map square [1 2 3 5])))
 (assert (= '(1 4 9 25) (map square '(1 2 3 5))))
 (assert (= '(10 1 12 3 14 5) (map-indexed 
                                (fn [x i] 
@@ -149,3 +149,4 @@
                             (if (even? i)
                               (conj acc v)
                               acc)) '() (range 10))))
+

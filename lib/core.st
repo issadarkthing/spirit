@@ -92,7 +92,7 @@
 (defn conj [coll & vals]
     (if (not (seq? coll))
         (throw "argument must be a collection, not " (type coll)))
-    (apply coll.Conj vals))
+    (<> coll.Conj vals))
 
 ; (defn swap! [atom f]
 ;   (atom.UpdateState f))
@@ -201,23 +201,30 @@
        (unsafe/swap i (inc i)))
      z)))
 
-(defn map [f coll]
-  (let [z '()]
-    (doseq [x coll]
-      (unsafe/swap z (conj z (f x))))
-    z))
 
+(defn map
+  ([f coll]
+   (map f coll (empty coll)))
+  ([f coll acc]
+   (let [x (first coll)
+         xs (rest coll)]
+     (if (nil? x)
+       acc
+       (recur f xs (conj acc (f x)))))))
 
-(defn map-indexed [f coll]
-  (let [z '() i 0]
-    (doseq [x coll]
-      (unsafe/swap z (conj z (f x i)))
-      (unsafe/swap i (inc i)))
-    z))
+(defn map-indexed
+  ([f coll]
+   (map-indexed f coll (empty coll) 0))
+  ([f coll acc i]
+   (let [x (first coll)
+         xs (rest coll)]
+     (if (nil? x)
+       acc
+       (recur f xs (conj acc (f x i)) (inc i))))))
 
 
 (defn filter [f coll]
-  (let [z '()]
+  (let [z (empty coll)]
     (doseq [x coll]
       (if (f x)
         (unsafe/swap z (conj z x))))
@@ -225,7 +232,7 @@
 
 
 (defn filter-indexed [f coll]
-  (let [z '() i 0]
+  (let [z (empty coll) i 0]
     (doseq [x coll]
       (if (f x i)
         (unsafe/swap z (conj z x)))
@@ -239,7 +246,7 @@
 
 (defn concat 
   ([coll1 coll2]
-   (apply coll1.Conj coll2))
+   (<> coll1.Conj coll2))
   ([coll1 coll2 & more]
    (reduce concat (concat coll1 coll2) more)))
 
@@ -306,9 +313,9 @@
 (defn symbol? [arg] (is-type? types/Symbol arg))
 
 ; Type initialization functions ---------------------
-(defn set [coll] (apply (type #{}) coll))
-(defn list [& coll] (apply (type '()) coll))
-(defn vector [& coll] (apply (type []) coll))
+(defn set [coll] (<> (type #{}) coll))
+(defn list [& coll] (<> (type '()) coll))
+(defn vector [& coll] (<> (type []) coll))
 (defn int [arg] (to-type (type 0) arg))
 (defn float [arg] (to-type (type 0.0) arg))
 (defn boolean [arg] (true? arg))

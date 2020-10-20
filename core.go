@@ -591,7 +591,6 @@ func apply(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 		return nil, err
 	}
 
-
 	args, err = evalValueList(scope, args)
 	if err != nil {
 		return nil, err
