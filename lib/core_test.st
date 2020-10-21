@@ -150,3 +150,6 @@
                               (conj acc v)
                               acc)) '() (range 10))))
 
+
+(assert (= 10 (hoist-test)))
+(defn hoist-test [] 10)
