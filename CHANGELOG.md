@@ -14,6 +14,7 @@ Vector           Elapsed time: 1.108098484s
 PersistentVector Elapsed time: 13.867µs
 ```
 - Added stack trace
+- Function hoisting for `defn` and `defmacro`
 
 v0.7.0
-- Added Atom type
+- Added Atom type (experimental)
