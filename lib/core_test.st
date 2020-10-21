@@ -16,7 +16,7 @@
 (assert (= [2 3 4] (next [1 2 3 4])))
 (assert (= nil (next [])))
 (assert (= [1 2 3 4] (cons 1 [2 3 4])))
-(assert (= [1 2 3 4] (conj [1 2] 3 4)))
+(assert (= [1 2 3 4] (conj [1 2 3] 4)))
 
 
 ; threading macros
