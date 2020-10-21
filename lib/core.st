@@ -89,10 +89,10 @@
         (throw "argument must be a collection, not " (type coll)))
     (coll.Cons v))
 
-(defn conj [coll & vals]
+(defn conj [coll vals]
     (if (not (seq? coll))
         (throw "argument must be a collection, not " (type coll)))
-    (<> coll.Conj vals))
+    (coll.Conj vals))
 
 ; (defn swap! [atom f]
 ;   (atom.UpdateState f))
@@ -170,9 +170,7 @@
 (defn empty [coll]
   (if (not (seq? coll))
     (throw "argument must be a Seq"))
-  (if (list? coll)
-    '()
-    []))
+  (if (list? coll) '() []))
 
 (defn take
   ([n coll]
@@ -255,7 +253,18 @@
   (if (fn? x)
     false
     (realized* x)))
-
+ 
+(defn flat 
+  ([coll]
+   (flat coll (empty coll)))
+  ([coll empty-seq]
+   (if (nil? coll) 
+     empty-seq
+     (let [x (first coll)
+           xs (next coll)]
+       (if (seq? x)
+         (concat (flat x empty-seq) (flat xs empty-seq))
+         (cons x (flat xs empty-seq)))))))
 
 ; source a file. Beware of circular dependency
 (defn source [filename]
