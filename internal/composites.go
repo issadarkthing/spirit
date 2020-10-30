@@ -485,7 +485,7 @@ func (p *PersistentVector) Cons(v Value) Seq {
 	return pv
 }
 
-func (p *PersistentVector) Update(i int, v Value) Seq {
+func (p *PersistentVector) Assoc(i int, v Value) Seq {
 	return &PersistentVector{
 		Vec: p.Vec.Assoc(i, v),
 		Position: p.Position,

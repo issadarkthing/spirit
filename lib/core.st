@@ -266,6 +266,10 @@
          (concat (flat x empty-seq) (flat xs empty-seq))
          (cons x (flat xs empty-seq)))))))
 
+(defn assoc [coll k v]
+  (if (vector? coll)
+    (coll.Assoc k v)))
+
 ; source a file. Beware of circular dependency
 (defn source [filename]
   (let [content (read-file target)]
