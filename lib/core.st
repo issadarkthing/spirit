@@ -77,12 +77,11 @@
 
 ; same as next but returns empty list if no next member instead of nil
 (defn rest [coll]
-    (if (not (seq? coll))
-        (throw "argument must be a collection, not " (type coll)))
-    (if (nil? (coll.Next))
-      '()
-      (coll.Next)))
-
+  (if (> (count coll) 1)
+    (next coll)
+   (if (list? coll)
+     '()
+     [])))
 
 (defn cons [v coll]
     (if (not (seq? coll))
@@ -140,7 +139,7 @@
 (defn reverse [coll]
   (when-not (seq? coll)
     (throw "argument must be Seq"))
-  (loop [result '() target coll]
+  (loop [result (empty coll) target coll]
     (if (empty? target)
       result
       (recur (cons (first target) result) (rest target)))))
@@ -174,7 +173,7 @@
 
 (defn take
   ([n coll]
-   (take n coll '()))
+   (take n coll (empty coll)))
   ([n coll acc]
    (if (= n (count acc))
      acc
@@ -272,8 +271,7 @@
 
 ; source a file. Beware of circular dependency
 (defn source [filename]
-  (let [content (read-file target)]
-    (eval-string content)))
+  (->> filename (read-file) (eval-string)))
 
 
 ; important macros -----------------------------------
