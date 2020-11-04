@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/issadarkthing/spirit/internal"
+	"github.com/kr/pretty"
 )
 
 func TestNew(t *testing.T) {
@@ -251,6 +252,79 @@ func TestReader_One(t *testing.T) {
 							Line:   1,
 							Column: 2,
 						},
+					},
+				},
+			},
+		},
+		{
+			name: "UnQuoteSplice",
+			src:  "~(x 3 ~@(list 1 2 3))",
+			want: &internal.List{
+				Values: []internal.Value{
+					internal.Symbol{Value: "unquote-splice"},
+					&internal.List{
+						Values: []internal.Value{
+							internal.Symbol{
+								Value: "x",
+								Position: internal.Position{
+									File:   "<string>",
+									Line:   1,
+									Column: 3,
+								},
+							},
+							internal.Number(3),
+							&internal.List{
+								Values: []internal.Value{
+									internal.Symbol{
+										Value: "unquote-splice",
+									},
+									&internal.List{
+										Values: []internal.Value{
+											internal.Symbol{
+												Value: "list",
+												Position: internal.Position{
+													File: "<string>",
+													Line: 1,
+													Column: 10,
+												},
+											},
+											internal.Number(1),
+											internal.Number(2),
+											internal.Number(3),
+										},
+										Position: internal.Position{
+											File: "<string>",
+											Line: 1,
+											Column: 9,
+										},
+									},
+								},
+							},
+						},
+						Position: internal.Position{
+							File:   "<string>",
+							Line:   1,
+							Column: 2,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "UnQuoteSplice",
+			src: "~@x",
+			want: &internal.List{
+				Values: []internal.Value{
+					internal.Symbol{
+						Value: "unquote-splice",
+					},
+					internal.Symbol{
+						Position: internal.Position{
+							File: "<string>",
+							Line: 1,
+							Column: 2,
+						},
+						Value: "x",
 					},
 				},
 			},
@@ -715,7 +789,6 @@ func TestReader_One_List(t *testing.T) {
 		},
 	})
 }
-
 
 
 func TestReader_One_Vector(t *testing.T) {

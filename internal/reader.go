@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/xiaq/persistent/hashmap"
 )
@@ -604,6 +605,27 @@ func quoteFormReader(expandFunc string) ReaderMacro {
 				return nil, errors.New("no-op form while reading quote form")
 			}
 			return nil, err
+		}
+
+		if strings.HasPrefix(expr.String(), "@") {
+			expandFunc = "unquote-splice"
+
+			if utf8.RuneCountInString(expr.String()) == 1 {
+				expr, err = rd.One()
+				if err != nil {
+					if err == io.EOF {
+						return nil, fmt.Errorf("%w: while reading quote form", ErrEOF)
+					} else if err == ErrSkip {
+						return nil, errors.New("no-op form while reading quote form")
+					}
+					return nil, err
+				}
+			} else {
+				if sym, ok := expr.(Symbol); ok {
+					sym.Value = strings.TrimPrefix(sym.Value, "@")
+					expr = sym
+				}
+			}
 		}
 
 		return &List{

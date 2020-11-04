@@ -347,7 +347,32 @@ func recursiveQuote(scope Scope, f Value) (Value, error) {
 			}
 
 			return v.Values[1].Eval(scope)
+		} 
+
+		result := make([]Value, 0, len(v.Values))
+		for _, value := range v.Values {
+			unquote, ok := unquoteSplice(value)
+			if !ok {
+				result = append(result, unquote)
+				continue
+			}
+			
+			evaled, err := unquote.Eval(scope)
+			if err != nil {
+				return nil, err
+			}
+			
+			list, ok := evaled.(*List)
+			if !ok {
+				return nil, fmt.Errorf(
+					"unquote splice must evaluate to list not %T", evaled)
+			}
+
+			for _, listVal := range list.Values {
+				result = append(result, listVal)
+			}
 		}
+		v.Values = result
 
 		quoted, err := quoteSeq(scope, v.Values)
 		return &List{Values: quoted}, err
@@ -370,6 +395,61 @@ func recursiveQuote(scope Scope, f Value) (Value, error) {
 	default:
 		return f, nil
 	}
+}
+
+func parseUnquoteSplice(val []Value) []Value {
+	result := make([]Value, 0, len(val))
+	for _, v := range val {
+
+		list, ok := v.(*List)
+		if !ok {
+			result = append(result, v)
+			continue
+		}
+
+		if list.Size() == 0 {
+			result = append(result, v)
+			continue
+		}
+
+		arg1 := list.Values[0]
+		name, ok := arg1.(Symbol)
+
+		if !ok {
+			result = append(result, v)
+			continue
+		}
+
+		if name.Value != "unquote-splice" {
+			result = append(result, v)
+			continue
+		}
+
+		for _, x := range list.Values[1:] {
+			result = append(result, x)
+		}
+	}
+
+	return result
+}
+
+func unquoteSplice(val Value) (Value, bool) {
+
+	list, isList := val.(*List)
+	if !isList {
+		return val, false
+	}
+
+	sym, isSymbol := list.First().(Symbol)
+	if !isSymbol {
+		return val, false
+	}
+
+	if sym.Value != "unquote-splice" {
+		return val, false
+	}
+
+	return list.Next().First(), true
 }
 
 func isUnquote(list []Value) bool {
