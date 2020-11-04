@@ -105,8 +105,8 @@ func TestVector_Eval(t *testing.T) {
 			getScope: func() internal.Scope {
 				return internal.NewScope(nil)
 			},
-			value:   internal.NewPersistentVector().
-			Cons(internal.Symbol{Value: "hello"}),
+			value: internal.NewPersistentVector().
+				Cons(internal.Symbol{Value: "hello"}),
 			wantErr: true,
 		},
 		{
@@ -119,7 +119,7 @@ func TestVector_Eval(t *testing.T) {
 				return scope
 			},
 			value: internal.Symbol{Value: "ls"},
-			want: internal.NewPersistentVector(),
+			want:  internal.NewPersistentVector(),
 		},
 	})
 }
@@ -161,8 +161,6 @@ func TestSet_Eval(t *testing.T) {
 	})
 }
 
-
-
 func TestList_String(t *testing.T) {
 	executeStringTestCase(t, []stringTestCase{
 		{
@@ -184,7 +182,7 @@ func TestList_String(t *testing.T) {
 		{
 			value: &internal.List{
 				Values: []internal.Value{
-					internal.Symbol{Value: "quote"}, 
+					internal.Symbol{Value: "quote"},
 					internal.Symbol{Value: "hello"},
 				},
 			},
@@ -215,14 +213,14 @@ func TestVector_String(t *testing.T) {
 		},
 		{
 			value: internal.NewPersistentVector().
-			Cons(internal.Keyword("hello")),
-			want:  "[:hello]",
+				Cons(internal.Keyword("hello")),
+			want: "[:hello]",
 		},
 		{
 			value: internal.NewPersistentVector().
-			Cons(&internal.List{}).
-			Cons(internal.Keyword("hello")),
-			want:  "[:hello ()]",
+				Cons(&internal.List{}).
+				Cons(internal.Keyword("hello")),
+			want: "[:hello ()]",
 		},
 	})
 }
@@ -325,7 +323,7 @@ func TestHashMap_Eval(t *testing.T) {
 				return scope
 			},
 			value: internal.Symbol{Value: "my-hashmap"},
-			want: internal.NewPersistentMap(),
+			want:  internal.NewPersistentMap(),
 		},
 	})
 }

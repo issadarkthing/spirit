@@ -28,6 +28,8 @@ func MacroExpand(scope Scope, form Value) (Value, bool, error) {
 	return v, true, err
 }
 
+
+
 // MultiFn represents a multi-arity function or macro definition.
 type MultiFn struct {
 	Name    string
@@ -112,7 +114,6 @@ func (multiFn MultiFn) Expand(scope Scope, args []Value) (Value, error) {
 	if !multiFn.IsMacro {
 		return &fn, nil
 	}
-
 	return fn.Invoke(scope, args...)
 }
 

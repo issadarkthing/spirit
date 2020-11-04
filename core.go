@@ -410,7 +410,7 @@ func parseLoop(scope internal.Scope, args []internal.Value) (*internal.Fn, error
 
 		bindings = append(bindings, binding{
 			Name: sym.Value,
-			Expr: vec.Index(i+1),
+			Expr: vec.Index(i + 1),
 		})
 	}
 
@@ -562,7 +562,7 @@ func convert(data map[string]interface{}) *internal.PersistentMap {
 		if nest, ok := v.(map[string]interface{}); ok {
 			pm = pm.Set(internal.Keyword(k), convert(nest))
 
-		// key with array value
+			// key with array value
 		} else if nestArr, ok := v.([]interface{}); ok {
 			vals := make([]internal.Value, 0, len(nestArr))
 
@@ -576,7 +576,7 @@ func convert(data map[string]interface{}) *internal.PersistentMap {
 			}
 			pm = pm.Set(internal.Keyword(k), internal.ValueOf(vals))
 
-		// others can simply use ValueOf
+			// others can simply use ValueOf
 		} else {
 			pm = pm.Set(internal.Keyword(k), internal.ValueOf(v))
 		}
@@ -585,7 +585,7 @@ func convert(data map[string]interface{}) *internal.PersistentMap {
 }
 
 func apply(scope internal.Scope, args []internal.Value) (internal.Value, error) {
-	
+
 	err := checkArityAtLeast(2, len(args))
 	if err != nil {
 		return nil, err
@@ -601,7 +601,7 @@ func apply(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 		return nil, doesNotImplementInvokable(args[0])
 	}
 
-	fnArgs := args[1:len(args)-1]
+	fnArgs := args[1 : len(args)-1]
 	lastArg, ok := args[len(args)-1].(internal.Seq)
 	if !ok {
 		return nil, doesNotImplementSeq(lastArg)

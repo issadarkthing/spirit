@@ -192,9 +192,9 @@ func TestReader_All(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name:    "ShebangRemoval",
-			src:     `#!/usr/bin/env spirit`,
-			want:    internal.Module(nil),
+			name: "ShebangRemoval",
+			src:  `#!/usr/bin/env spirit`,
+			want: internal.Module(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -790,74 +790,73 @@ func TestReader_One_List(t *testing.T) {
 	})
 }
 
-
 func TestReader_One_Vector(t *testing.T) {
 	executeReaderTests(t, []readerTestCase{
 		{
 			name: "Empty",
 			src:  `[]`,
 			want: internal.NewPersistentVector().
-			SetPosition(internal.Position{
-				File:   "<string>",
-				Line:   1,
-				Column: 1,
-			}),
+				SetPosition(internal.Position{
+					File:   "<string>",
+					Line:   1,
+					Column: 1,
+				}),
 		},
 		{
 			name: "WithOneEntry",
 			src:  `[help]`,
 			want: internal.NewPersistentVector().
-			SetPosition(internal.Position{
-				File:   "<string>",
-				Line:   1,
-				Column: 1,
-			}).
-			Cons(internal.Symbol{
-				Value: "help",
-				Position: internal.Position{
+				SetPosition(internal.Position{
 					File:   "<string>",
 					Line:   1,
-					Column: 2,
-				},
-			}),
+					Column: 1,
+				}).
+				Cons(internal.Symbol{
+					Value: "help",
+					Position: internal.Position{
+						File:   "<string>",
+						Line:   1,
+						Column: 2,
+					},
+				}),
 		},
 		{
 			name: "WithMultipleEntry",
 			src:  `[+ 0xF 3.1413]`,
 			want: internal.NewPersistentVector().
-			SetPosition(internal.Position{
-				File:   "<string>",
-				Line:   1,
-				Column: 1,
-			}).
-			Cons(internal.Number(3.1413)).
-			Cons(internal.Number(15)).
-			Cons(internal.Symbol{
-				Value: "+",
-				Position: internal.Position{
+				SetPosition(internal.Position{
 					File:   "<string>",
 					Line:   1,
-					Column: 2,
-				}}),
+					Column: 1,
+				}).
+				Cons(internal.Number(3.1413)).
+				Cons(internal.Number(15)).
+				Cons(internal.Symbol{
+					Value: "+",
+					Position: internal.Position{
+						File:   "<string>",
+						Line:   1,
+						Column: 2,
+					}}),
 		},
 		{
 			name: "WithCommaSeparator",
 			src:  `[+,0xF,3.1413]`,
 			want: internal.NewPersistentVector().
-			SetPosition(internal.Position{
-				File:   "<string>",
-				Line:   1,
-				Column: 1,
-			}).
-			Cons(internal.Number(3.1413)).
-			Cons(internal.Number(15)).
-			Cons(internal.Symbol{
-				Value: "+",
-				Position: internal.Position{
+				SetPosition(internal.Position{
 					File:   "<string>",
 					Line:   1,
-					Column: 2,
-				}}),
+					Column: 1,
+				}).
+				Cons(internal.Number(3.1413)).
+				Cons(internal.Number(15)).
+				Cons(internal.Symbol{
+					Value: "+",
+					Position: internal.Position{
+						File:   "<string>",
+						Line:   1,
+						Column: 2,
+					}}),
 		},
 		{
 			name: "MultiLine",
@@ -865,22 +864,22 @@ func TestReader_One_Vector(t *testing.T) {
 					  0xF
 					  3.1413
 					]`,
-					want: internal.NewPersistentVector().
-					SetPosition(internal.Position{
+			want: internal.NewPersistentVector().
+				SetPosition(internal.Position{
+					File:   "<string>",
+					Line:   1,
+					Column: 1,
+				}).
+				Cons(internal.Number(3.1413)).
+				Cons(internal.Number(15)).
+				Cons(internal.Symbol{
+					Value: "+",
+					Position: internal.Position{
 						File:   "<string>",
 						Line:   1,
-						Column: 1,
-					}).
-					Cons(internal.Number(3.1413)).
-					Cons(internal.Number(15)).
-					Cons(internal.Symbol{
-						Value: "+",
-						Position: internal.Position{
-							File:   "<string>",
-							Line:   1,
-							Column: 2,
-						},
-					}),
+						Column: 2,
+					},
+				}),
 		},
 		{
 			name: "MultiLineWithComments",
@@ -888,27 +887,27 @@ func TestReader_One_Vector(t *testing.T) {
 					  0xF    ; hex representation of 15
 					  3.1413 ; value of math constant pi
 				  ]`,
-				  want: internal.NewPersistentVector().
-				  SetPosition(internal.Position{
-					  File:   "<string>",
-					  Line:   1,
-					  Column: 1,
-				  }).
-				  Cons(internal.Number(3.1413)).
-				  Cons(internal.Number(15)).
-				  Cons(internal.Symbol{
-					  Value: "+",
-					  Position: internal.Position{
-						  File:   "<string>",
-						  Line:   1,
-						  Column: 2,
-					  },
-				  }),
-		  },
-		  {
-			  name:    "UnexpectedEOF",
-			  src:     "[+ 1 2 ",
-			  wantErr: true,
+			want: internal.NewPersistentVector().
+				SetPosition(internal.Position{
+					File:   "<string>",
+					Line:   1,
+					Column: 1,
+				}).
+				Cons(internal.Number(3.1413)).
+				Cons(internal.Number(15)).
+				Cons(internal.Symbol{
+					Value: "+",
+					Position: internal.Position{
+						File:   "<string>",
+						Line:   1,
+						Column: 2,
+					},
+				}),
+		},
+		{
+			name:    "UnexpectedEOF",
+			src:     "[+ 1 2 ",
+			wantErr: true,
 		},
 	})
 }
@@ -990,12 +989,16 @@ func executeReaderTests(t *testing.T, tests []readerTestCase) {
 			}
 			if got, ok := got.(internal.Comparable); ok {
 				if !got.Compare(tt.want) {
-					t.Errorf("One() got = %#v, want %#v", got, tt.want)
+					t.Errorf("One() got -> %s\nwant -> %s", 
+						pretty.Sprint(got), pretty.Sprint(tt.want),
+					)
 					return
 				}
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("One() got = %#v, want %#v", got, tt.want)
+				t.Errorf("One() got -> %s\nwant -> %s", 
+					pretty.Sprint(got), pretty.Sprint(tt.want),
+				)
 			}
 		})
 	}

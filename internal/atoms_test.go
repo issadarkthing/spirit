@@ -190,7 +190,7 @@ func executeStringTestCase(t *testing.T, tests []stringTestCase) {
 		t.Run(reflect.TypeOf(tt.value).Name(), func(t *testing.T) {
 			got := strings.TrimSpace(tt.value.String())
 			if got != tt.want {
-				t.Errorf("String() \ngot \n%s, \nwant \n%s", 
+				t.Errorf("String() \ngot \n%s, \nwant \n%s",
 					pretty.Sprint(got), pretty.Sprint(tt.want),
 				)
 			}
@@ -222,7 +222,7 @@ func executeEvalTests(t *testing.T, tests []evalTestCase) {
 			}
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Eval() got %s, want %s", 
+				t.Errorf("Eval() got %s, want %s",
 					pretty.Sprint(got), pretty.Sprint(tt.want),
 				)
 			}

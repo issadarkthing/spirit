@@ -57,7 +57,7 @@ func (spirit *Spirit) ReadEval(r io.Reader) (internal.Value, error) {
 	hoistedVals := []string{"def", "defn", "defmacro"}
 	for _, form := range mod.(internal.Module) {
 		if list, ok := form.(*internal.List); ok {
-			
+
 			if list.Size() < 2 {
 				continue
 			}
@@ -65,7 +65,7 @@ func (spirit *Spirit) ReadEval(r io.Reader) (internal.Value, error) {
 			def, isSymbol := list.Values[0].(internal.Symbol)
 			if !isSymbol {
 				return nil, fmt.Errorf("first argument must be symbol, not '%v'",
-				reflect.TypeOf(list.Values[0]))
+					reflect.TypeOf(list.Values[0]))
 			}
 
 			if !includes(def.String(), hoistedVals) {
@@ -75,7 +75,7 @@ func (spirit *Spirit) ReadEval(r io.Reader) (internal.Value, error) {
 			sym, isSymbol := list.Values[1].(internal.Symbol)
 			if !isSymbol {
 				return nil, fmt.Errorf("first argument must be symbol, not '%v'",
-				reflect.TypeOf(list.Values[1]))
+					reflect.TypeOf(list.Values[1]))
 			}
 			symbol := sym.String()
 
@@ -97,8 +97,6 @@ func (spirit *Spirit) ReadEval(r io.Reader) (internal.Value, error) {
 	}
 	return internal.Eval(spirit, mod)
 }
-
-
 
 func includes(search string, content []string) bool {
 	for _, v := range content {

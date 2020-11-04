@@ -68,9 +68,9 @@ func newEvalErr(v Value, err error) EvalError {
 // EvalError represents error during evaluation.
 type EvalError struct {
 	Position
-	Cause         error
-	StackTrace    string
-	Form          Value
+	Cause      error
+	StackTrace string
+	Form       Value
 }
 
 // Unwrap returns the underlying cause of this error.

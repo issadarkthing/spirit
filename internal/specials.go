@@ -143,7 +143,7 @@ func parseLet(scope Scope, args []Value) (*Fn, error) {
 
 		bindings = append(bindings, binding{
 			Name: sym.Value,
-			Expr: vec.Index(i+1),
+			Expr: vec.Index(i + 1),
 		})
 	}
 

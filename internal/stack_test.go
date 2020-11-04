@@ -27,16 +27,16 @@ func TestStack_Eval(t *testing.T) {
 				internal.Call{
 					Name: "do",
 					Position: internal.Position{
-						File: "<string>",
-						Line: 1,
+						File:   "<string>",
+						Line:   1,
 						Column: 1,
 					},
 				},
 				internal.Call{
 					Name: "if",
 					Position: internal.Position{
-						File:  "<string>",
-						Line: 1,
+						File:   "<string>",
+						Line:   1,
 						Column: 5,
 					},
 				},
@@ -53,16 +53,16 @@ func TestStack_Eval(t *testing.T) {
 				internal.Call{
 					Name: "do",
 					Position: internal.Position{
-						File: "<string>",
-						Line: 1,
+						File:   "<string>",
+						Line:   1,
 						Column: 1,
 					},
 				},
 				internal.Call{
 					Name: "if",
 					Position: internal.Position{
-						File:  "<string>",
-						Line: 2,
+						File:   "<string>",
+						Line:   2,
 						Column: 6,
 					},
 				},
@@ -77,24 +77,24 @@ func TestStack_Eval(t *testing.T) {
 				internal.Call{
 					Name: "do",
 					Position: internal.Position{
-						File: "<string>",
-						Line: 1,
+						File:   "<string>",
+						Line:   1,
 						Column: 1,
 					},
 				},
 				internal.Call{
 					Name: "do",
 					Position: internal.Position{
-						File: "<string>",
-						Line: 2,
+						File:   "<string>",
+						Line:   2,
 						Column: 6,
 					},
 				},
 				internal.Call{
 					Name: "if",
 					Position: internal.Position{
-						File: "<string>",
-						Line: 3,
+						File:   "<string>",
+						Line:   3,
 						Column: 8,
 					},
 				},
@@ -117,9 +117,9 @@ func executeStackTests(t *testing.T, tests []stackTestCase) {
 			internal.ReadEvalStr(scope, tt.src)
 
 			if scope.Size() != len(tt.want) {
-				t.Errorf("Mismatch stack size, expected %d, got %d", 
-					 len(tt.want), scope.Size(),
-				)				
+				t.Errorf("Mismatch stack size, expected %d, got %d",
+					len(tt.want), scope.Size(),
+				)
 				return
 			}
 
@@ -135,4 +135,3 @@ func executeStackTests(t *testing.T, tests []stackTestCase) {
 		})
 	}
 }
-

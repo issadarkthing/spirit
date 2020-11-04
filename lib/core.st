@@ -57,7 +57,7 @@
           index min]
      (if (= index max)
        coll
-       (recur (cons index coll) (+ step index))))))
+       (recur (conj coll index) (+ step index))))))
 
 (defn first [coll]
   (if (not (seq? coll))

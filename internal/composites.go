@@ -31,7 +31,7 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 	}
 
 	fnCall := Call{
-		Name: lf.Values[0].String(),
+		Name:     lf.Values[0].String(),
 		Position: lf.Position,
 	}
 
@@ -58,7 +58,6 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 
 		return nil, err
 	}
-
 
 	scope.Push(fnCall)
 	val, err := invokable.Invoke(scope, lf.Values[1:]...)
@@ -417,7 +416,6 @@ type PersistentVector struct {
 	Vec vector.Vector
 }
 
-
 func NewPersistentVector() *PersistentVector {
 	return &PersistentVector{Vec: vector.Empty}
 }
@@ -456,14 +454,14 @@ func (p *PersistentVector) Next() Seq {
 		return nil
 	}
 	return &PersistentVector{
-		Vec: p.Vec.SubVector(1, p.Vec.Len()),
+		Vec:      p.Vec.SubVector(1, p.Vec.Len()),
 		Position: p.Position,
 	}
 }
 
 func (p *PersistentVector) Conj(vals ...Value) Seq {
 	pv := &PersistentVector{
-		Vec: p.Vec,
+		Vec:      p.Vec,
 		Position: p.Position,
 	}
 	for _, v := range vals {
@@ -487,14 +485,14 @@ func (p *PersistentVector) Cons(v Value) Seq {
 
 func (p *PersistentVector) Assoc(i int, v Value) Seq {
 	return &PersistentVector{
-		Vec: p.Vec.Assoc(i, v),
+		Vec:      p.Vec.Assoc(i, v),
 		Position: p.Position,
 	}
 }
 
 func (p *PersistentVector) SubVector(i, j int) Seq {
 	return &PersistentVector{
-		Vec: p.Vec.SubVector(i, j),
+		Vec:      p.Vec.SubVector(i, j),
 		Position: p.Position,
 	}
 }
@@ -609,7 +607,7 @@ func (s *Stack) StackTrace() string {
 
 	var str strings.Builder
 	// last index in slice
-	last := s.Size()-1
+	last := s.Size() - 1
 	for i := range *s {
 		// iterate over slice in reverse
 		call := (*s)[last-i]
@@ -639,7 +637,7 @@ func containerString(vals []Value, begin, end, sep string) string {
 }
 
 // if an error occured when function is called, the error produced does not
-// contain stackTrace. This helper function will add stackTrace to the EvalError 
+// contain stackTrace. This helper function will add stackTrace to the EvalError
 // type, and return as is if it has stackTrace
 func addStackTrace(scope Scope, err error) error {
 	if evalErr, ok := err.(EvalError); ok && evalErr.StackTrace == "" {
