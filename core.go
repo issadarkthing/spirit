@@ -310,8 +310,8 @@ func stringTypeOf(v interface{}) string {
 // Evaluate the expressions in another goroutine; returns chan
 func future(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
-	ch := &internal.Channel{
-		C: make(chan internal.Value),
+	ch := &internal.Future{
+		Channel: make(chan internal.Value),
 		Value: internal.Nil{},
 	}
 
@@ -320,12 +320,12 @@ func future(scope internal.Scope, args []internal.Value) (internal.Value, error)
 	return ch, nil
 }
 
-type chanWrapper func(*internal.Channel) (internal.Value, error)
+type chanWrapper func(*internal.Future) (internal.Value, error)
 
 // Deref chan from future to get the value. This call is blocking until future is resolved.
 // The result will be cached.
 func deref(scope internal.Scope) chanWrapper {
-	return func(ch *internal.Channel) (internal.Value, error) {
+	return func(ch *internal.Future) (internal.Value, error) {
 		for {
 			if ch.Realized {
 				return ch.Value, nil
@@ -338,7 +338,7 @@ func sleep(s int) {
 	time.Sleep(time.Millisecond * time.Duration(s))
 }
 
-func futureRealize(ch *internal.Channel) bool {
+func futureRealize(ch *internal.Future) bool {
 	return ch.Realized
 }
 

@@ -19,6 +19,7 @@ is much, much similar to Clojure.
 - HashMap
 - Set
 - Atom
+- Future
 
 ## Differences
 These are the differences that I deliberately made to differ from Clojure.

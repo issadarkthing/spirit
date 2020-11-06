@@ -620,13 +620,13 @@ func (s *Stack) StackTrace() string {
 	return str.String()
 }
 
-type Channel struct {
+type Future struct {
 	Realized bool
 	Value    Value
-	C        chan Value
+	Channel  chan Value
 }
 
-func (c *Channel) Submit(scope Scope, form Value) {
+func (c *Future) Submit(scope Scope, form Value) {
 	go func() {
 		val, err := form.Eval(scope)
 		if err != nil {
@@ -637,11 +637,11 @@ func (c *Channel) Submit(scope Scope, form Value) {
 	}()
 }
 
-func (c Channel) String() string {
-	return fmt.Sprintf("<channel(realized: %v value: %v)>", c.Realized, c.Value)
+func (c Future) String() string {
+	return fmt.Sprintf("<future(realized: %v value: %v)>", c.Realized, c.Value)
 }
 
-func (c *Channel) Eval(_ Scope) (Value, error) {
+func (c *Future) Eval(_ Scope) (Value, error) {
 	return c, nil
 }
 

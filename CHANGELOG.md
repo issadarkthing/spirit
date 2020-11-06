@@ -1,6 +1,5 @@
 v0.8.0
-- Add support for unquote splicing
-- Float64 and Int64 are removed and changed to type Number which is float64 in Go.
+- Float64 and Int64 are removed and changed to type `Number` which is float64 in Go.
 - Added basic JSON parser
 - Replaced HashMap with PersistentHashMap. Improved 6x runtime performance because
 PersistentHashMap implements structural sharing.
@@ -16,6 +15,8 @@ PersistentVector Elapsed time: 13.867µs
 ```
 - Added stack trace
 - Function hoisting for `defn` and `defmacro`
+- Added support for unquote splicing
+- Added `Future`
 
 v0.7.0
 - Added Atom type (experimental)

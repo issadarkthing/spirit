@@ -11,7 +11,7 @@ import (
 var (
 	_ internal.Seq = &internal.List{}
 	_ internal.Seq = internal.Set{}
-	_ internal.Value = &internal.Channel{}
+	_ internal.Value = &internal.Future{}
 )
 
 func TestList_Eval(t *testing.T) {
