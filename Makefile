@@ -36,4 +36,4 @@ build: test
 	@go build -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" -o ./bin/spirit ./cmd/spirit/
 
 run: 
-	@./bin/spirit -u -p ./lib/core.st sample.st
+	@./bin/spirit -u -p ./lib/core.st ./sample/sample.st
