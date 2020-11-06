@@ -39,6 +39,10 @@
   ([prompt]
    (read* prompt)))
 
+(defmacro tap [expr]
+  `(let [result ~expr]
+     (print result)
+     result))
 ; math operations -------------------------------
 
 (defn positive? [x]
@@ -130,11 +134,28 @@
         true
         (int? num)))
 
+(defn some [f coll]
+  (if (nil? coll)
+    false
+    (or (f (first coll)) (some f (next coll)))))  
+
+(defn every [f coll]
+  (if (nil? coll)
+    false
+    (and (f (first coll)) (some f (next coll)))))  
+
+(defn find [f coll]
+  (when (and coll (not (empty? coll)))
+    (let [v (first coll)]
+      (if (f v)
+        v
+        (find f (next coll))))))
+
 (defn even? [num]
-    (= (mod num 2) 0.0))
+    (= (mod num 2) 0))
 
 (defn odd? [num]
-    (= (mod num 2) 1.0))
+    (= (mod num 2) 1))
 
 (defn reverse [coll]
   (when-not (seq? coll)
@@ -309,6 +330,13 @@
 (defmacro force [x]
   `(deref* '~x (~x)))
 
+(defmacro cond [& clauses]
+  (when clauses
+    (when (not (even? (count clauses)))
+      (throw "cond requires an even number of forms"))
+    `(if (eval (first '~clauses))
+       (eval (second '~clauses))
+       (eval (cons 'cond (drop 2 '~clauses))))))
 
 ; Type check functions -------------------------------
 (defn is-type? [typ arg] (= typ (type arg)))
