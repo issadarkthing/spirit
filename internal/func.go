@@ -192,6 +192,7 @@ type Fn struct {
 	Args     []string
 	Variadic bool
 	Body     Value
+	Scope    Scope
 	Func     func(scope Scope, args []Value) (Value, error)
 }
 
@@ -218,7 +219,12 @@ func (fn *Fn) Invoke(scope Scope, args ...Value) (Value, error) {
 		return fn.Func(scope, args)
 	}
 
-	fnScope := NewScope(scope)
+	fnScope := NewScope(fn.Scope)
+	if s, ok := scope.(*MapScope); ok {
+		for k, v := range s.bindings {
+			fnScope.Bind(k, v)
+		}
+	}
 
 	for idx := range fn.Args {
 		var argVal Value

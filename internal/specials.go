@@ -541,7 +541,7 @@ func makeFn(scope Scope, spec []Value) (*Fn, error) {
 		return nil, err
 	}
 
-	fn := &Fn{Body: body}
+	fn := &Fn{Body: body, Scope: scope}
 	if err := fn.parseArgSpec(spec[0]); err != nil {
 		return nil, err
 	}
