@@ -620,6 +620,31 @@ func (s *Stack) StackTrace() string {
 	return str.String()
 }
 
+type Channel struct {
+	Realized bool
+	Value    Value
+	C        chan Value
+}
+
+func (c *Channel) Submit(scope Scope, form Value) {
+	go func() {
+		val, err := form.Eval(scope)
+		if err != nil {
+			panic(err)
+		}
+		c.Value = val
+		c.Realized = true
+	}()
+}
+
+func (c Channel) String() string {
+	return fmt.Sprintf("<channel(realized: %v value: %v)>", c.Realized, c.Value)
+}
+
+func (c *Channel) Eval(_ Scope) (Value, error) {
+	return c, nil
+}
+
 func hasher(s interface{}) uint32 {
 	return hash.String(s.(Value).String())
 }

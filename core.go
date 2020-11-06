@@ -310,44 +310,27 @@ func stringTypeOf(v interface{}) string {
 // Evaluate the expressions in another goroutine; returns chan
 func future(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
-	ch := make(chan internal.Value)
+	ch := &internal.Channel{
+		C: make(chan internal.Value),
+		Value: internal.Nil{},
+	}
 
-	go func() {
+	ch.Submit(scope, args[0])
 
-		val, err := args[0].Eval(scope)
-		if err != nil {
-			panic(err)
-		}
-
-		ch <- val
-		close(ch)
-	}()
-
-	return internal.ValueOf(ch), nil
+	return ch, nil
 }
 
-type chanWrapper func(internal.Symbol, <-chan internal.Value) (internal.Value, error)
+type chanWrapper func(*internal.Channel) (internal.Value, error)
 
 // Deref chan from future to get the value. This call is blocking until future is resolved.
 // The result will be cached.
 func deref(scope internal.Scope) chanWrapper {
-
-	return func(symbol internal.Symbol, ch <-chan internal.Value) (internal.Value, error) {
-
-		derefSymbol := fmt.Sprintf("__deref__%s__result__", symbol.Value)
-
-		value, ok := <-ch
-		if ok {
-			scope.Bind(derefSymbol, value)
-			return value, nil
+	return func(ch *internal.Channel) (internal.Value, error) {
+		for {
+			if ch.Realized {
+				return ch.Value, nil
+			}
 		}
-
-		value, err := scope.Resolve(derefSymbol)
-		if err != nil {
-			return nil, err
-		}
-
-		return value, nil
 	}
 }
 
@@ -355,13 +338,8 @@ func sleep(s int) {
 	time.Sleep(time.Millisecond * time.Duration(s))
 }
 
-func futureRealize(ch <-chan internal.Value) bool {
-	select {
-	case _, ok := <-ch:
-		return !ok
-	default:
-		return false
-	}
+func futureRealize(ch *internal.Channel) bool {
+	return ch.Realized
 }
 
 func xlispTime(scope internal.Scope, args []internal.Value) (internal.Value, error) {

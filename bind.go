@@ -29,7 +29,7 @@ func bindAll(scope internal.Scope) error {
 		},
 		"core/bounded?": internal.ValueOf(bound(scope)),
 		"core/sleep":    internal.ValueOf(sleep),
-		"core/deref*":   internal.ValueOf(deref(scope)),
+		"core/deref":   internal.ValueOf(deref(scope)),
 		"core/doseq": &internal.Fn{
 			Args:     []string{"vector", "exprs"},
 			Variadic: true,
@@ -86,8 +86,8 @@ func bindAll(scope internal.Scope) error {
 		"core/recur":        internal.Recur,
 
 		"core/macroexpand": internal.ValueOf(macroExpand),
-		"core/eval":        internal.ValueOf(internal.Eval),
-		"core/eval-string": internal.ValueOf(internal.ReadEvalStr),
+		"core/eval":        internal.ValueOf(scope.(*Spirit).Eval),
+		"core/eval-string": internal.ValueOf(scope.(*Spirit).ReadEvalStr),
 		"core/type":        internal.ValueOf(typeOf),
 		"core/to-type":     internal.ValueOf(toType),
 		"core/impl?":       internal.ValueOf(implements),
