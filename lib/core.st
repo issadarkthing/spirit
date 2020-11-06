@@ -12,6 +12,7 @@
 (def Char   (type \a))
 (def Fn     (type (fn* [])))
 (def HashMap(type {}))
+(def Chan   (type (future* 1)))
 
 (ns 'core)
 
@@ -141,8 +142,8 @@
 
 (defn every [f coll]
   (if (nil? coll)
-    false
-    (and (f (first coll)) (some f (next coll)))))  
+    true
+    (and (f (first coll)) (every f (next coll)))))  
 
 (defn find [f coll]
   (when (and coll (not (empty? coll)))
@@ -290,6 +291,28 @@
   (if (vector? coll)
     (coll.Assoc k v)))
 
+(defn abs [x]
+  (if (< x 0) (- x) x))
+
+; wait for any of the channels realized and returns the value
+(defn wait-any [forms]
+  (if (some realized? forms)
+    (find realized? forms)
+    (recur forms)))
+  
+; wait for all of the channels realized and returns Seq of values
+; wait-all does not wait sequentially instead it waits for whichever comes first
+; and continue wait for others
+(defn wait-all [forms]
+  (if (every (fn [x] (not (chan? x))) forms)
+    forms
+    (recur (map 
+             (fn [v] 
+               (if (chan? v) 
+                 (if (realized? v) (deref v) v)
+                 v)) 
+             forms))))
+
 ; source a file. Beware of circular dependency
 (defn source [filename]
   (->> filename (read-file) (eval-string)))
@@ -314,9 +337,6 @@
     ([expr] (let [message "assertion failed"]
                 `(when-not ~expr (throw ~message))))
     ([expr message] `(when-not ~expr (throw ~message))))
-
-(defmacro deref [symbol]
-  `(deref* '~symbol ~symbol))
 
 
 (defmacro future [& body]
@@ -350,6 +370,7 @@
 (defn string? [arg] (is-type? types/String arg))
 (defn keyword? [arg] (is-type? types/Keyword arg))
 (defn symbol? [arg] (is-type? types/Symbol arg))
+(defn chan? [arg] (is-type? types/Chan arg))
 
 ; Type initialization functions ---------------------
 (defn set [coll] (<> (type #{}) coll))
