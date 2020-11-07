@@ -554,7 +554,6 @@ func readLambda(rd *Reader, _ rune) (Value, error) {
 		&List{Values: forms},
 	}
 
-	fmt.Println(fn)
 	return &List{
 		Values:   fn,
 		Position: pi,
