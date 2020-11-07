@@ -12,7 +12,7 @@
 (def Char   (type \a))
 (def Fn     (type (fn* [])))
 (def HashMap(type {}))
-(def Chan   (type (future* 1)))
+(def Future (type (future* 1)))
 
 (ns 'core)
 
@@ -109,7 +109,7 @@
 (defn into [to from]
   (if (empty? from)
     to
-    (recur (cons (first from) to) (next from))))
+    (recur (conj to (first from)) (next from))))
 
 (defn empty? [coll]
     (if (nil? coll)
@@ -124,11 +124,13 @@
             (throw "cons cannot be done for " (type coll)))))
 
 (defn last [coll]
+  (if (vector? coll)
+    (coll (- (count coll) 1))
     (let [v   (first coll)
-           rem (next coll)]
-        (if (nil? rem)
-            v
-            (last (next coll)))))
+          rem (next coll)]
+      (if (nil? rem)
+        v
+        (last (next coll))))))
 
 (defn number? [num]
     (if (float? num)
@@ -304,11 +306,11 @@
 ; wait-all does not wait sequentially instead it waits for whichever comes first
 ; and continue wait for others
 (defn wait-all [forms]
-  (if (every (fn [x] (not (chan? x))) forms)
+  (if (every (fn [x] (not (future? x))) forms)
     forms
     (recur (map 
              (fn [v] 
-               (if (chan? v) 
+               (if (future? v) 
                  (if (realized? v) (deref v) v)
                  v)) 
              forms))))
@@ -317,13 +319,16 @@
 (defn source [filename]
   (->> filename (read-file) (eval-string)))
 
+(defn complement
+  [f] 
+  (fn 
+    ([] (not (f)))
+    ([x] (not (f x)))
+    ([x y] (not (f x y)))
+    ([x y & zs] (not (<> f x y zs)))))
 
 ; important macros -----------------------------------
 
-
-; (defmacro apply [callable args]
-;   `(eval (cons ~callable ~args)))
-    
 
 (defmacro when [expr & body]
     (let [body (cons 'do body)]
@@ -370,7 +375,7 @@
 (defn string? [arg] (is-type? types/String arg))
 (defn keyword? [arg] (is-type? types/Keyword arg))
 (defn symbol? [arg] (is-type? types/Symbol arg))
-(defn chan? [arg] (is-type? types/Chan arg))
+(defn future? [arg] (is-type? types/Future arg))
 
 ; Type initialization functions ---------------------
 (defn set [coll] (<> (type #{}) coll))

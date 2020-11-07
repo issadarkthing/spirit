@@ -80,15 +80,15 @@
 (assert (= '(5 4 3 2 1 0) (down-range 5)))
 
 ; ; complex recursive function
-(def reverse (fn* reverse [coll]
-                  (if (not (seq? coll))
-                    (throw "argument must be a sequence"))
-                  (if (nil? (next coll))
-                    [(first coll)]
-                    (let [first-value   (first coll)
-                          reversed      (reverse (next coll))]
-                      (conj reversed first-value)))))
-(assert (= '(5 4 3 2 1) (reverse '(1 2 3 4 5))))
+(def reverse-x (fn* reverse-x [coll]
+                    (if (not (seq? coll))
+                      (throw "argument must be a sequence"))
+                    (if (nil? (next coll))
+                      [(first coll)]
+                      (let [first-value   (first coll)
+                            reversed      (reverse-x (next coll))]
+                        (conj reversed first-value)))))
+(assert (= '(5 4 3 2 1) (reverse-x '(1 2 3 4 5))))
 
 (def fib (fn* fib [n]
               (if (> n 1)  ; if n=0 or n=1 return n
@@ -153,3 +153,35 @@
 
 (assert (= 10 (hoist-test)))
 (defn hoist-test [] 10)
+
+
+(assert (= (rest [1]) []))
+(assert (= (rest '(1)) '()))
+
+(assert (= (drop 2 '(1 2 3)) '(3)))
+(assert (= (drop 2 [1 2 3]) [3]))
+
+
+(assert (some even? '(1 3 5 8)))
+(assert (every even? '(2 4 6 8 10)))
+
+(assert (= 8 (find even? '(1 3 5 8 7))))
+(assert (= nil (find even? '(1 3 5 11 7))))
+
+
+(assert (= [1 2 3] (flat [1 [2 [3]]])))
+(assert (= '(1 2 3) (flat '(1 (2 (3))))))
+
+
+(assert (= 10 (abs -10)))
+(assert (= 10 (abs 10)))
+
+(assert (= [1 2 3] (range-vec 1 4)))
+(assert (= 10 (tap (+ 5 5))))
+
+(assert (= (last '(1 2 3)) 3))
+(assert (= (last [1 2 3]) 3))
+
+(assert (= (reverse [1 2 3]) [3 2 1]))
+(assert (= (reverse '(1 2 3)) '(3 2 1)))
+
