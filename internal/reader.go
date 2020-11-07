@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 	"unicode"
@@ -502,6 +503,64 @@ func readList(rd *Reader, _ rune) (Value, error) {
 	}, nil
 }
 
+// recursively find anonymous function syntax arguments
+func findArgs(forms []Value) []string {
+
+	argsString := []string{}
+
+	for _, v := range forms {
+
+		if list, ok := v.(*List); ok {
+			argsString = append(argsString, findArgs(list.Values)...)
+		}
+
+		sym, ok := v.(Symbol); 
+		if !ok {
+			continue
+		}
+
+		if strings.HasPrefix(sym.Value, "%") {
+			argsString = append(argsString, sym.Value)
+		}
+	}
+
+	return argsString
+}
+
+func readLambda(rd *Reader, _ rune) (Value, error) {
+	pi := rd.Position()
+	forms, err := readContainer(rd, '(', ')', "list")
+	if err != nil {
+		return nil, err
+	}
+
+	argsString := findArgs(forms)
+	sort.Strings(argsString)
+
+	args := []Value{}
+	for _, v := range argsString {
+		args = append(args, Symbol{Value: v})
+	}
+
+	args = Values(args).Uniq()
+	var vec Seq = NewPersistentVector()
+	for _, v := range args {
+		vec = vec.Conj(v)
+	}
+
+	fn := []Value{
+		Symbol{Value: "fn"},
+		vec,
+		&List{Values: forms},
+	}
+
+	fmt.Println(fn)
+	return &List{
+		Values:   fn,
+		Position: pi,
+	}, nil
+}
+
 func readHashMap(rd *Reader, _ rune) (Value, error) {
 	pi := rd.Position()
 	forms, err := readContainer(rd, '{', '}', "hash-map")
@@ -780,6 +839,8 @@ func defaultDispatchTable() map[rune]ReaderMacro {
 		'{': readSet,
 		'}': unmatchedDelimiter,
 		'!': readComment,
+		'(': readLambda,
+		')': unmatchedDelimiter,
 	}
 }
 
