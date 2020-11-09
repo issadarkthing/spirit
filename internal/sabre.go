@@ -5,6 +5,7 @@ package internal
 import (
 	"fmt"
 	"io"
+	"reflect"
 	"strings"
 )
 
@@ -32,7 +33,57 @@ func ReadEval(scope Scope, r io.Reader) (Value, error) {
 		return nil, err
 	}
 
+	hoistedVals := []string{"def", "defn", "defmacro"}
+	for _, form := range mod.(Module) {
+		if list, ok := form.(*List); ok {
+
+			if list.Size() < 2 {
+				continue
+			}
+
+			def, isSymbol := list.Values[0].(Symbol)
+			if !isSymbol {
+				return nil, fmt.Errorf("first argument must be symbol, not '%v'",
+					reflect.TypeOf(list.Values[0]))
+			}
+
+			if !includes(def.String(), hoistedVals) {
+				continue
+			}
+
+			sym, isSymbol := list.Values[1].(Symbol)
+			if !isSymbol {
+				return nil, fmt.Errorf("first argument must be symbol, not '%v'",
+					reflect.TypeOf(list.Values[1]))
+			}
+			symbol := sym.String()
+
+			if def.String() == "def" && (symbol == "defn" || symbol == "defmacro") {
+				_, err := form.Eval(scope)
+				if err != nil {
+					return nil, err
+				}
+			} else if def.String() == "def" {
+				continue
+			}
+
+			_, err := form.Eval(scope)
+			if err != nil {
+				return nil, err
+			}
+
+		}
+	}
 	return Eval(scope, mod)
+}
+
+func includes(search string, content []string) bool {
+	for _, v := range content {
+		if v == search {
+			return true
+		}
+	}
+	return false
 }
 
 // ReadEvalStr is a convenience wrapper for Eval that reads forms from

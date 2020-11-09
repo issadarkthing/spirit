@@ -3,7 +3,6 @@ package spirit
 import (
 	"fmt"
 	"io"
-	"reflect"
 	"strings"
 	"sync"
 
@@ -17,9 +16,8 @@ const (
 
 // returns new Spirit instance
 func New() *Spirit {
-	sl := &Spirit{
-		mu:       &sync.RWMutex{},
-		bindings: map[nsSymbol]internal.Value{},
+	sl := &Spirit{ mu:       &sync.RWMutex{},
+		Bindings: map[nsSymbol]internal.Value{},
 	}
 
 	if err := bindAll(sl); err != nil {
@@ -38,7 +36,7 @@ type Spirit struct {
 	mu        *sync.RWMutex
 	currentNS string
 	checkNS   bool
-	bindings  map[nsSymbol]internal.Value
+	Bindings  map[nsSymbol]internal.Value
 }
 
 // Eval evaluates the given value in spirit context.
@@ -49,63 +47,10 @@ func (spirit *Spirit) Eval(v internal.Value) (internal.Value, error) {
 // ReadEval reads from the given reader and evaluates all the forms
 // obtained in spirit context.
 func (spirit *Spirit) ReadEval(r io.Reader) (internal.Value, error) {
-	internalReader := internal.NewReader(r)
-	mod, err := internalReader.All()
-	if err != nil {
-		return nil, err
-	}
-	hoistedVals := []string{"def", "defn", "defmacro"}
-	for _, form := range mod.(internal.Module) {
-		if list, ok := form.(*internal.List); ok {
-
-			if list.Size() < 2 {
-				continue
-			}
-
-			def, isSymbol := list.Values[0].(internal.Symbol)
-			if !isSymbol {
-				return nil, fmt.Errorf("first argument must be symbol, not '%v'",
-					reflect.TypeOf(list.Values[0]))
-			}
-
-			if !includes(def.String(), hoistedVals) {
-				continue
-			}
-
-			sym, isSymbol := list.Values[1].(internal.Symbol)
-			if !isSymbol {
-				return nil, fmt.Errorf("first argument must be symbol, not '%v'",
-					reflect.TypeOf(list.Values[1]))
-			}
-			symbol := sym.String()
-
-			if def.String() == "def" && (symbol == "defn" || symbol == "defmacro") {
-				_, err := form.Eval(spirit)
-				if err != nil {
-					return nil, err
-				}
-			} else if def.String() == "def" {
-				continue
-			}
-
-			_, err := form.Eval(spirit)
-			if err != nil {
-				return nil, err
-			}
-
-		}
-	}
-	return internal.Eval(spirit, mod)
+	return internal.ReadEval(spirit, r)
 }
 
-func includes(search string, content []string) bool {
-	for _, v := range content {
-		if v == search {
-			return true
-		}
-	}
-	return false
-}
+
 
 // ReadEvalStr reads the source and evaluates it in spirit context.
 func (spirit *Spirit) ReadEvalStr(src string) (internal.Value, error) {
@@ -127,7 +72,7 @@ func (spirit *Spirit) Bind(symbol string, v internal.Value) error {
 		return fmt.Errorf("cannot bind outside current namespace")
 	}
 
-	spirit.bindings[*nsSym] = v
+	spirit.Bindings[*nsSym] = v
 	return nil
 }
 
@@ -179,7 +124,7 @@ func (spirit *Spirit) Parent() internal.Scope {
 
 func (spirit *Spirit) resolveAny(symbol string, syms ...nsSymbol) (internal.Value, error) {
 	for _, s := range syms {
-		v, found := spirit.bindings[s]
+		v, found := spirit.Bindings[s]
 		if found {
 			return v, nil
 		}
