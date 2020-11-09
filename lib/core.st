@@ -138,12 +138,12 @@
         (int? num)))
 
 (defn some [f coll]
-  (if (nil? coll)
+  (if (or (empty? coll) (nil? coll))
     false
     (or (f (first coll)) (some f (next coll)))))  
 
 (defn every [f coll]
-  (if (nil? coll)
+  (if (or (empty? coll) (nil? coll))
     true
     (and (f (first coll)) (every f (next coll)))))  
 
@@ -289,9 +289,10 @@
          (concat (flat x empty-seq) (flat xs empty-seq))
          (cons x (flat xs empty-seq)))))))
 
-(defn assoc [coll k v]
+(defn assoc [coll & args]
   (if (vector? coll)
-    (coll.Assoc k v)))
+    (coll.Assoc (first args) (second args))
+    (<> assoc* coll args)))
 
 (defn abs [x]
   (if (< x 0) (- x) x))
@@ -317,7 +318,8 @@
 
 ; source a file. Beware of circular dependency
 (defn source [filename]
-  (->> filename (read-file) (eval-string)))
+  (def *file* filename)
+  (eval-string (read-file filename)))
 
 (defn complement
   [f] 
@@ -327,8 +329,48 @@
     ([x y] (not (f x y)))
     ([x y & zs] (not (<> f x y zs)))))
 
+
+(defn take-last [n coll]
+  (drop (- (count coll) n) coll))
+
+(defn sum [coll]
+  (<> + coll))
+
+
+(defn constantly [x]
+  (fn [& args] x))
+                     
+(defn identity [x] x)
+  
+(defn not=
+  ([x] false)
+  ([x y] (not (= x y)))
+  ([x y & more]
+   (not (<> = x y more))))
+
 ; important macros -----------------------------------
 
+(defmacro -> [x & forms]
+  (loop [x x forms forms]
+    (if (empty? forms)
+      x
+      (let [form (first forms)
+            threaded (if (list? form)
+                       (let [f (first form)
+                             args (next form)] 
+                         `(<> ~f '~x '~args))
+                       `(list '~form '~x))]
+        (recur (eval threaded) (next forms))))))
+
+(defmacro ->> [x & forms]
+  (loop [x x forms forms]
+    (if (empty? forms)
+      x
+      (let [form (first forms)
+            threaded (if (list? form)
+                       `(conj '~form '~x)
+                       `(list '~form '~x))]
+        (recur (eval threaded) (next forms))))))
 
 (defmacro when [expr & body]
     (let [body (cons 'do body)]

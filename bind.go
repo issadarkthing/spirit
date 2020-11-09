@@ -55,11 +55,6 @@ func bindAll(scope internal.Scope) error {
 
 		"core/and*": internal.ValueOf(and),
 		"core/or*":  internal.ValueOf(or),
-		"core/->": &internal.Fn{
-			Args:     []string{"exprs"},
-			Func:     threadFirst,
-			Variadic: true,
-		},
 		"core/case": &internal.Fn{
 			Args:     []string{"exprs", "clauses"},
 			Func:     caseForm,
