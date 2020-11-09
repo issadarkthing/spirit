@@ -14,8 +14,12 @@ import (
 	"github.com/issadarkthing/spirit/internal/repl"
 )
 
-const help = `spirit %s [Commit: %s] [Compiled with %s]
+const (
+	help = `spirit %s [Commit: %s] [Compiled with %s]
 Visit https://github.com/issadarkthing/spirit for more.`
+	prompt = " λ >>"
+	multiline = "|"
+)
 
 var (
 	version = "N/A"
@@ -25,6 +29,12 @@ var (
 	unload       = flag.Bool("u", false, "Unload core library")
 	preload      = flag.String("p", "", "Pre-loads file")
 	printVersion = flag.Bool("v", false, "Prints slang version and exit")
+	matcher      = map[rune]rune{
+		'(': ')',
+		'[': ']',
+		'{': '}',
+		'"': '"',
+	}
 )
 
 func main() {
@@ -98,13 +108,13 @@ func main() {
 		return
 	}
 
-	lr, errMapper := readlineInstance()
+	lr, errMapper := readlineInstance(xl)
 
 	repl := repl.New(xl,
 		repl.WithBanner(fmt.Sprintf(help, version, commit, runtime.Version())),
 		repl.WithInput(lr, errMapper),
 		repl.WithOutput(lr.Stdout()),
-		repl.WithPrompts("=>", "|"),
+		repl.WithPrompts(prompt, multiline),
 	)
 
 	if err := repl.Loop(context.Background()); err != nil {
@@ -113,8 +123,62 @@ func main() {
 	fmt.Println("Bye!")
 }
 
-func readlineInstance() (*readline.Instance, func(error) error) {
-	lr, err := readline.New("")
+
+func insertAt(index int, value rune, slice []rune) []rune {
+	newSlice := make([]rune, 0, len(slice)+1)
+
+	for i, v := range slice {
+		if i == index {
+			newSlice = append(newSlice, value, v)
+			continue
+		}
+		newSlice = append(newSlice, v)
+	}
+
+	if index > len(slice)-1 {
+		newSlice = append(newSlice, value)
+	}
+
+	return newSlice
+}
+
+func removeAt(index int, slice []rune) []rune {
+	return append(slice[:index], slice[index+1:]...)
+}
+
+func listener(line []rune, pos int, key rune) ([]rune, int, bool) {
+
+	switch key {
+	case '(', '{', '[':
+		line = insertAt(pos, matcher[key], line)
+		return line, pos, true
+	case '"':
+		if len(line) > pos && line[pos] == '"' {
+			return removeAt(pos, line), pos, true
+		}
+		line = insertAt(pos, '"', line)
+		return line, pos, true
+	case ')', '}', ']':
+		if len(line) > pos && line[pos] == key {
+			return removeAt(pos, line), pos, true
+		}
+	}
+
+	return line, pos, false
+}
+
+func readlineInstance(scope internal.Scope) (*readline.Instance, func(error) error) {
+	completer := readline.NewPrefixCompleter(
+		readline.PcItem("(source *file*)"),
+	)
+
+	lr, err := readline.NewEx(&readline.Config{
+		HistoryFile: "/tmp/spirit-repl.tmp",
+		AutoComplete: completer,
+		Listener: readline.FuncListener(listener),
+	})
+
+
 	if err != nil {
 		fatalf("readline: %v", err)
 	}
