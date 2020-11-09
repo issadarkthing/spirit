@@ -18,7 +18,7 @@ func bindAll(scope internal.Scope) error {
 			Variadic: true,
 			Func:     future,
 		},
-		"core/assoc":      internal.ValueOf(assoc),
+		"core/assoc*":      internal.ValueOf(assoc),
 		"core/keyword":    internal.ValueOf(keyword),
 		"core/parse-json": internal.ValueOf(parsejson),
 		"core/round":      internal.ValueOf(math.Round),
@@ -60,15 +60,18 @@ func bindAll(scope internal.Scope) error {
 			Func:     threadFirst,
 			Variadic: true,
 		},
-		"core/->>": &internal.Fn{
-			Args:     []string{"exprs"},
-			Func:     threadLast,
-			Variadic: true,
-		},
 		"core/case": &internal.Fn{
 			Args:     []string{"exprs", "clauses"},
 			Func:     caseForm,
 			Variadic: true,
+		},
+		"core/eval": &internal.Fn{
+			Args: []string{"exprs"},
+			Func: eval,
+		},
+		"core/eval-string": &internal.Fn{
+			Args: []string{"exprs"},
+			Func: evalStr,
 		},
 		"core/loop": internal.SpecialForm{
 			Name:  "loop",
@@ -87,8 +90,6 @@ func bindAll(scope internal.Scope) error {
 		"core/recur":        internal.Recur,
 
 		"core/macroexpand": internal.ValueOf(macroExpand),
-		"core/eval":        internal.ValueOf(scope.(*Spirit).Eval),
-		"core/eval-string": internal.ValueOf(scope.(*Spirit).ReadEvalStr),
 		"core/type":        internal.ValueOf(typeOf),
 		"core/to-type":     internal.ValueOf(toType),
 		"core/impl?":       internal.ValueOf(implements),

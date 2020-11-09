@@ -598,3 +598,26 @@ func apply(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 
 	return val, nil
 }
+
+func eval(scope internal.Scope, args []internal.Value) (internal.Value, error) {
+	form, err := args[0].Eval(scope)
+	if err != nil {
+		return nil, err
+	}
+	return form.Eval(scope)
+}
+
+func evalStr(scope internal.Scope, args []internal.Value) (internal.Value, error) {
+	form, err := args[0].Eval(scope)
+	if err != nil {
+		return nil, err
+	}
+
+	fromStr, ok := form.(internal.String)
+	if !ok {
+		return nil, invalidType(internal.String(""), form)
+	}
+
+	return internal.ReadEvalStr(scope, fromStr.String())
+}
+
