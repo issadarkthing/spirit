@@ -142,29 +142,6 @@ func isTruthy(v internal.Value) bool {
 	return true
 }
 
-func slangRange(args ...int) (*internal.List, error) {
-	var result []internal.Value
-
-	switch len(args) {
-	case 1:
-		result = createRange(0, args[0], 1)
-	case 2:
-		result = createRange(args[0], args[1], 1)
-	case 3:
-		result = createRange(args[0], args[1], args[2])
-	}
-
-	return &internal.List{Values: result}, nil
-}
-
-func createRange(min, max, step int) []internal.Value {
-
-	result := make([]internal.Value, 0, max-min)
-	for i := min; i < max; i += step {
-		result = append(result, internal.Number(i))
-	}
-	return result
-}
 
 func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 

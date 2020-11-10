@@ -59,6 +59,17 @@
   ([min max] (lazy-range* min max 1))
   ([min max step] (lazy-range* min max step)))
 
+(defn range
+  ([max]
+   (range 0 max 1))
+  ([min max]
+   (range min max 1))
+  ([min max step]
+   (loop [i min res '()]
+     (if (>= i max)
+       res
+       (recur (+ i step) (conj res i))))))
+
 (defn range-vec
   ([max]
    (range-vec 0 max 1))

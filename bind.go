@@ -12,7 +12,6 @@ func bindAll(scope internal.Scope) error {
 	core := map[string]internal.Value{
 
 		// built-in
-		"core/range": internal.ValueOf(slangRange),
 		"core/lazy-range*": internal.ValueOf(lazyRange),
 		"core/future*": &internal.Fn{
 			Args:     []string{"body"},
