@@ -13,6 +13,7 @@ func bindAll(scope internal.Scope) error {
 
 		// built-in
 		"core/range": internal.ValueOf(slangRange),
+		"core/lazy-range*": internal.ValueOf(lazyRange),
 		"core/future*": &internal.Fn{
 			Args:     []string{"body"},
 			Variadic: true,
@@ -117,6 +118,7 @@ func bindAll(scope internal.Scope) error {
 		"core/random":    internal.ValueOf(random),
 		"core/shuffle":   internal.ValueOf(shuffle),
 		"core/read-file": internal.ValueOf(readFile),
+		"core/source":    internal.ValueOf(source(scope)),
 
 		"string/split": internal.ValueOf(splitString),
 

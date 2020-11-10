@@ -13,6 +13,7 @@
 (def Fn     (type (fn* [])))
 (def HashMap(type {}))
 (def Future (type (future* 1)))
+(def LazySeq (type (lazy-range* 0 0 1)))
 
 (ns 'core)
 
@@ -51,6 +52,12 @@
 
 ; sequence operations -------------------------------
 (defn seq? [arg] (impl? arg types/Seq))
+
+(defn lazy-range 
+  ([] (lazy-range* 0 9223372036854775806 1))
+  ([max] (lazy-range* 0 max 1))
+  ([min max] (lazy-range* min max 1))
+  ([min max step] (lazy-range* min max step)))
 
 (defn range-vec
   ([max]
@@ -193,7 +200,11 @@
 (defn empty [coll]
   (if (not (seq? coll))
     (throw "argument must be a Seq"))
-  (if (list? coll) '() []))
+  (cond 
+    (list? coll) '() 
+    (vector? coll) []
+    (lazy-seq? coll) (lazy-range 0 0)))
+    
 
 (defn take
   ([n coll]
@@ -418,6 +429,7 @@
 (defn keyword? [arg] (is-type? types/Keyword arg))
 (defn symbol? [arg] (is-type? types/Symbol arg))
 (defn future? [arg] (is-type? types/Future arg))
+(defn lazy-seq? [arg] (is-type? types/LazySeq arg))
 
 ; Type initialization functions ---------------------
 (defn set [coll] (<> (type #{}) coll))

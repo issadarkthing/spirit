@@ -645,6 +645,107 @@ func (c *Future) Eval(_ Scope) (Value, error) {
 	return c, nil
 }
 
+// Implements Seq interface but lazy
+type LazySeq struct {
+	Min   int
+	Max   int
+	Step  int
+	Front []Value
+	Back  []Value
+}
+
+func (l LazySeq) First() Value {
+	return Number(l.Min)
+}
+
+func (l LazySeq) Next() Seq {
+
+	if len(l.Front) != 0 {
+		return LazySeq{
+			Min: l.Min,
+			Max: l.Max,
+			Step: l.Step,
+			Front: l.Front[1:],
+			Back: l.Back,
+		}
+
+	} else if l.Min+1 != l.Max {
+		return LazySeq{
+			Min: l.Min + l.Step,
+			Max: l.Max,
+			Step: l.Step,
+			Front: l.Front,
+			Back: l.Back,
+		}
+
+	} else if len(l.Back) != 0 {
+		return LazySeq{
+			Min: l.Min,
+			Max: l.Max,
+			Step: l.Step,
+			Front: l.Front,
+			Back: l.Back[1:],
+		}
+	}
+	
+	return nil
+}
+
+func (l LazySeq) Cons(v Value) Seq {
+	return LazySeq{
+		Min: l.Min,
+		Max: l.Max,
+		Step: l.Step,
+		Front: append([]Value{v}, l.Front...),
+		Back: l.Back,
+	}
+}
+
+func (l LazySeq) Conj(v ...Value) Seq {
+	return LazySeq{
+		Min: l.Min,
+		Max: l.Max,
+		Step: l.Step,
+		Front: l.Front,
+		Back: append(l.Back, v...),
+	}
+}
+
+func (l LazySeq) Size() int {
+	return ((l.Max-l.Min) / l.Step) + len(l.Front) + len(l.Back)
+}
+
+func (l LazySeq) String() string {
+	str := strings.Builder{}
+	str.Grow(l.Size())
+	 
+	str.WriteString("<LazySeq(")
+
+	for _, v := range l.Front {
+		str.WriteString(fmt.Sprintf("%s ", v))
+	}
+
+	for i := l.Min; i < l.Max; i += l.Step {
+		str.WriteString(fmt.Sprintf("%d ", i))
+	}
+
+	for _, v := range l.Back {
+		str.WriteString(fmt.Sprintf("%s ", v))
+	}
+
+	result := str.String()
+	result = strings.TrimSuffix(result, " ")
+
+	return result + ")>"
+}
+
+func (l LazySeq) Eval(_ Scope) (Value, error) {
+	return l, nil
+}
+
+
+// ------------------ helper functions ---------------------------
+
 func hasher(s interface{}) uint32 {
 	return hash.String(s.(Value).String())
 }
