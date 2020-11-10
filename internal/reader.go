@@ -606,6 +606,22 @@ func readVector(rd *Reader, _ rune) (Value, error) {
 	return pv, nil
 }
 
+func readLazySeq(rd *Reader, _ rune) (Value, error) {
+	pi := rd.Position()
+
+	forms, err := readContainer(rd, '[', ']', "lazy-seq")
+	if err != nil {
+		return nil, err
+	}
+
+	return &List{
+		Values: append([]Value{Symbol{
+			Value: "lazy-range",
+		}}, forms...),
+		Position: pi,
+	}, nil
+}
+
 func readSet(rd *Reader, _ rune) (Value, error) {
 	pi := rd.Position()
 
@@ -840,6 +856,8 @@ func defaultDispatchTable() map[rune]ReaderMacro {
 		'!': readComment,
 		'(': readLambda,
 		')': unmatchedDelimiter,
+		'[': readLazySeq,
+		']': unmatchedDelimiter,
 	}
 }
 
