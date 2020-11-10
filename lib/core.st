@@ -100,10 +100,10 @@
         (throw "argument must be a collection, not " (type coll)))
     (coll.Cons v))
 
-(defn conj [coll & vals]
+(defn conj [coll vals]
     (if (not (seq? coll))
         (throw "argument must be a collection, not " (type coll)))
-    (<> coll.Conj vals))
+    (coll.Conj vals))
 
 ; (defn swap! [atom f]
 ;   (atom.UpdateState f))
