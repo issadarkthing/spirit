@@ -20,7 +20,7 @@ sample.st
 .lsp/*
 sample.lisp
 foldl.lisp
+sample/
 
 
 sample.json
-sample.edn
