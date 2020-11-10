@@ -22,7 +22,7 @@ func invalidType(expected, got internal.Value) error {
 }
 
 func doesNotImplementSeq(got internal.Value) error {
-	return fmt.Errorf("%v does not implement Seq interface", got)
+	return fmt.Errorf("%T does not implement Seq interface", got)
 }
 
 func doesNotImplementInvokable(got internal.Value) error {
