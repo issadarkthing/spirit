@@ -58,15 +58,18 @@ func ReadEval(scope Scope, r io.Reader) (Value, error) {
 			}
 			symbol := sym.String()
 
+			// only hoist for def that defines defn and defmacro
 			if def.String() == "def" && (symbol == "defn" || symbol == "defmacro") {
 				_, err := form.Eval(scope)
 				if err != nil {
 					return nil, err
 				}
+			// do not hoist def
 			} else if def.String() == "def" {
 				continue
 			}
 
+			// this part here only has defn and defmacro
 			_, err := form.Eval(scope)
 			if err != nil {
 				return nil, err
