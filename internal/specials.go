@@ -169,11 +169,11 @@ func parseDo(scope Scope, args []Value) (*Fn, error) {
 				return Nil{}, nil
 			}
 
-			results, err := evalValueList(scope, args)
+			results, err := EvalValueLast(scope, args)
 			if err != nil {
 				return nil, err
 			}
-			return results[len(results)-1], err
+			return results, err
 		},
 	}, nil
 }
@@ -272,7 +272,7 @@ func parseRecur(scope Scope, forms []Value) (*Fn, error) {
 				Value: "recur",
 			}
 
-			results, err := evalValueList(scope, args)
+			results, err := EvalValueList(scope, args)
 			if err != nil {
 				return nil, err
 			}

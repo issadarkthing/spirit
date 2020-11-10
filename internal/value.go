@@ -151,7 +151,8 @@ func (vals Values) String() string {
 	return containerString(vals, "(", ")", " ")
 }
 
-func evalValueList(scope Scope, vals []Value) ([]Value, error) {
+// evaluates list and returns the evaluated list
+func EvalValueList(scope Scope, vals []Value) ([]Value, error) {
 	var result []Value
 
 	for _, arg := range vals {
@@ -161,6 +162,22 @@ func evalValueList(scope Scope, vals []Value) ([]Value, error) {
 		}
 
 		result = append(result, v)
+	}
+
+	return result, nil
+}
+
+// evaluates list and only returns the last expression
+func EvalValueLast(scope Scope, vals []Value) (Value, error) {
+
+	var result Value = Nil{}
+
+	for _, arg := range vals {
+		v, err := arg.Eval(scope)
+		if err != nil {
+			return nil, newEvalErr(arg, err)
+		}
+		result = v
 	}
 
 	return result, nil

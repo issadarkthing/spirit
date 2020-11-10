@@ -100,7 +100,7 @@ func (kw Keyword) Invoke(scope Scope, args ...Value) (Value, error) {
 		return nil, err
 	}
 
-	argVals, err := evalValueList(scope, args)
+	argVals, err := EvalValueList(scope, args)
 	if err != nil {
 		return nil, err
 	}

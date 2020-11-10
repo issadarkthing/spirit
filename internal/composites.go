@@ -118,7 +118,7 @@ func (vf Vector) Conj(vals ...Value) Seq {
 // Eval evaluates each value in the vector form and returns the resultant
 // values as new vector.
 func (vf Vector) Eval(scope Scope) (Value, error) {
-	vals, err := evalValueList(scope, vf.Values)
+	vals, err := EvalValueList(scope, vf.Values)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (vf Vector) Eval(scope Scope) (Value, error) {
 // Invoke of a vector performs a index lookup. Only arity 1 is allowed
 // and should be an integer value to be used as index.
 func (vf Vector) Invoke(scope Scope, args ...Value) (Value, error) {
-	vals, err := evalValueList(scope, args)
+	vals, err := EvalValueList(scope, args)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ type Set struct {
 // Eval evaluates each value in the set form and returns the resultant
 // values as new set.
 func (set Set) Eval(scope Scope) (Value, error) {
-	vals, err := evalValueList(scope, set.Uniq())
+	vals, err := EvalValueList(scope, set.Uniq())
 	if err != nil {
 		return nil, err
 	}
@@ -276,16 +276,12 @@ type Module []Value
 // Eval evaluates all the vals in the module body and returns the result of the
 // last evaluation.
 func (mod Module) Eval(scope Scope) (Value, error) {
-	res, err := evalValueList(scope, mod)
+	res, err := EvalValueLast(scope, mod)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(res) == 0 {
-		return Nil{}, nil
-	}
-
-	return res[len(res)-1], nil
+	return res, nil
 }
 
 // Compare returns true if the 'v' is also a module and all forms in the
@@ -549,7 +545,7 @@ func (p *PersistentVector) GetValues() []Value {
 }
 
 func (p *PersistentVector) Invoke(scope Scope, args ...Value) (Value, error) {
-	vals, err := evalValueList(scope, args)
+	vals, err := EvalValueList(scope, args)
 	if err != nil {
 		return nil, err
 	}

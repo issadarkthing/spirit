@@ -94,7 +94,7 @@ func (t Type) Invoke(scope Scope, args ...Value) (Value, error) {
 		return nil, fmt.Errorf("type '%s' cannot be initialized", t.T)
 	}
 
-	argVals, err := evalValueList(scope, args)
+	argVals, err := EvalValueList(scope, args)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func reflectFn(rv reflect.Value) *Fn {
 				}
 			}()
 
-			args, err = evalValueList(scope, args)
+			args, err = EvalValueList(scope, args)
 			if err != nil {
 				return nil, err
 			}
