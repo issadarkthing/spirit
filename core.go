@@ -103,17 +103,6 @@ func toType(to internal.Type, val internal.Value) (internal.Value, error) {
 	return nil, fmt.Errorf("cannot convert '%s' to '%s'", rv.Type(), to.T)
 }
 
-// ThreadFirst threads the expressions through forms by inserting result of
-// eval as first argument to next expr.
-func threadFirst(scope internal.Scope, args []internal.Value) (internal.Value, error) {
-	return threadCall(scope, args, false)
-}
-
-// ThreadLast threads the expressions through forms by inserting result of
-// eval as last argument to next expr.
-func threadLast(scope internal.Scope, args []internal.Value) (internal.Value, error) {
-	return threadCall(scope, args, true)
-}
 
 // MakeString returns stringified version of all args.
 func makeString(vals ...internal.Value) internal.Value {
@@ -139,52 +128,7 @@ func makeString(vals ...internal.Value) internal.Value {
 	}
 }
 
-func threadCall(scope internal.Scope, args []internal.Value, last bool) (internal.Value, error) {
 
-	err := checkArityAtLeast(1, len(args))
-	if err != nil {
-		return nil, err
-	}
-
-	res := args[0]
-	// res, err := internal.Eval(scope, args[0])
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	for args = args[1:]; len(args) > 0; args = args[1:] {
-		form := args[0]
-
-		switch f := form.(type) {
-		case *internal.List:
-			if last {
-				f.Values = append(f.Values, res)
-			} else {
-				f.Values = append([]internal.Value{f.Values[0], res}, f.Values[1:]...)
-			}
-			res, err = internal.Eval(scope, f)
-			if v, ok := res.(*internal.List); ok {
-				res = v.Cons(internal.Symbol{Value: "list"})
-			}
-
-		case internal.Invokable:
-			res, err = f.Invoke(scope, res)
-
-		default:
-			return nil, fmt.Errorf("%s is not invokable", reflect.TypeOf(res))
-		}
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if res, ok := res.(*internal.List); ok {
-		return res.Eval(scope)
-	}
-
-	return res, nil
-}
 
 func isTruthy(v internal.Value) bool {
 	if v == nil || v == (internal.Nil{}) {
@@ -224,6 +168,10 @@ func createRange(min, max, step int) []internal.Value {
 
 func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
+	if err := checkArityAtLeast(1, len(args)); err != nil {
+		return nil, err
+	}
+
 	arg1 := args[0]
 	// function arguments binding
 	vecs, ok := arg1.(*internal.PersistentVector)
@@ -249,9 +197,8 @@ func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 	symbol, ok := vecs.Index(0).(internal.Symbol)
 	var result internal.Value
 
-	list := realize(l)
-	for _, v := range list.Values {
-		scope.Bind(symbol.Value, v)
+	for curr := l; curr != nil; curr = curr.Next() {
+		scope.Bind(symbol.Value, curr.First())
 		for _, body := range args[1:] {
 			result, err = body.Eval(scope)
 			if err != nil {
@@ -618,6 +565,31 @@ func evalStr(scope internal.Scope, args []internal.Value) (internal.Value, error
 		return nil, invalidType(internal.String(""), form)
 	}
 
-	return internal.ReadEvalStr(scope, fromStr.String())
+	return internal.ReadEvalStr(scope, string(fromStr))
 }
 
+
+func lazyRange(min, max, step int) internal.LazySeq {
+	return internal.LazySeq{
+		Min: min,
+		Max: max,
+		Step: step,
+	}
+}
+
+
+func source(scope internal.Scope) func(string) (internal.Value, error) {
+	return func(file string) (internal.Value, error) {
+		content, err := readFile(file)
+		if err != nil {
+			return nil, err
+		}
+
+		value, err := internal.ReadEvalStr(scope, content)
+		if err != nil {
+			return nil, err
+		}
+
+		return value, nil
+	}
+}
