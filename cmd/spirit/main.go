@@ -168,13 +168,9 @@ func listener(line []rune, pos int, key rune) ([]rune, int, bool) {
 }
 
 func readlineInstance(scope internal.Scope) (*readline.Instance, func(error) error) {
-	completer := readline.NewPrefixCompleter(
-		readline.PcItem("(source *file*)"),
-	)
 
 	lr, err := readline.NewEx(&readline.Config{
 		HistoryFile: "/tmp/spirit-repl.tmp",
-		AutoComplete: completer,
 		Listener: readline.FuncListener(listener),
 	})
 
