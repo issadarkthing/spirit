@@ -650,7 +650,7 @@ func (c *Future) Submit(scope Scope, form Value) {
 }
 
 func (c Future) String() string {
-	return fmt.Sprintf("<future(realized: %v value: %v)>", c.Realized, c.Value)
+	return fmt.Sprintf("<Future(realized: %v value: %v)>", c.Realized, c.Value)
 }
 
 func (c *Future) Eval(_ Scope) (Value, error) {
