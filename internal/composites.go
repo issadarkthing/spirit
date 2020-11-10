@@ -332,6 +332,22 @@ func (p *PersistentMap) Get(key, defValue Value) Value {
 	return val.(Value)
 }
 
+func (p *PersistentMap) Invoke(scope Scope, args ...Value) (Value, error) {
+	
+	if len(args) < 1 || len(args) > 2 {
+		return nil, fmt.Errorf("invoking hash map requires 1 or 2 arguments")
+	}
+
+	key := args[0]
+	var defaultVal Value = Nil{}
+
+	if len(args) == 2 {
+		defaultVal = args[1]
+	}
+
+	return p.Get(key, defaultVal), nil
+}
+
 func (p *PersistentMap) Delete(k Value) *PersistentMap {
 	return &PersistentMap{Data: p.Data.Dissoc(k)}
 }
