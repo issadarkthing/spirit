@@ -266,16 +266,6 @@
          (cons (f (first s1) (first s2) (first s3))
                (map f (rest s1) (rest s2) (rest s3)))))))
 
-; (defn map
-;   ([f coll]
-;    (map f coll (empty coll)))
-;   ([f coll acc]
-;    (let [x (first coll)
-;          xs (rest coll)]
-;      (if (nil? x)
-;        acc
-;        (recur f xs (conj acc (f x)))))))
-
 (defn map-indexed
   ([f coll]
    (map-indexed f coll (empty coll) 0))
