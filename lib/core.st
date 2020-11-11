@@ -50,6 +50,7 @@
 (defn positive? [x]
   (> x 0))
 
+
 ; sequence operations -------------------------------
 (defn seq? [arg] (impl? arg types/Seq))
 
@@ -247,16 +248,33 @@
        (unsafe/swap i (inc i)))
      z)))
 
-
 (defn map
   ([f coll]
-   (map f coll (empty coll)))
-  ([f coll acc]
-   (let [x (first coll)
-         xs (rest coll)]
-     (if (nil? x)
-       acc
-       (recur f xs (conj acc (f x)))))))
+   (if (empty? coll)
+       coll
+       (cons (f (first coll)) (map f (rest coll)))))
+  ([f c1 c2]
+   (let [s1 c1 s2 c2]
+     (if (or (empty? s1) (empty? s2))
+         (empty s1)
+         (cons (f (first s1) (first s2))
+               (map f (rest s1) (rest s2))))))
+  ([f c1 c2 c3]
+   (let [s1 c1 s2 c2 s3 c3]
+     (if (or  (empty? s1) (empty? s2) (empty? s3))
+         (empty s1)
+         (cons (f (first s1) (first s2) (first s3))
+               (map f (rest s1) (rest s2) (rest s3)))))))
+
+; (defn map
+;   ([f coll]
+;    (map f coll (empty coll)))
+;   ([f coll acc]
+;    (let [x (first coll)
+;          xs (rest coll)]
+;      (if (nil? x)
+;        acc
+;        (recur f xs (conj acc (f x)))))))
 
 (defn map-indexed
   ([f coll]
@@ -468,4 +486,6 @@
 (defn or [& args]
   (reduce (fn [acc x] (or* acc x)) args))
 
+
 (defn not [arg] (= false (true? arg)))
+
