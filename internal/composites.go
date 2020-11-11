@@ -30,6 +30,7 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 		return nil, err
 	}
 
+
 	fnCall := Call{
 		Name:     lf.Values[0].String(),
 		Position: lf.Position,
@@ -65,6 +66,7 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 		return nil, addStackTrace(scope, err)
 	}
 	scope.Pop()
+
 	return val, nil
 }
 
@@ -665,6 +667,11 @@ type LazySeq struct {
 }
 
 func (l LazySeq) First() Value {
+	
+	if l.Min >= l.Max {
+		return ValueOf(nil)
+	}
+
 	return ValueOf(l.Min)
 }
 
@@ -676,11 +683,16 @@ func (l LazySeq) Next() Seq {
 			Max: l.Max,
 			Step: l.Step,
 		}
-	} 	
+	}
+
 	return nil
 }
 
 func (l LazySeq) values() []Value {
+
+	if l.Size() == 0 {
+		return []Value{}
+	}
 	result := make([]Value, 0, l.Size())
 	var curr Seq
 	for curr = l; curr != nil; curr = curr.Next() {
