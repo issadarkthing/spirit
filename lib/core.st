@@ -53,8 +53,8 @@
 ; sequence operations -------------------------------
 (defn seq? [arg] (impl? arg types/Seq))
 
-(defn lazy-range 
-  ([] (lazy-range* 0 9223372036854775806 1))
+(defn lazy-range
+  ([] (lazy-range* 0 922337203685477 1))
   ([max] (lazy-range* 0 max 1))
   ([min max] (lazy-range* min max 1))
   ([min max step] (lazy-range* min max step)))
