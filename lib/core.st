@@ -248,23 +248,19 @@
        (unsafe/swap i (inc i)))
      z)))
 
-(defn map
+
+(defn map 
   ([f coll]
-   (if (empty? coll)
-       coll
-       (cons (f (first coll)) (map f (rest coll)))))
-  ([f c1 c2]
-   (let [s1 c1 s2 c2]
-     (if (or (empty? s1) (empty? s2))
-         (empty s1)
-         (cons (f (first s1) (first s2))
-               (map f (rest s1) (rest s2))))))
-  ([f c1 c2 c3]
-   (let [s1 c1 s2 c2 s3 c3]
-     (if (or  (empty? s1) (empty? s2) (empty? s3))
-         (empty s1)
-         (cons (f (first s1) (first s2) (first s3))
-               (map f (rest s1) (rest s2) (rest s3)))))))
+   (loop [s coll acc (empty coll)]
+         (if (empty? s)
+             acc
+             (recur (rest s) (conj acc (f (first s)))))))
+  ([f coll1 coll2]
+   (loop [s1 coll1, s2 coll2, acc (empty coll1)]
+         (if (or (empty? s1) (empty? s2))
+             acc
+             (recur (rest s1) (rest s2) (conj acc (f (first s1) (first s2))))))))
+
 
 (defn map-indexed
   ([f coll]
