@@ -214,9 +214,10 @@
   (if (not (seq? coll))
     (throw "argument must be a Seq"))
   (cond 
+    (string? coll) ""
     (list? coll) '() 
     (vector? coll) []
-    (lazy-seq? coll) (lazy-range 0 0)))
+    (lazy-seq? coll) []))
     
 
 (defn take
