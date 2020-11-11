@@ -173,7 +173,7 @@
     (let [v (first coll)]
       (if (f v)
         v
-        (find f (next coll))))))
+        (recur f (next coll))))))
 
 (defn even? [num]
     (= (mod num 2) 0))
