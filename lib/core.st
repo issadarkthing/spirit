@@ -103,9 +103,9 @@
 (defn rest [coll]
   (if (> (count coll) 1)
     (next coll)
-   (if (list? coll)
-     '()
-     [])))
+   (cond 
+     (or (lazy-seq? coll) (list? coll)) '()
+     (vector? coll) [])))
 
 (defn cons [v coll]
     (if (not (seq? coll))
@@ -218,7 +218,7 @@
     (string? coll) ""
     (list? coll) '() 
     (vector? coll) []
-    (lazy-seq? coll) []))
+    (lazy-seq? coll) '()))
     
 
 (defn take
