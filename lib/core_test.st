@@ -198,5 +198,6 @@
 (assert (= (splice-test 1 2 3) '(1 2 3)))
 
 (assert (= #[1 100] (lazy-range 1 100)))
-(assert (= [0 1 2] (take 3 #[1000000000000])))
-(assert (= [5 7 9 11 13] (take 5 #[5 100000 2])))
+(assert (= '(0 1 2) (take 3 #[1000000000000])))
+(assert (= '(5 7 9 11 13) (take 5 #[5 100000 2])))
+(assert (= nil (first #[0])))
