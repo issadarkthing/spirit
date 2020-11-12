@@ -108,6 +108,8 @@ func bindAll(scope internal.Scope) error {
 		"core/>=":  internal.ValueOf(gtE),
 		"core/<":   internal.ValueOf(lt),
 		"core/<=":  internal.ValueOf(ltE),
+		"core/sqrt": internal.ValueOf(math.Sqrt),
+		"core/prime?": internal.ValueOf(isPrime),
 
 		// io functions
 		"core/$":         internal.ValueOf(shell),

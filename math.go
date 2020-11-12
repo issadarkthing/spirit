@@ -1,6 +1,8 @@
 package spirit
 
 import (
+	"math"
+
 	"github.com/issadarkthing/spirit/internal"
 )
 
@@ -87,4 +89,13 @@ func gtE(base internal.Number, args ...internal.Number) bool {
 		inc = inc && (arg <= base)
 	}
 	return inc
+}
+
+func isPrime(value internal.Number) bool {
+    for i := 2; i <= int(math.Floor(float64(value)/2)); i++ {
+        if int(value)%i == 0 {
+            return false
+        }
+    }
+    return value > 1
 }
