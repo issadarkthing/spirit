@@ -5,6 +5,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log"
+	"runtime/pprof"
 	"os"
 	"runtime"
 
@@ -29,6 +31,8 @@ var (
 	unload       = flag.Bool("u", false, "Unload core library")
 	preload      = flag.String("p", "", "Pre-loads file")
 	printVersion = flag.Bool("v", false, "Prints slang version and exit")
+	memProfile   = flag.String("memprofile", "", "memory profiling")
+	cpuProfile   = flag.String("cpuprofile", "", "cpu profiling")
 	matcher      = map[rune]rune{
 		'(': ')',
 		'[': ']',
@@ -43,7 +47,18 @@ func main() {
 	if *printVersion {
 		fmt.Println(version)
 		return
+
+	} else if *cpuProfile != "" {
+		f, err := os.Create(*cpuProfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
 	}
+
 
 	xl := spirit.New()
 	xl.BindGo("*version*", version)
@@ -96,6 +111,20 @@ func main() {
 		if err != nil {
 			fatalf("error: %v\n", err)
 		}
+
+
+		if *memProfile != "" {
+			f, err := os.Create(*memProfile)	
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer f.Close()
+
+			if err := pprof.WriteHeapProfile(f); err != nil {
+				log.Fatal("could not write memory profile: ", err)
+			}
+		}
+
 		return
 	}
 
