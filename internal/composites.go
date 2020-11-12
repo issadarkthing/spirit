@@ -718,18 +718,7 @@ func (l LazySeq) Size() int {
 }
 
 func (l LazySeq) String() string {
-	str := strings.Builder{}
-	 
-	str.WriteString("<LazySeq(")
-
-	for i := l.Min; i < l.Max; i += l.Step {
-		str.WriteString(fmt.Sprintf("%d ", i))
-	}
-
-	result := str.String()
-	result = strings.TrimSuffix(result, " ")
-
-	return result + ")>"
+	return fmt.Sprintf("#[%d %d %d]", l.Min, l.Max, l.Step)
 }
 
 func (l LazySeq) Eval(_ Scope) (Value, error) {
