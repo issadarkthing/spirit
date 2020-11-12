@@ -695,7 +695,7 @@ func (l LazySeq) values() []Value {
 	}
 	result := make([]Value, 0, l.Size())
 	var curr Seq
-	for curr = l; curr != nil; curr = curr.Next() {
+	for curr = l; curr != nil && curr.First() != nil; curr = curr.Next() {
 		result = append(result, curr.First())
 	}
 	return result
