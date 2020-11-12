@@ -16,8 +16,20 @@ import (
 
 // Println is an alias for fmt.Println which ignores the return values.
 func println(args ...interface{}) error {
-	_, err := fmt.Println(args...)
+	result := []interface{}{}
+	for _, v := range args {
+		if str, ok := v.(internal.String); ok {
+			result = append(result, removeSuffixPrefix(string(str), `"`))
+			continue
+		}
+		result = append(result, v)
+	}
+	_, err := fmt.Println(result...)
 	return err
+}
+
+func removeSuffixPrefix(str, cutset string) string {
+	return strings.TrimSuffix(strings.TrimPrefix(str, cutset), cutset)
 }
 
 // Printf is an alias for fmt.Printf which ignores the return values.
