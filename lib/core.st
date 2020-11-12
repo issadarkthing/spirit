@@ -276,7 +276,7 @@
 (defn filter [f coll]
   (let [z (empty coll)]
     (doseq [x coll]
-      (if (f x)
+      (when (f x)
         (unsafe/swap z (conj z x))))
     z))
 
