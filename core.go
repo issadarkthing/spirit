@@ -174,7 +174,7 @@ func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 	symbol, ok := vecs.Index(0).(internal.Symbol)
 	var result internal.Value
 
-	for curr := l; curr != nil; curr = curr.Next() {
+	for curr := l; curr != nil && curr.First() != nil; curr = curr.Next() {
 		scope.Bind(symbol.Value, curr.First())
 		for _, body := range args[1:] {
 			result, err = body.Eval(scope)
