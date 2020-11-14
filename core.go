@@ -570,3 +570,104 @@ func source(scope internal.Scope) func(string) (internal.Value, error) {
 		return value, nil
 	}
 }
+
+func defClass(scope internal.Scope, args []internal.Value) (internal.Value, error) {
+	
+	if err := checkArityAtLeast(2, len(args)); err != nil {
+		return nil, err
+	}
+
+	name, ok := args[0].(internal.Symbol)
+	if !ok {
+		return nil, invalidType(internal.Symbol{}, args[0])
+	}
+
+	class := internal.Class{
+		Name: name.String(),
+	}
+
+	// identifies the position of the member declaration
+	hashMapIndex := 1
+
+	if symbol, ok := args[1].(internal.Symbol); ok {
+		if symbol.Value != "<-" {
+			return nil, fmt.Errorf("expecting hashMap or <- symbol")
+		}
+
+		arg2, err := args[2].Eval(scope)
+		if err != nil {
+			return nil, err
+		}
+
+		if parent, ok := arg2.(internal.Class); ok {
+			class.Parent = &parent	
+		}
+
+		hashMapIndex = 3
+	}
+
+	evaledArgs, err := internal.EvalValueList(scope, args[hashMapIndex:])
+	if err != nil {
+		return nil, err
+	}
+
+	
+	hashMap, ok := evaledArgs[0].(*internal.PersistentMap)
+	if !ok {
+		return nil, invalidType(&internal.PersistentMap{}, evaledArgs[0])
+	}
+
+	members := make(map[string]internal.Type)
+	for it := hashMap.Data.Iterator(); it.HasElem(); it.Next() {
+		k, v := it.Elem()
+
+		keyword, ok := k.(internal.Keyword)
+		if !ok {
+			return nil, invalidType(internal.Keyword(""), k.(internal.Value))
+		}
+
+		memberType, ok := v.(internal.Type)
+		if !ok {
+			return nil, invalidType(internal.Type{}, v.(internal.Value))
+		}
+
+		members[keyword.String()] = memberType
+	}
+
+	class.Members = members
+
+	methods := make(map[string]internal.Invokable)
+	for _, m := range evaledArgs[1:] {
+		
+		method, ok := m.(*internal.List)
+		if !ok {
+			return nil, fmt.Errorf("expected defmethod")
+		}
+
+		name := method.First()
+		var body internal.Value = method.Next().First()
+		
+		body, err = body.Eval(scope)
+		if err != nil {
+			return nil, err
+		}
+		
+		fn, ok := body.(internal.Invokable)
+		if !ok {
+			return nil, fmt.Errorf("expecting invokable")
+		}
+
+		methods[":" + name.String()] = fn
+	}
+
+	class.Methods = methods
+
+	if scope.Parent() != nil {
+		scope = scope.Parent()
+	}
+	scope.Bind(class.Name, class)
+
+	return class, nil
+}
+
+

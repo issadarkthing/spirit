@@ -72,6 +72,10 @@ func bindAll(scope internal.Scope) error {
 			Name:  "loop",
 			Parse: parseLoop,
 		},
+		"core/defclass": &internal.Fn{
+			Args: []string{"hash-map", "class"},
+			Func: defClass,
+		},
 
 		// special forms
 		"core/do":           internal.Do,
