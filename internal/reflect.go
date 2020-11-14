@@ -88,6 +88,10 @@ func (t Type) Eval(_ Scope) (Value, error) { return t, nil }
 
 func (t Type) String() string { return fmt.Sprintf("%v", t.T) }
 
+func TypeOf(value interface{}) Type {
+	return Type{reflect.TypeOf(value)}
+}
+
 // Invoke creates zero value of the given type.
 func (t Type) Invoke(scope Scope, args ...Value) (Value, error) {
 	if isKind(t.T, reflect.Interface, reflect.Chan, reflect.Func) {
