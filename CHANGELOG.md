@@ -17,6 +17,7 @@ PersistentVector Elapsed time: 13.867µs
 - Function hoisting for `defn` and `defmacro`
 - Added support for unquote splicing
 - Added `Future`
+- Added Object-Oriented Programming `defclass` and `defmethod`
 
 v0.7.0
 - Added Atom type (experimental)

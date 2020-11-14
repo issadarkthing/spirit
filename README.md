@@ -29,3 +29,4 @@ These are the differences that I deliberately made to differ from Clojure.
 - All functions that acts on Seq returns the same concrete type Seq.
 	For example, `map` on vector returns vector instead of list
 - Keyword is used instead of String as key on JSON object
+- Object Oriented
