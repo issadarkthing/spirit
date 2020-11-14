@@ -169,6 +169,7 @@ func (sym Symbol) resolveValue(scope Scope) (Value, error) {
 		return target, err
 	}
 
+
 	rv := reflect.ValueOf(target)
 	for i := 1; i < len(fields); i++ {
 		if rv.Type() == reflect.TypeOf(Any{}) {
@@ -184,6 +185,23 @@ func (sym Symbol) resolveValue(scope Scope) (Value, error) {
 	if isKind(rv.Type(), reflect.Chan, reflect.Array,
 		reflect.Func, reflect.Ptr) && rv.IsNil() {
 		return Nil{}, nil
+	}
+
+	if object, ok := target.(Object); ok {
+
+		fn, ok := rv.Interface().(Invokable)
+		if !ok {
+			return ValueOf(rv.Interface()), nil
+		}
+		
+		// if it is a method call, supply the instance as the first param
+		return &Fn{
+			Args: []string{"instance"},
+			Func: func(scope Scope, args []Value) (Value, error) {
+				args = append([]Value{object}, args...)
+				return fn.Invoke(scope, args...)
+			},
+		}, nil
 	}
 
 	return ValueOf(rv.Interface()), nil
