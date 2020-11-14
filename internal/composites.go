@@ -760,6 +760,28 @@ func (c Class) String() string {
 	return str.String()
 }
 
+func (c Class) GetMember(name Keyword) (Type, bool) {
+	member := c.Members.Get(name, nil)
+	if member == nil && c.Parent == nil {
+		return TypeOf(ValueOf(nil)), false
+
+	} else if member == nil && c.Parent != nil {
+		return c.Parent.GetMember(name)
+	}
+	return member.(Type), true
+}
+
+func (c Class) GetMethod(name Keyword) (Invokable, bool) {
+	method := c.Methods.Get(name, nil)
+	if method == nil && c.Parent == nil {
+		return nil, false
+
+	} else if method == nil && c.Parent != nil {
+		return c.Parent.GetMethod(name)
+	}
+	return method.(Invokable), true
+}
+
 func (c Class) GetMembers() map[string]Type {
 	members := make(map[string]Type)
 	if c.Parent != nil {
@@ -874,6 +896,18 @@ func (o Object) String() string {
 
 	str.WriteString("\n}")
 	return str.String()
+}
+
+func (o Object) GetMember(name Keyword) (Value, bool) {
+	val := o.Members.Get(name, nil)
+	if val == nil {
+		return nil, false
+	}
+	return val, true
+}
+
+func (o Object) GetMethod(name Keyword) (Invokable, bool) {
+	return o.InstanceOf.GetMethod(name)
 }
 
 // ------------------ helper functions ---------------------------

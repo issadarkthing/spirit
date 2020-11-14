@@ -556,26 +556,28 @@ type binding struct {
 
 func accessClassMember(target reflect.Value, name string) (reflect.Value, error) {
 	
-	class := target.Interface().(Object)
+	object := target.Interface().(Object)
+	key := Keyword(name)
 
-
-	method, methodFound := class.InstanceOf.GetMethods()[":" + name]
+	method, methodFound := object.GetMethod(key)
 
 	if methodFound {
 		return reflect.ValueOf(method), nil
 	}
 
-	member, memberFound := class.Members[":" + name]
+	member, memberFound := object.GetMember(key)
 
 	if memberFound {
 		return reflect.ValueOf(member), nil
 	}
 
-	_, found := class.InstanceOf.Parent.Members[":" + name]
+	// return nil if member exists in Class but not in Object
+	_, found := object.InstanceOf.GetMember(key)
 	if found {
 		return reflect.ValueOf(Nil{}), nil
 	}
 
+	// error if it cannot find member or method
 	return reflect.Value{}, fmt.Errorf("cannot find member or method %s", name)
 }
 
