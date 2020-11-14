@@ -12,7 +12,9 @@
 (def Fn     (type (fn* [])))
 (def HashMap(type {}))
 (def Future (type (future* 1)))
-(def LazySeq (type (lazy-range* 0 0 1)))
+(def LazySeq(type (lazy-range* 0 0 1)))
+(def Class  (type (defclass Empty {})))
+(def Object (type (Empty {})))
 
 (ns 'core)
 
