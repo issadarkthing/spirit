@@ -736,8 +736,8 @@ func errMismatchedType(expected, got Value) error {
 type Class struct {
 	Name    string
 	Parent  *Class
-	Members map[string]Type
-	Methods map[string]Invokable
+	Members *PersistentMap
+	Methods *PersistentMap
 }
 
 func (c Class) Eval(_ Scope) (Value, error) {
@@ -749,11 +749,11 @@ func (c Class) String() string {
 
 	str.WriteString(fmt.Sprintf("%s {", c.Name))
 	for name, memberType := range c.GetMembers() {
-		str.WriteString(fmt.Sprintf("\n  %s -> %s", name, memberType))
+		str.WriteString(fmt.Sprintf("\n  %v -> %v", name, memberType))
 	}
 
 	for name, method := range c.GetMethods() {
-		str.WriteString(fmt.Sprintf("\n  %s => %v", name, method))
+		str.WriteString(fmt.Sprintf("\n  %v => %v", name, method))
 	}
 
 	str.WriteString("\n}")
@@ -766,8 +766,12 @@ func (c Class) GetMembers() map[string]Type {
 		members = c.Parent.GetMembers()
 	}
 
-	for name, memberType := range c.Members {
-		members[name] = memberType
+	for it := c.Members.Data.Iterator(); it.HasElem(); it.Next() {
+		name, memberType := it.Elem()
+
+		key := name.(Keyword)
+		value := memberType.(Type)
+		members[string(key)] = value
 	}
 
 	return members
@@ -779,10 +783,13 @@ func (c Class) GetMethods() map[string]Invokable {
 		methods = c.Parent.GetMethods()
 	}
 
-	for name, method := range c.Methods {
-		methods[name] = method
-	}
+	for it := c.Methods.Data.Iterator(); it.HasElem(); it.Next() {
+		name, memberType := it.Elem()
 
+		key := name.(Keyword)
+		value := memberType.(Invokable)
+		methods[string(key)] = value
+	}
 	return methods
 }
 
@@ -802,8 +809,6 @@ func (c Class) Invoke(scope Scope, args ...Value) (Value, error) {
 		return nil, fmt.Errorf("expected PersistentMap")
 	}
 
-	members := c.GetMembers()
-	instanceMembers := make(map[string]Value)
 
 	for it := passedMap.Data.Iterator(); it.HasElem(); it.Next() {
 		k, v := it.Elem()
@@ -818,7 +823,7 @@ func (c Class) Invoke(scope Scope, args ...Value) (Value, error) {
 			return nil, fmt.Errorf("mismatched type: expected Value")
 		}
 
-		memberType, ok := members[key.String()]
+		memberType, ok := c.GetMember(key)
 		if !ok {
 			return nil, errMemberNotFound(key)
 		}
@@ -827,44 +832,44 @@ func (c Class) Invoke(scope Scope, args ...Value) (Value, error) {
 			return nil, errMismatchedType(memberType, value)
 		}
 
-		instanceMembers[key.String()] = value
 	}
 
 	return Object{
 		InstanceOf: c,
-		Members:    instanceMembers,
+		Members:    passedMap,
 	}, nil
 }
 
-func (c *Class) DefineMember(name string, member Type) {
-	c.Members[name] = member
-}
-
-func (c *Class) DefineMethod(name string, f Invokable) {
-	c.Methods[name] = f
-}
 
 type Object struct {
 	InstanceOf Class
-	Members    map[string]Value
+	Members    *PersistentMap
 }
 
 func (o Object) Eval(_ Scope) (Value, error) {
 	return o, nil
 }
 
+func (o Object) Set(key, value Value) Value {
+	return Object{
+		InstanceOf: o.InstanceOf,
+		Members: o.Members.Set(key, value).(*PersistentMap),
+	}
+}
 
 func (o Object) String() string {
 
-	if len(o.Members) == 0 {
+	if o.Members.Data.Len() == 0 {
 		return fmt.Sprintf("%s {}", o.InstanceOf.Name)
 	}
 
 	str := strings.Builder{}
 
 	str.WriteString(fmt.Sprintf("%s {", o.InstanceOf.Name))
-	for name, memberType := range o.Members {
-		str.WriteString(fmt.Sprintf("\n  %s = %s", name, memberType))
+	for it := o.Members.Data.Iterator(); it.HasElem(); it.Next() {
+		
+		name, member := it.Elem()
+		str.WriteString(fmt.Sprintf("\n  %s = %s", name, member))
 	}
 
 	str.WriteString("\n}")
