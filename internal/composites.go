@@ -320,7 +320,7 @@ func NewPersistentMap() *PersistentMap {
 	return &PersistentMap{Data: hashmap.New(compare, hasher)}
 }
 
-func (p *PersistentMap) Set(k, v Value) *PersistentMap {
+func (p *PersistentMap) Set(k, v Value) Value {
 	return &PersistentMap{
 		Data: p.Data.Assoc(k, v),
 	}

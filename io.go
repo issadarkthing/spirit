@@ -79,11 +79,10 @@ func readFile(name string) (string, error) {
 
 func createShellOutput(out, err string, exit int) *internal.PersistentMap {
 	m := internal.NewPersistentMap()
-
-	return m.
-		Set(internal.Keyword("exit"), internal.Number(exit)).
-		Set(internal.Keyword("out"), internal.String(out)).
-		Set(internal.Keyword("err"), internal.String(err))
+	m = m.Set(internal.Keyword("exit"), internal.Number(exit)).(*internal.PersistentMap)
+	m = m.Set(internal.Keyword("out"), internal.String(out)).(*internal.PersistentMap)
+	m = m.Set(internal.Keyword("err"), internal.String(err)).(*internal.PersistentMap)
+	return m
 }
 
 func shell(command string) (*internal.PersistentMap, error) {

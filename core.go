@@ -430,7 +430,7 @@ func keyword(str string) internal.Keyword {
 	return internal.Keyword(str)
 }
 
-func assoc(hm *internal.PersistentMap, args ...internal.Value) (*internal.PersistentMap, error) {
+func assoc(hm internal.Assoc, args ...internal.Value) (internal.Assoc, error) {
 
 	if len(args)%2 != 0 {
 		return nil, fmt.Errorf("invalid number of arguments passed")
@@ -438,7 +438,17 @@ func assoc(hm *internal.PersistentMap, args ...internal.Value) (*internal.Persis
 
 	h := hm
 	for i := 0; i < len(args); i += 2 {
-		h = h.Set(args[i], args[i+1])
+
+		key := args[i]
+		value := args[i+1]
+
+		if _, ok := hm.(internal.Object); ok {
+			if _, ok := key.(internal.Keyword); !ok {
+				return nil, fmt.Errorf("Object requires Keyword as key")
+			}
+		}
+
+		h = h.Set(key, value).(internal.Assoc)
 	}
 
 	return h, nil
@@ -462,7 +472,7 @@ func convert(data map[string]interface{}) *internal.PersistentMap {
 
 		// nested object
 		if nest, ok := v.(map[string]interface{}); ok {
-			pm = pm.Set(internal.Keyword(k), convert(nest))
+			pm = pm.Set(internal.Keyword(k), convert(nest)).(*internal.PersistentMap)
 
 			// key with array value
 		} else if nestArr, ok := v.([]interface{}); ok {
@@ -476,11 +486,11 @@ func convert(data map[string]interface{}) *internal.PersistentMap {
 					vals = append(vals, internal.ValueOf(n))
 				}
 			}
-			pm = pm.Set(internal.Keyword(k), internal.ValueOf(vals))
+			pm = pm.Set(internal.Keyword(k), internal.ValueOf(vals)).(*internal.PersistentMap)
 
 			// others can simply use ValueOf
 		} else {
-			pm = pm.Set(internal.Keyword(k), internal.ValueOf(v))
+			pm = pm.Set(internal.Keyword(k), internal.ValueOf(v)).(*internal.PersistentMap)
 		}
 	}
 	return pm
@@ -617,26 +627,23 @@ func defClass(scope internal.Scope, args []internal.Value) (internal.Value, erro
 		return nil, invalidType(&internal.PersistentMap{}, evaledArgs[0])
 	}
 
-	members := make(map[string]internal.Type)
 	for it := hashMap.Data.Iterator(); it.HasElem(); it.Next() {
 		k, v := it.Elem()
 
-		keyword, ok := k.(internal.Keyword)
+		_, ok := k.(internal.Keyword)
 		if !ok {
 			return nil, invalidType(internal.Keyword(""), k.(internal.Value))
 		}
 
-		memberType, ok := v.(internal.Type)
+		_, ok = v.(internal.Type)
 		if !ok {
 			return nil, invalidType(internal.Type{}, v.(internal.Value))
 		}
-
-		members[keyword.String()] = memberType
 	}
 
-	class.Members = members
+	class.Members = hashMap
 
-	methods := make(map[string]internal.Invokable)
+	methods := internal.NewPersistentMap()
 	for _, m := range evaledArgs[1:] {
 		
 		method, ok := m.(*internal.List)
@@ -644,7 +651,7 @@ func defClass(scope internal.Scope, args []internal.Value) (internal.Value, erro
 			return nil, fmt.Errorf("expected defmethod")
 		}
 
-		name := method.First()
+		name := internal.Keyword(method.First().String())
 		var body internal.Value = method.Next().First()
 		
 		body, err = body.Eval(scope)
@@ -657,14 +664,16 @@ func defClass(scope internal.Scope, args []internal.Value) (internal.Value, erro
 			return nil, fmt.Errorf("expecting invokable")
 		}
 
-		methods[":" + name.String()] = fn
+		methods = methods.Set(name, fn).(*internal.PersistentMap)
 	}
 
 	class.Methods = methods
 
+	// define in global variable
 	if scope.Parent() != nil {
 		scope = scope.Parent()
 	}
+
 	scope.Bind(class.Name, class)
 
 	return class, nil

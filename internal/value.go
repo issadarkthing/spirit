@@ -38,6 +38,14 @@ type Seq interface {
 	Size() int
 }
 
+// Assoc represents value that can be mapped
+type Assoc interface {
+	Value
+
+	// Set should set the value and returns new structure with updated value
+	Set(Value, Value) Value
+}
+
 // Compare compares two values in an identity independent manner. If
 // v1 has `Compare(Value) bool` method, the comparison is delegated to
 // it as `v1.Compare(v2)`.

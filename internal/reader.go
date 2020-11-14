@@ -582,7 +582,7 @@ func readHashMap(rd *Reader, _ rune) (Value, error) {
 				reflect.TypeOf(forms[i]))
 		}
 
-		hm = hm.Set(forms[i], forms[i+1])
+		hm = hm.Set(forms[i], forms[i+1]).(*PersistentMap)
 	}
 
 	return hm, nil
