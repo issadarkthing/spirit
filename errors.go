@@ -39,3 +39,15 @@ func checkArityAtLeast(atLeast, got int) error {
 
 	return nil
 }
+
+func checkArityMinMax(min, max, got int) error {
+
+	msg := "invalid number of arguments passed;" +
+	"expected at least %d or at most %d instead got %d"
+
+	if got < min || got > max {
+		return fmt.Errorf(msg, min, max, got)
+	}
+
+	return nil
+}
