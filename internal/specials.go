@@ -554,7 +554,37 @@ type binding struct {
 	Expr Value
 }
 
+func accessClassMember(target reflect.Value, name string) (reflect.Value, error) {
+	
+	class := target.Interface().(Object)
+
+
+	method, methodFound := class.InstanceOf.GetMethods()[":" + name]
+
+	if methodFound {
+		return reflect.ValueOf(method), nil
+	}
+
+	member, memberFound := class.Members[":" + name]
+
+	if memberFound {
+		return reflect.ValueOf(member), nil
+	}
+
+	_, found := class.InstanceOf.Parent.Members[":" + name]
+	if found {
+		return reflect.ValueOf(Nil{}), nil
+	}
+
+	return reflect.Value{}, fmt.Errorf("cannot find member or method %s", name)
+}
+
 func accessMember(target reflect.Value, member string) (reflect.Value, error) {
+	
+	if target.Type() == reflect.TypeOf(Object{}) {
+		return accessClassMember(target, member)
+	}
+
 	if member[0] >= 'a' && member[0] <= 'z' {
 		return reflect.Value{}, fmt.Errorf("cannot access private member")
 	}
