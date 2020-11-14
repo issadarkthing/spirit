@@ -3,7 +3,7 @@
 (assert (= 🧠 "The Brain!"))
 
 ; basic functions
-(assert (= 3 (eval '(int (+ 1 2)))))
+(assert (= 3 (eval '(number (+ 1 2)))))
 (assert (true? true))
 (assert (true? []))
 (assert (not (true? false)))
@@ -60,7 +60,7 @@
 (assert (= "hello-bob" (str "hello-" "bob")))
 
 ; ; type checking functions
-(assert (int? 10))
+(assert (number? 10))
 ; (assert (not (int? 10.0)))
 (assert (string? ""))
 (assert (not (string? nil)))
@@ -72,11 +72,11 @@
 (assert (= (type [])(type [1 2 3])))
 (assert (symbol? 'hello))
 (assert (= '(1 2 3 4 5 6) (concat [1 2 3] '(4 5 6))))
-(assert (= 10 (-> 5 (+ 5) int)))
+(assert (= 10 (-> 5 (+ 5) number)))
 (assert (= "hello" (-> 0 ["hello" 1 2 #{}])))
 
 ; ; simple function definition
-(def dec (fn* [i] (int (- i 1))))
+(def dec (fn* [i] (number (- i 1))))
 (assert (= 9 (dec 10)))
 
 ; ; simple recursive function with variadic args
@@ -201,3 +201,6 @@
 (assert (= '(0 1 2) (take 3 #[1000000000000])))
 (assert (= '(5 7 9 11 13) (take 5 #[5 100000 2])))
 (assert (= nil (first #[0])))
+
+
+

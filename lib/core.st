@@ -1,7 +1,6 @@
 (ns 'types)
 
-(def Int    (type 0))
-(def Float  (type 0.0))
+(def Number (type 0.0))
 (def Vector (type []))
 (def List   (type ()))
 (def Set    (type #{}))
@@ -153,10 +152,6 @@
         v
         (last (next coll))))))
 
-(defn number? [num]
-    (if (float? num)
-        true
-        (int? num)))
 
 (defn some [f coll]
   (if (or (empty? coll) (nil? coll))
@@ -192,9 +187,7 @@
 (defn inc [num]
     (if (not (number? num))
         (throw "argument must be a number"))
-    (if (int? num)
-        (int (+ 1 num))
-        (+ 1 num)))
+    (+ 1 num))
 
 (defn zero? [num]
   (= num 0))
@@ -202,9 +195,7 @@
 (defn dec [num]
     (if (not (number? num))
         (throw "argument must be a number"))
-    (if (int? num)
-        (int (- num 1))
-        (- num 1)))
+    (- num 1))
 
 (defn count [coll]
     (if (not (seq? coll))
@@ -323,6 +314,11 @@
     (coll.Assoc (first args) (second args))
     (<> assoc* coll args)))
 
+(defn max
+  ([x] x)
+  ([x y] (if (> x y) x y))
+  ([x y & others] (reduce max (max x y) others)))
+
 (defn abs [x]
   (if (< x 0) (- x) x))
 
@@ -377,7 +373,39 @@
   ([x y & more]
    (not (<> = x y more))))
 
+
+(defn partial
+  ([f] f)
+  ([f arg1]
+   (fn
+     ([] (f arg1))
+     ([x] (f arg1 x))
+     ([x y] (f arg1 x y))
+     ([x y z] (f arg1 x y z))
+     ([x y z & args] (<> f arg1 x y z args))))
+  ([f arg1 arg2]
+   (fn
+     ([] (f arg1 arg2))
+     ([x] (f arg1 arg2 x))
+     ([x y] (f arg1 arg2 x y))
+     ([x y z] (f arg1 arg2 x y z))
+     ([x y z & args] (<> f arg1 arg2 x y z args))))
+  ([f arg1 arg2 arg3]
+   (fn
+     ([] (f arg1 arg2 arg3))
+     ([x] (f arg1 arg2 arg3 x))
+     ([x y] (f arg1 arg2 arg3 x y))
+     ([x y z] (f arg1 arg2 arg3 x y z))
+     ([x y z & args] (<> f arg1 arg2 arg3 x y z args))))
+  ([f arg1 arg2 arg3 & more]
+   (fn [& args] (<> f arg1 arg2 arg3 (concat more args)))))
+
 ; important macros -----------------------------------
+
+(defmacro defmethod [name & fdecl]
+  (let [with-name (fdecl.Cons name)
+        method    (with-name.Cons 'fn)]
+    `'(~name ~method))) 
 
 (defmacro -> [x & forms]
   (loop [x x forms forms]
@@ -440,8 +468,7 @@
 (defn list? [arg] (is-type? types/List arg))
 (defn fn? [arg] (is-type? types/Fn arg))
 (defn vector? [arg] (is-type? types/Vector arg))
-(defn int? [arg] (is-type? types/Int arg))
-(defn float? [arg] (is-type? types/Float arg))
+(defn number? [arg] (is-type? types/Number arg))
 (defn boolean? [arg] (is-type? types/Bool arg))
 (defn string? [arg] (is-type? types/String arg))
 (defn keyword? [arg] (is-type? types/Keyword arg))
@@ -453,8 +480,7 @@
 (defn set [coll] (<> (type #{}) coll))
 (defn list [& coll] (<> (type '()) coll))
 (defn vector [& coll] (<> (type []) coll))
-(defn int [arg] (to-type (type 0) arg))
-(defn float [arg] (to-type (type 0.0) arg))
+(defn number [arg] (to-type (type 0) arg))
 (defn boolean [arg] (true? arg))
 
 ; boolean operations --------------------------------
