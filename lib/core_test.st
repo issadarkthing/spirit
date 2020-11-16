@@ -203,4 +203,33 @@
 (assert (= nil (first #[0])))
 
 
+(defclass Human
+  {:age types/Number
+   :name types/String}
+  
+  (defmethod aging [self]
+    (assoc self :age (inc self.age)))
+  
+  (defmethod get-age [self]
+    self.age))
 
+
+(defclass Student <- Human
+  {:id types/String}
+  
+  (defmethod get-id [self]
+    self.id))
+
+(def student (Student {:id "10" :age 20}))
+
+; member access
+(assert (= student.id "10"))
+
+; method invocation
+(assert (= (student.get-id) "10"))
+
+; inherited method and member
+(assert (= (student.get-age) 20))
+
+; uninitialized member defaulted to nil
+(assert (= nil student.name))
