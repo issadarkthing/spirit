@@ -159,3 +159,26 @@ func initspirit() (*spirit.Spirit, error) {
 
 	return sl, nil
 }
+
+func BenchmarkBinaryTree(b *testing.B) {
+
+	f, err := os.Open("./sample/tree.st")
+	if err != nil {
+		b.Error(err)
+	}
+	defer f.Close()
+
+	spirit, err := initspirit()
+	if err != nil {
+		b.Error(err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		_, err := spirit.ReadEval(f)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+
+}
+
