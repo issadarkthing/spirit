@@ -3,24 +3,24 @@
 In Spirit, you can define `Class` and `Object` like other OOP languages with only difference that both `Class` and `Object` are immutable.
 
 #### Defining class
-Defining a class in Spirit requires you to specify type for each members. This helps to reduce bugs in most dynamic type system.
+Defining a class in Spirit requires you to initiliaze default value for each members. This helps to reduce bugs in most dynamic type system.
 ```clojure
 (defclass Human
-    {:age types/Number})
+    {:age 0})
 ```
 
 #### Inheritance
 You can also inherit from other `Class` using `<-`
 ```clojure
 (defclass Student <- Human
-    {:id types/String})
+    {:id ""})
 ```
 
 #### Defining Method
 `defmethod` need to be defined in `defclass`. Each method receives the instance of the class as the first argument. First argument can be named other than `self`.
 ```clojure
 (defclass Class-Rep <- Student
-    {:class types/String}
+    {:class ""}
     
     (defmethod report [self]
         (print (str self.class " is doing fine.")))
