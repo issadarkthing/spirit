@@ -33,7 +33,7 @@ func ReadEval(scope Scope, r io.Reader) (Value, error) {
 		return nil, err
 	}
 
-	hoistedVals := []string{"def", "defn", "defmacro"}
+	hoistedVals := []string{"def", "defn", "defmacro", "defclass"}
 	for _, form := range mod.(Module) {
 		if list, ok := form.(*List); ok {
 
