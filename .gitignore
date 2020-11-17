@@ -24,3 +24,5 @@ sample/
 
 
 sample.json
+spirit.pprof
+spirit.memprof
