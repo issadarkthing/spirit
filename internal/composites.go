@@ -784,14 +784,15 @@ func (c Class) String() string {
 	return c.PrettyPrint(0)
 }
 
+func (c Class) GetMember(name Keyword) (Value, bool) {
 	member := c.Members.Get(name, nil)
 	if member == nil && c.Parent == nil {
-		return TypeOf(ValueOf(nil)), false
+		return Nil{}, false
 
 	} else if member == nil && c.Parent != nil {
 		return c.Parent.GetMember(name)
 	}
-	return member.(Type), true
+	return member, true
 }
 
 func (c Class) GetMethod(name Keyword) (Invokable, bool) {
@@ -805,8 +806,15 @@ func (c Class) GetMethod(name Keyword) (Invokable, bool) {
 	return method.(Invokable), true
 }
 
-func (c Class) GetMembers() map[string]Type {
-	members := make(map[string]Type)
+// finds whether member or method exists
+func (c Class) Exists(name Keyword) bool {
+	_, member := c.GetMember(name)
+	_, method := c.GetMethod(name)
+	return member || method
+}
+
+func (c Class) GetMembers() map[string]Value {
+	members := make(map[string]Value)
 	if c.Parent != nil {
 		members = c.Parent.GetMembers()
 	}
@@ -815,7 +823,7 @@ func (c Class) GetMembers() map[string]Type {
 		name, memberType := it.Elem()
 
 		key := name.(Keyword)
-		value := memberType.(Type)
+		value := memberType.(Value)
 		members[string(key)] = value
 	}
 
@@ -868,13 +876,31 @@ func (c Class) Invoke(scope Scope, args ...Value) (Value, error) {
 			return nil, fmt.Errorf("mismatched type: expected Value")
 		}
 
-		memberType, ok := c.GetMember(key)
+		defaultMember, ok := c.GetMember(key)
 		if !ok {
 			return nil, errMemberNotFound(key)
 		}
 
-		if memberType != TypeOf(value) {
-			return nil, errMismatchedType(memberType, value)
+		if valueObject, ok := value.(Object); ok {
+
+			defaultObject, ok := defaultMember.(Object)
+			if !ok {
+				return nil, fmt.Errorf("expected %T instead got %s", 
+					defaultMember, valueObject.InstanceOf.Name)
+			}
+
+			if defaultObject.InstanceOf.Name != valueObject.InstanceOf.Name {
+				return nil, fmt.Errorf(
+					"expected %s instead got %s",
+					defaultObject.InstanceOf.Name, valueObject.InstanceOf.Name,
+				)
+			}
+
+			continue
+		}
+
+		if TypeOf(defaultMember) != TypeOf(value) {
+			return nil, errMismatchedType(defaultMember, value)
 		}
 
 	}
