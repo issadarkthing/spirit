@@ -442,9 +442,14 @@ func assoc(hm internal.Assoc, args ...internal.Value) (internal.Assoc, error) {
 		key := args[i]
 		value := args[i+1]
 
-		if _, ok := hm.(internal.Object); ok {
-			if _, ok := key.(internal.Keyword); !ok {
-				return nil, fmt.Errorf("Object requires Keyword as key")
+		if object, ok := hm.(internal.Object); ok {
+			keyword, ok := key.(internal.Keyword); 
+			if !ok {
+				return nil, fmt.Errorf("object requires Keyword as key")
+			}
+
+			if !object.InstanceOf.Exists(keyword) {
+				return nil, fmt.Errorf("cannot find member or method %s", string(keyword))
 			}
 		}
 
