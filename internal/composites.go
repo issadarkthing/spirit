@@ -10,6 +10,10 @@ import (
 	"github.com/xiaq/persistent/vector"
 )
 
+const (
+	IndentLevel = 4
+)
+
 // List represents an list of forms/vals. Evaluating a list leads to a
 // function invocation.
 type List struct {
@@ -744,23 +748,42 @@ func (c Class) Eval(_ Scope) (Value, error) {
 	return c, nil	
 }
 
-func (c Class) String() string {
+func (c Class) PrettyPrint(indent int) string {
+
+	// add whitespace based on indentation level
+	space := strings.Repeat(" ", indent)
+
+	if c.Members.Data.Len() == 0 {
+		return fmt.Sprintf("%s {}", c.Name)
+	}
+
 	str := strings.Builder{}
 
-	str.WriteString(fmt.Sprintf("%s {", c.Name))
-	for name, memberType := range c.GetMembers() {
-		str.WriteString(fmt.Sprintf("\n  %v -> %v", name, memberType))
+	fmt.Fprintf(&str, "class %s {", c.Name)
+	for name, member := range c.GetMembers() {
+
+		if m, ok := member.(Class); ok {
+			classStr := m.PrettyPrint(indent + IndentLevel)
+			fmt.Fprintf(&str, "\n%s    %s: %s", space, name, classStr)
+
+		} else if m, ok := member.(Object); ok {
+			objectStr := m.PrettyPrint(indent + IndentLevel)
+			fmt.Fprintf(&str, "\n%s    %s: %s", space, name, objectStr)
+
+		} else {
+			fmt.Fprintf(&str, "\n%s    %s: %s", space, name, member)
+
+		}
 	}
 
-	for name, method := range c.GetMethods() {
-		str.WriteString(fmt.Sprintf("\n  %v => %v", name, method))
-	}
-
-	str.WriteString("\n}")
+	fmt.Fprintf(&str, "\n%s}", space)
 	return str.String()
 }
 
-func (c Class) GetMember(name Keyword) (Type, bool) {
+func (c Class) String() string {
+	return c.PrettyPrint(0)
+}
+
 	member := c.Members.Get(name, nil)
 	if member == nil && c.Parent == nil {
 		return TypeOf(ValueOf(nil)), false
@@ -879,7 +902,10 @@ func (o Object) Set(key, value Value) Value {
 	}
 }
 
-func (o Object) String() string {
+func (o Object) PrettyPrint(indent int) string {
+
+	// add whitespace based on indentation level
+	space := strings.Repeat(" ", indent)
 
 	if o.Members.Data.Len() == 0 {
 		return fmt.Sprintf("%s {}", o.InstanceOf.Name)
@@ -887,15 +913,31 @@ func (o Object) String() string {
 
 	str := strings.Builder{}
 
-	str.WriteString(fmt.Sprintf("%s {", o.InstanceOf.Name))
+	fmt.Fprintf(&str, "%s {", o.InstanceOf.Name)
 	for it := o.Members.Data.Iterator(); it.HasElem(); it.Next() {
 		
 		name, member := it.Elem()
-		str.WriteString(fmt.Sprintf("\n  %s = %s", name, member))
+
+		if m, ok := member.(Class); ok {
+			classStr := m.PrettyPrint(indent + IndentLevel)
+			fmt.Fprintf(&str, "\n%s    %s: %s", space, name, classStr)
+
+		} else if m, ok := member.(Object); ok {
+			objectStr := m.PrettyPrint(indent + IndentLevel)
+			fmt.Fprintf(&str, "\n%s    %s: %s", space, name, objectStr)
+
+		} else {
+			fmt.Fprintf(&str, "\n%s    %s: %s", space, string(name.(Keyword)), member)
+		}
+
 	}
 
-	str.WriteString("\n}")
+	fmt.Fprintf(&str, "\n%s}", space)
 	return str.String()
+}
+
+func (o Object) String() string {
+	return o.PrettyPrint(0)
 }
 
 func (o Object) GetMember(name Keyword) (Value, bool) {
