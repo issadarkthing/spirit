@@ -571,10 +571,9 @@ func accessClassMember(target reflect.Value, name string) (reflect.Value, error)
 		return reflect.ValueOf(member), nil
 	}
 
-	// return nil if member exists in Class but not in Object
-	_, found := object.InstanceOf.GetMember(key)
+	defaultVal, found := object.InstanceOf.GetMember(key)
 	if found {
-		return reflect.ValueOf(Nil{}), nil
+		return reflect.ValueOf(defaultVal), nil
 	}
 
 	// error if it cannot find member or method
