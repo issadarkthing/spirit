@@ -26,7 +26,7 @@ test-verbose:
 
 benchmark:
 	@echo "Running benchmarks..."
-	@go test -benchmem -run="none" -bench="Benchmark.*" -v ./...
+	@go test -benchmem -run="none" -benchmem -bench="Benchmark.*" -v ./...
 
 build-only:
 	@go build -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" -o ./bin/spirit ./cmd/spirit/
