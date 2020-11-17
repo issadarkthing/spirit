@@ -604,6 +604,7 @@ func defClass(scope internal.Scope, args []internal.Value) (internal.Value, erro
 	// identifies the position of the member declaration
 	hashMapIndex := 1
 
+	// handles inheritence
 	if symbol, ok := args[1].(internal.Symbol); ok {
 		if symbol.Value != "<-" {
 			return nil, fmt.Errorf("expecting hashMap or <- symbol")
@@ -627,22 +628,19 @@ func defClass(scope internal.Scope, args []internal.Value) (internal.Value, erro
 	}
 
 	
+	// evaluate passed hash map
 	hashMap, ok := evaledArgs[0].(*internal.PersistentMap)
 	if !ok {
 		return nil, invalidType(&internal.PersistentMap{}, evaledArgs[0])
 	}
 
+	// ensure all the keys in hashmap are keywords
 	for it := hashMap.Data.Iterator(); it.HasElem(); it.Next() {
-		k, v := it.Elem()
+		key, _ := it.Elem()
 
-		_, ok := k.(internal.Keyword)
+		_, ok := key.(internal.Keyword)
 		if !ok {
-			return nil, invalidType(internal.Keyword(""), k.(internal.Value))
-		}
-
-		_, ok = v.(internal.Type)
-		if !ok {
-			return nil, invalidType(internal.Type{}, v.(internal.Value))
+			return nil, invalidType(internal.Keyword(""), key.(internal.Value))
 		}
 	}
 
