@@ -76,6 +76,11 @@ func bindAll(scope internal.Scope) error {
 			Args: []string{"hash-map", "class"},
 			Func: defClass,
 		},
+		"core/mem": &internal.Fn{
+			Args: []string{"exprs"},
+			Variadic: true,
+			Func: mem,
+		},
 
 		// special forms
 		"core/do":           internal.Do,
@@ -88,6 +93,7 @@ func bindAll(scope internal.Scope) error {
 		"core/syntax-quote": internal.SyntaxQuote,
 		"core/recur":        internal.Recur,
 
+		"core/memory":      internal.ValueOf(memory),
 		"core/macroexpand": internal.ValueOf(macroExpand),
 		"core/type":        internal.ValueOf(typeOf),
 		"core/to-type":     internal.ValueOf(toType),
@@ -97,6 +103,7 @@ func bindAll(scope internal.Scope) error {
 		"core/substring":   internal.ValueOf(strings.Contains),
 		"core/trim-suffix": internal.ValueOf(strings.TrimSuffix),
 		"core/resolve":     internal.ValueOf(resolve(scope)),
+		"core/force-gc":    internal.ValueOf(forceGC),
 
 		// Type system functions
 		"core/str": internal.ValueOf(makeString),

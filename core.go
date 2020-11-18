@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
+	"runtime"
 	"strings"
 	"time"
 
@@ -682,4 +684,53 @@ func defClass(scope internal.Scope, args []internal.Value) (internal.Value, erro
 	return class, nil
 }
 
+func forceGC() {
+	runtime.GC()
+}
 
+func mem(scope internal.Scope, args []internal.Value) (internal.Value, error) {
+
+	var mem runtime.MemStats
+
+	runtime.ReadMemStats(&mem)
+	initialByte := int64(mem.HeapAlloc)	
+
+	val, err := internal.EvalValueLast(scope, args)
+	if err != nil {
+		return nil, err
+	}
+
+	runtime.ReadMemStats(&mem)
+	alloc := int64(mem.HeapAlloc) - initialByte
+
+	if alloc < 0 {
+		alloc = int64(math.Abs(float64(alloc)))
+		fmt.Println("-" + byteCount(alloc))
+
+	} else {
+		fmt.Println(byteCount(alloc))
+	}
+
+	return val, nil
+}
+
+func memory() {
+	var memStat runtime.MemStats
+	runtime.ReadMemStats(&memStat)
+	fmt.Println(byteCount(int64(memStat.HeapAlloc)))
+}
+
+// converts byte to human readable format
+func byteCount(b int64) string {
+    const unit int64 = 1000
+    if b < unit {
+        return fmt.Sprintf("%d B", b)
+    }
+    div, exp := int64(unit), 0
+    for n := b / unit; n >= unit; n /= unit {
+        div *= unit
+        exp++
+    }
+    return fmt.Sprintf("%.1f %cB",
+        float64(b)/float64(div), "kMGTPE"[exp])
+}
