@@ -375,6 +375,13 @@
   ([x y & more]
    (not (<> = x y more))))
 
+(defn char->str [x]
+  (if (not= (char? x))
+    (throw "cannot cast type not char"))
+  (to-type types/String x))
+
+(defn join [coll]
+  (<> str (map char->str coll)))
 
 (defn partial
   ([f] f)
@@ -466,6 +473,7 @@
 
 ; Type check functions -------------------------------
 (defn is-type? [typ arg] (= typ (type arg)))
+(defn char? [arg] (is-type? types/Char arg))
 (defn set? [arg] (is-type? #{} arg))
 (defn list? [arg] (is-type? types/List arg))
 (defn fn? [arg] (is-type? types/Fn arg))
