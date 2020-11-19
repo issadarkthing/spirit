@@ -73,7 +73,7 @@ func bindAll(scope internal.Scope) error {
 			Parse: parseLoop,
 		},
 		"core/defclass": &internal.Fn{
-			Args: []string{"hash-map", "class"},
+			Args: []string{"hash-map", "methods"},
 			Func: defClass,
 		},
 		"core/mem": &internal.Fn{
