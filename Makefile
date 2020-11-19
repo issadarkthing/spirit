@@ -39,4 +39,4 @@ run:
 	@./bin/spirit -u -p ./lib/core.st ./sample/sample.st
 
 repl:
-	@bin/spirit -u -p ./lib/core.st
+	@rlwrap bin/spirit -u -p ./lib/core.st
