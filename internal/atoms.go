@@ -56,7 +56,13 @@ func (se String) First() Value {
 
 // Next slices the string by excluding first character and returns the
 // remainder.
-func (se String) Next() Seq { return String(se[1:]) }
+func (se String) Next() Seq { 
+	if len(se) <= 1 {
+		return nil
+	}
+
+	return String(se[1:]) 
+}
 
 // Cons converts the string to character sequence and adds the given value
 // to the beginning of the list.
