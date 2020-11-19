@@ -34,6 +34,7 @@
 
 (defn nil? [arg] (= nil arg))
 
+
 ; io operations -----------------------------------
 
 (defn read
@@ -54,6 +55,7 @@
 
 ; sequence operations -------------------------------
 (defn seq? [arg] (impl? arg types/Seq))
+
 
 (defn lazy-range
   ([] (lazy-range* 0 922337203685477 1))
@@ -182,9 +184,9 @@
   (when-not (seq? coll)
     (throw "argument must be Seq"))
   (loop [result (empty coll) target coll]
-    (if (empty? target)
+    (if (nil? target)
       result
-      (recur (cons (first target) result) (rest target)))))
+      (recur (cons (first target) result) (next target)))))
 
 (defn inc [num]
     (if (not (number? num))
@@ -410,6 +412,7 @@
    (fn [& args] (<> f arg1 arg2 arg3 (concat more args)))))
 
 ; important macros -----------------------------------
+
 
 (defmacro defmethod [name & fdecl]
   (let [with-name (fdecl.Cons name)
