@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -10,7 +9,6 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/chzyer/readline"
 	"github.com/issadarkthing/spirit"
 	"github.com/issadarkthing/spirit/internal"
 	"github.com/issadarkthing/spirit/internal/repl"
@@ -141,8 +139,6 @@ func main() {
 
 	repl := repl.New(xl,
 		repl.WithBanner(fmt.Sprintf(help, version, commit, runtime.Version())),
-		repl.WithInput(lr, errMapper),
-		repl.WithOutput(lr.Stdout()),
 		repl.WithPrompts(prompt, multiline),
 	)
 
@@ -150,74 +146,12 @@ func main() {
 		fatalf("REPL exited with error: %v", err)
 	}
 	fmt.Println("Bye!")
-}
-
-
-func insertAt(index int, value rune, slice []rune) []rune {
-	newSlice := make([]rune, 0, len(slice)+1)
-
-	for i, v := range slice {
-		if i == index {
-			newSlice = append(newSlice, value, v)
-			continue
-		}
-		newSlice = append(newSlice, v)
 	}
-
-	if index > len(slice)-1 {
-		newSlice = append(newSlice, value)
-	}
-
-	return newSlice
-}
-
-func removeAt(index int, slice []rune) []rune {
-	return append(slice[:index], slice[index+1:]...)
-}
-
-func listener(line []rune, pos int, key rune) ([]rune, int, bool) {
-
-	switch key {
-	case '(', '{', '[':
-		line = insertAt(pos, matcher[key], line)
-		return line, pos, true
-	case '"':
-		if len(line) > pos && line[pos] == '"' {
-			return removeAt(pos, line), pos, true
-		}
-		line = insertAt(pos, '"', line)
-		return line, pos, true
-	case ')', '}', ']':
-		if len(line) > pos && line[pos] == key {
-			return removeAt(pos, line), pos, true
-		}
-	}
-
-	return line, pos, false
-}
-
-func readlineInstance(scope internal.Scope) (*readline.Instance, func(error) error) {
-
-	lr, err := readline.NewEx(&readline.Config{
-		HistoryFile: "/tmp/spirit-repl.tmp",
-		Listener: readline.FuncListener(listener),
-	})
-
-
-	if err != nil {
-		fatalf("readline: %v", err)
-	}
-
-	errMapper := func(e error) error {
-		if errors.Is(e, readline.ErrInterrupt) {
-			return nil
-		}
 
 		return e
+		log.Fatalf("REPL exited with error: %v", err)
 	}
 
-	return lr, errMapper
-}
 
 func fatalf(format string, args ...interface{}) {
 	fmt.Printf(format, args...)
