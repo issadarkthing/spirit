@@ -19,6 +19,7 @@ const (
 Visit https://github.com/issadarkthing/spirit for more.`
 	prompt = " λ >>"
 	multiline = "|"
+	stdpath = "/.local/lib/spirit/core.st"
 )
 
 var (
@@ -31,12 +32,6 @@ var (
 	printVersion = flag.Bool("v", false, "Prints slang version and exit")
 	memProfile   = flag.String("memprofile", "", "memory profiling")
 	cpuProfile   = flag.String("cpuprofile", "", "cpu profiling")
-	matcher      = map[rune]rune{
-		'(': ')',
-		'[': ']',
-		'{': '}',
-		'"': '"',
-	}
 )
 
 func main() {
@@ -58,56 +53,58 @@ func main() {
 	}
 
 
-	xl := spirit.New()
-	xl.BindGo("*version*", version)
+	sp := spirit.New()
+	sp.BindGo("*version*", version)
 
 	var result internal.Value
 	var err error
 
 	home, err := os.UserHomeDir()
 	if err != nil {
-		fatalf("error: %v\n", err)
+		log.Fatalf("error: %v\n", err)
 	}
 
-	libPath := home + "/.local/lib/spirit/core.st"
+	libPath := home + stdpath
 
 	core, err := os.Open(libPath)
 	if err != nil {
-		fatalf("error: %v\n", err)
+		log.Fatalf("error: %v\n", err)
 	}
 	defer core.Close()
 
+	// do not load standard library
 	if !*unload {
-		_, err = xl.ReadEval(core)
+		_, err = sp.ReadEval(core)
 	}
 
+	// pre-load file
 	if *preload != "" {
 		preloadFile, err := os.Open(*preload)
 		if err != nil {
-			fatalf("error: %v\n", err)
+			log.Fatalf("error: %v\n", err)
 		}
 		defer preloadFile.Close()
 
-		_, err = xl.ReadEval(preloadFile)
+		_, err = sp.ReadEval(preloadFile)
 		if err != nil {
-			fatalf("error: %v\n", err)
+			log.Fatalf("error: %v\n", err)
 		}
 	}
 
-	xl.SwitchNS(internal.Symbol{Value: "user"})
+	sp.SwitchNS(internal.Symbol{Value: "user"})
 
 	if len(flag.Args()) > 0 {
 
 		fh, err := os.Open(flag.Arg(0))
 		if err != nil {
-			fatalf("error: %v\n", err)
+			log.Fatalf("error: %v\n", err)
 		}
 		defer fh.Close()
 
-		xl.BindGo("*file*", fh.Name())
-		_, err = xl.ReadEval(fh)
+		sp.BindGo("*file*", fh.Name())
+		_, err = sp.ReadEval(fh)
 		if err != nil {
-			fatalf("error: %v\n", err)
+			log.Fatalf("error: %v\n", err)
 		}
 
 
@@ -127,33 +124,23 @@ func main() {
 	}
 
 	if *executeStr != "" {
-		result, err = xl.ReadEvalStr(*executeStr)
+		result, err = sp.ReadEvalStr(*executeStr)
 		fmt.Println(result)
 		if err != nil {
-			fatalf("error: %v\n", err)
+			log.Fatalf("error: %v\n", err)
 		}
 		return
 	}
 
-	lr, errMapper := readlineInstance(xl)
 
-	repl := repl.New(xl,
+	repl := repl.New(sp,
 		repl.WithBanner(fmt.Sprintf(help, version, commit, runtime.Version())),
 		repl.WithPrompts(prompt, multiline),
 	)
 
 	if err := repl.Loop(context.Background()); err != nil {
-		fatalf("REPL exited with error: %v", err)
-	}
-	fmt.Println("Bye!")
-	}
-
-		return e
 		log.Fatalf("REPL exited with error: %v", err)
 	}
 
-
-func fatalf(format string, args ...interface{}) {
-	fmt.Printf(format, args...)
-	os.Exit(1)
+	fmt.Println("Bye!")
 }
