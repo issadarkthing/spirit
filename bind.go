@@ -81,6 +81,11 @@ func bindAll(scope internal.Scope) error {
 			Variadic: true,
 			Func: mem,
 		},
+		"core/recur": &internal.Fn{
+			Args: []string{"bindings"},
+			Variadic: true,
+			Func: recur,
+		},
 
 		// special forms
 		"core/do":           internal.Do,
@@ -91,7 +96,6 @@ func bindAll(scope internal.Scope) error {
 		"core/let":          internal.Let,
 		"core/quote":        internal.SimpleQuote,
 		"core/syntax-quote": internal.SyntaxQuote,
-		"core/recur":        internal.Recur,
 
 		"core/memory":      internal.ValueOf(memory),
 		"core/macroexpand": internal.ValueOf(macroExpand),

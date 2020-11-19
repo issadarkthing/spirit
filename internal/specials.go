@@ -59,11 +59,6 @@ var (
 		Name:  "syntax-quote",
 		Parse: parseSyntaxQuote,
 	}
-
-	Recur = SpecialForm{
-		Name:  "recur",
-		Parse: parseRecur,
-	}
 )
 
 func fnParser(isMacro bool) func(scope Scope, forms []Value) (*Fn, error) {
@@ -264,24 +259,7 @@ func parseSyntaxQuote(scope Scope, forms []Value) (*Fn, error) {
 	}, nil
 }
 
-func parseRecur(scope Scope, forms []Value) (*Fn, error) {
 
-	return &Fn{
-		Func: func(scope Scope, args []Value) (Value, error) {
-			symbol := Symbol{
-				Value: "recur",
-			}
-
-			results, err := EvalValueList(scope, args)
-			if err != nil {
-				return nil, err
-			}
-
-			results = append([]Value{symbol}, results...)
-			return &List{Values: results}, nil
-		},
-	}, nil
-}
 
 // SpecialForm is a Value type for representing special forms that will be
 // subjected to an intermediate Parsing stage before evaluation.
