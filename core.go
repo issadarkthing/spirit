@@ -219,13 +219,13 @@ func recur(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 		Value: "recur",
 	}
 
-	results, err := evalValueList(scope, args)
+	results, err := internal.EvalValueList(scope, args)
 	if err != nil {
 		return nil, err
 	}
 
 	results = append([]internal.Value{symbol}, results...)
-	return &internal.List{Values: results}, nil
+	return &internal.List{Values: internal.Values(results)}, nil
 }
 
 // Returns string representation of type
