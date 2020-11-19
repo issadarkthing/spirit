@@ -56,17 +56,34 @@ func (se String) First() Value {
 
 // Next slices the string by excluding first character and returns the
 // remainder.
-func (se String) Next() Seq { return se.chars().Next() }
+func (se String) Next() Seq { return String(se[1:]) }
 
 // Cons converts the string to character sequence and adds the given value
 // to the beginning of the list.
-func (se String) Cons(v Value) Seq { return se.chars().Cons(v) }
+func (se String) Cons(v Value) Seq { return se.castString(v) + se }
 
 // Conj joins the given values to list of characters of the string and returns
 // the new sequence.
-func (se String) Conj(vals ...Value) Seq { return se.chars().Conj(vals...) }
+func (se String) Conj(vals ...Value) Seq { 
+	result := se
+	for _, val := range vals {
+		result += se.castString(val)
+	}
+	return result
+}
 
 func (se String) Size() int { return utf8.RuneCountInString(string(se)) }
+
+func (se String) castString(val Value) String {
+	switch v := val.(type) {
+	case String: 
+		return v
+	case Character:
+		return String(v)
+	default:
+		return String(v.String())
+	}
+}
 
 func (se String) chars() Values {
 	var vals Values
