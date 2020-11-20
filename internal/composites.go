@@ -862,49 +862,6 @@ func (c Class) Invoke(scope Scope, args ...Value) (Value, error) {
 		return nil, fmt.Errorf("expected PersistentMap")
 	}
 
-
-	for it := passedMap.Data.Iterator(); it.HasElem(); it.Next() {
-		k, v := it.Elem()
-
-		key, ok := k.(Keyword)
-		if !ok {
-			return nil, fmt.Errorf("mismatched type: expected Keyword")
-		}
-
-		value, ok := v.(Value)
-		if !ok {
-			return nil, fmt.Errorf("mismatched type: expected Value")
-		}
-
-		defaultMember, ok := c.GetMember(key)
-		if !ok {
-			return nil, errMemberNotFound(key)
-		}
-
-		if valueObject, ok := value.(Object); ok {
-
-			defaultObject, ok := defaultMember.(Object)
-			if !ok {
-				return nil, fmt.Errorf("expected %T instead got %s", 
-					defaultMember, valueObject.InstanceOf.Name)
-			}
-
-			if defaultObject.InstanceOf.Name != valueObject.InstanceOf.Name {
-				return nil, fmt.Errorf(
-					"expected %s instead got %s",
-					defaultObject.InstanceOf.Name, valueObject.InstanceOf.Name,
-				)
-			}
-
-			continue
-		}
-
-		if TypeOf(defaultMember) != TypeOf(value) {
-			return nil, errMismatchedType(defaultMember, value)
-		}
-
-	}
-
 	return Object{
 		InstanceOf: c,
 		Members:    passedMap,
