@@ -130,6 +130,10 @@
     coll
     (recur (dec n) (next coll))))
 
+(defn drop-last
+  ([coll] (drop-last 1 coll))
+  ([n coll] (map (fn [x _] x) coll (drop n coll))))
+
 (defn into [to from]
   (if (empty? from)
     to
