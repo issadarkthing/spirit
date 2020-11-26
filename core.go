@@ -7,6 +7,7 @@ import (
 	"math"
 	"reflect"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -97,6 +98,19 @@ func implements(v interface{}, t internal.Type) (bool, error) {
 // ToType attempts to convert given internal value to target type. Returns
 // error if conversion not possible.
 func toType(to internal.Type, val internal.Value) (internal.Value, error) {
+
+	// convert string to number
+	if to == internal.TypeOf(internal.Number(0)) {
+		if str, ok := val.(internal.String); ok {
+			fl, err := strconv.ParseFloat(string(str), 64)
+			if err != nil {
+				return nil, err
+			}
+
+			return internal.Number(fl), nil
+		}
+	}
+
 	rv := reflect.ValueOf(val)
 	if rv.Type().ConvertibleTo(to.T) || rv.Type().AssignableTo(to.T) {
 		return internal.ValueOf(rv.Convert(to.T).Interface()), nil
