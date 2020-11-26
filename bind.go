@@ -97,6 +97,7 @@ func bindAll(scope internal.Scope) error {
 		"core/quote":        internal.SimpleQuote,
 		"core/syntax-quote": internal.SyntaxQuote,
 
+		"core/in-ns":       internal.ValueOf(scope.(*Spirit).SwitchNS),
 		"core/memory":      internal.ValueOf(memory),
 		"core/macroexpand": internal.ValueOf(macroExpand),
 		"core/type":        internal.ValueOf(typeOf),
