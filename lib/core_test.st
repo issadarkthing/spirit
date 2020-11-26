@@ -24,7 +24,7 @@
 (assert (= (-> 5 (+ 3) (/ 2) (- 1)) 3))
 (assert (= (->>  1 (conj [2 3 4])) [2 3 4 1]))
 (assert (= (->> (range-vec 1 11)
-                (map #(* % %)) 
+                (map #(* %1 %1)) 
                 (filter even?) 
                 (take 2) 
                 (reduce +))
@@ -249,3 +249,18 @@
 
 ; access nested member
 (assert (= "toyota" student.car.name))
+
+
+;; syntax lambda
+
+; omit first paramater
+(assert (= 11 (reduce #(+ 1 %2) '(1 2 10))))
+
+(defn pass-four [f]
+  (f 1 2 3 4))
+
+; omit first three paramater
+(assert (= [4] (pass-four #(vector %4))))
+
+; nested form
+(assert (= 6 (pass-four #(+ %4 (+ %1 %1)))))

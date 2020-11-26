@@ -538,8 +538,17 @@ func readLambda(rd *Reader, _ rune) (Value, error) {
 	sort.Strings(argsString)
 
 	args := []Value{}
-	for _, v := range argsString {
-		args = append(args, Symbol{Value: v})
+	if len(argsString) > 0 {
+		last := argsString[len(argsString)-1]
+		maxStr := last[1:]
+		max, err := strconv.Atoi(maxStr)
+		if err != nil {
+			return nil, fmt.Errorf("invalid anonymous function argument %v", maxStr)
+		}
+
+		for i := 1; i <= max; i++ {
+			args = append(args, Symbol{Value: "%" + strconv.Itoa(i)})
+		}
 	}
 
 	args = Values(args).Uniq()
