@@ -317,10 +317,10 @@
          (concat (flat x empty-seq) (flat xs empty-seq))
          (cons x (flat xs empty-seq)))))))
 
-(defn assoc [coll & args]
+(defn assoc [coll key value]
   (if (vector? coll)
-    (coll.Assoc (first args) (second args))
-    (<> assoc* coll args)))
+    (coll.Assoc key value)
+    (assoc* coll key value)))
 
 (defn max
   ([x] x)
