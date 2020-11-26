@@ -524,24 +524,26 @@ func apply(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 		return nil, err
 	}
 
-	args, err = evalValueList(scope, args)
+	evaledArgs, err := internal.EvalValueList(scope, args)
 	if err != nil {
 		return nil, err
 	}
 
-	fn, ok := args[0].(internal.Invokable)
+	fn, ok := evaledArgs[0].(internal.Invokable)
 	if !ok {
-		return nil, doesNotImplementInvokable(args[0])
+		return nil, doesNotImplementInvokable(evaledArgs[0])
 	}
 
-	fnArgs := args[1 : len(args)-1]
-	lastArg, ok := args[len(args)-1].(internal.Seq)
+	fnArgs := evaledArgs[1 : len(evaledArgs)-1]
+
+	lastArg := evaledArgs[len(evaledArgs)-1]
+	coll, ok := lastArg.(internal.Seq)
 	if !ok {
 		return nil, doesNotImplementSeq(lastArg)
 	}
 
-	if lastArg.Size() != 0 {
-		for it := lastArg; it != nil; it = it.Next() {
+	if coll.Size() != 0 {
+		for it := coll; it != nil; it = it.Next() {
 			fnArgs = append(fnArgs, it.First())
 		}
 	}
