@@ -110,55 +110,6 @@ func (lf *List) parse(scope Scope) error {
 	return nil
 }
 
-// Vector represents a list of values. Unlike List type, evaluation of
-// vector does not lead to function invoke.
-type Vector struct {
-	Values
-	Position
-}
-
-func (vf Vector) Conj(vals ...Value) Seq {
-	return *&Vector{Values: append(vf.Values, vals...)}
-}
-
-// Eval evaluates each value in the vector form and returns the resultant
-// values as new vector.
-func (vf Vector) Eval(scope Scope) (Value, error) {
-	vals, err := EvalValueList(scope, vf.Values)
-	if err != nil {
-		return nil, err
-	}
-
-	return Vector{Values: vals}, nil
-}
-
-// Invoke of a vector performs a index lookup. Only arity 1 is allowed
-// and should be an integer value to be used as index.
-func (vf Vector) Invoke(scope Scope, args ...Value) (Value, error) {
-	vals, err := EvalValueList(scope, args)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(vals) != 1 {
-		return nil, fmt.Errorf("call requires exactly 1 argument, got %d", len(vals))
-	}
-
-	index, isInt := vals[0].(Number)
-	if !isInt {
-		return nil, fmt.Errorf("key must be integer")
-	}
-
-	if int(index) >= len(vf.Values) {
-		return nil, fmt.Errorf("index out of bounds")
-	}
-
-	return vf.Values[int(index)], nil
-}
-
-func (vf Vector) String() string {
-	return containerString(vf.Values, "[", "]", " ")
-}
 
 // Set represents a list of unique values. (Experimental)
 type Set struct {
@@ -194,85 +145,6 @@ func (set Set) valid() bool {
 	}
 
 	return true
-}
-
-// HashMap represents a container for key-value pairs.
-type HashMap struct {
-	Position
-	Data map[Value]Value
-}
-
-// Eval evaluates all keys and values and returns a new HashMap containing
-// the evaluated values.
-func (hm *HashMap) Eval(scope Scope) (Value, error) {
-	res := &HashMap{Data: map[Value]Value{}}
-	for k, v := range hm.Data {
-		key, err := k.Eval(scope)
-		if err != nil {
-			return nil, err
-		}
-
-		val, err := v.Eval(scope)
-		if err != nil {
-			return nil, err
-		}
-
-		res.Data[key] = val
-	}
-
-	return res, nil
-}
-
-func (hm *HashMap) String() string {
-	var fields []Value
-	for k, v := range hm.Data {
-		fields = append(fields, k, v)
-	}
-	return containerString(fields, "{", "}", " ")
-}
-
-// Get returns the value associated with the given key if found.
-// Returns def otherwise.
-func (hm *HashMap) Get(key Value, def Value) Value {
-	if !isHashable(key) {
-		return def
-	}
-
-	v, found := hm.Data[key]
-	if !found {
-		return def
-	}
-
-	return v
-}
-
-// Set changes the value associated with the given key.
-// destructive update
-func (hm *HashMap) Set(key, val Value) error {
-	if !isHashable(key) {
-		return fmt.Errorf("value of type '%s' is not hashable", key)
-	}
-
-	hm.Data[key] = val
-	return nil
-}
-
-// Keys returns all the keys in the hashmap.
-func (hm *HashMap) Keys() Values {
-	var res []Value
-	for k := range hm.Data {
-		res = append(res, k)
-	}
-	return res
-}
-
-// Values returns all the values in the hashmap.
-func (hm *HashMap) Values() Values {
-	var res []Value
-	for _, v := range hm.Data {
-		res = append(res, v)
-	}
-	return res
 }
 
 // Module represents a group of forms. Evaluating a module leads to evaluation
@@ -595,12 +467,22 @@ type Call struct {
 	Name string
 }
 
+// maximum stack to be stored
+const MAX_STACK_CALL = 20
+
 // Stack contains function call. When fn is called, Call will be pushed in Stack,
 // when the fn exits, the stack is popped
 type Stack []Call
 
 // Add function call to stack
 func (s *Stack) Push(call Call) {
+
+	if s.Size() > MAX_STACK_CALL {
+
+		// remove the bottom element
+		*s = (*s)[1:]
+	}
+
 	*s = append(*s, call)
 }
 
