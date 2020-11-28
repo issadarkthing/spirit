@@ -256,18 +256,41 @@
        (unsafe/swap i (inc i)))
      z)))
 
+(defn map
+  ([f c1]
+   (map-1 f c1))
+  ([f c1 c2]
+   (map-2 f c1 c2))
+  ([f c1 c2 c3]
+   (map-3 f c1 c2 c3)))
 
-(defn map 
+(defn map-1
   ([f coll]
-   (loop [s coll acc (empty coll)]
-         (if (empty? s)
-             acc
-             (recur (rest s) (conj acc (f (first s)))))))
+   (map-1 f coll (empty coll)))
+  ([f coll acc]
+   (if (nil? coll)
+     acc
+     (recur f (next coll) (conj acc (f (first coll)))))))
+
+(defn map-2
   ([f coll1 coll2]
-   (loop [s1 coll1, s2 coll2, acc (empty coll1)]
-         (if (or (empty? s1) (empty? s2))
-             acc
-             (recur (rest s1) (rest s2) (conj acc (f (first s1) (first s2))))))))
+   (map-2 f coll1 coll2 (empty coll1)))
+  ([f coll1 coll2 acc]
+   (if (or (nil? coll1) (nil? coll2))
+     acc
+     (let [acc (conj acc (f (first coll1) (first coll2)))]
+       (recur f (next coll1) (next coll2) acc)))))
+
+
+(defn map-3
+  ([f coll1 coll2 coll3]
+   (map-3 f coll1 coll2 coll3 (empty coll1)))
+  ([f coll1 coll2 coll3 acc]
+   (if (or (nil? coll1) (nil? coll2) (nil? coll3))
+     acc
+     (let [acc (conj acc (f (first coll1) (first coll2) (first coll3)))]
+       (recur f (next coll1) (next coll2) (next coll3) acc)))))
+
 
 
 (defn map-indexed
