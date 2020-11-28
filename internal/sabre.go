@@ -18,7 +18,6 @@ func Eval(scope Scope, form Value) (Value, error) {
 
 	v, err := form.Eval(scope)
 	if err != nil {
-		// return v, newEvalErr(form, err)
 		return v, err
 	}
 
@@ -33,51 +32,62 @@ func ReadEval(scope Scope, r io.Reader) (Value, error) {
 		return nil, err
 	}
 
+	err = hoistValues(scope, mod)
+	if err != nil {
+		return nil, err
+	}
+
+	return Eval(scope, mod)
+}
+
+func hoistValues(scope Scope, value Value) error {
+
 	hoistedVals := []string{"def", "defn", "defmacro", "defclass"}
-	for _, form := range mod.(Module) {
-		if list, ok := form.(*List); ok {
+	for _, form := range value.(Module) {
+		list, ok := form.(*List); 
+		if !ok {
+			continue
+		}
 
-			if list.Size() < 2 {
-				continue
-			}
+		if list.Size() < 2 {
+			continue
+		}
 
-			def, isSymbol := list.Values[0].(Symbol)
-			if !isSymbol {
-				return nil, fmt.Errorf("first argument must be symbol, not '%v'",
-					reflect.TypeOf(list.Values[0]))
-			}
+		def, isSymbol := list.Values[0].(Symbol)
+		if !isSymbol {
+			return fmt.Errorf("first argument must be symbol, not '%v'",
+			reflect.TypeOf(list.Values[0]))
+		}
 
-			if !includes(def.String(), hoistedVals) {
-				continue
-			}
+		if !includes(def.String(), hoistedVals) {
+			continue
+		}
 
-			sym, isSymbol := list.Values[1].(Symbol)
-			if !isSymbol {
-				return nil, fmt.Errorf("first argument must be symbol, not '%v'",
-					reflect.TypeOf(list.Values[1]))
-			}
-			symbol := sym.String()
+		sym, isSymbol := list.Values[1].(Symbol)
+		if !isSymbol {
+			return fmt.Errorf("first argument must be symbol, not '%v'",
+			reflect.TypeOf(list.Values[1]))
+		}
+		symbol := sym.String()
 
-			// only hoist for def that defines defn and defmacro
-			if def.String() == "def" && (symbol == "defn" || symbol == "defmacro") {
-				_, err := form.Eval(scope)
-				if err != nil {
-					return nil, err
-				}
-			// do not hoist def
-			} else if def.String() == "def" {
-				continue
-			}
-
-			// this part here only has defn and defmacro
+		// only hoist for def that defines defn and defmacro
+		if def.String() == "def" && (symbol == "defn" || symbol == "defmacro") {
 			_, err := form.Eval(scope)
 			if err != nil {
-				return nil, err
+				return err
 			}
-
+			// do not hoist def
+		} else if def.String() == "def" {
+			continue
 		}
+
+		_, err := form.Eval(scope)
+		if err != nil {
+			return err
+		}
+
 	}
-	return Eval(scope, mod)
+	return nil
 }
 
 func includes(search string, content []string) bool {
