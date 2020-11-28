@@ -555,7 +555,7 @@ func accessClassMember(target reflect.Value, name string) (reflect.Value, error)
 	}
 
 	// error if it cannot find member or method
-	return reflect.Value{}, fmt.Errorf("cannot find member or method %s", name)
+	return reflect.Value{}, fmt.Errorf("cannot find member or method '%s'", name)
 }
 
 func accessMember(target reflect.Value, member string) (reflect.Value, error) {
