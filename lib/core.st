@@ -134,6 +134,22 @@
   ([coll] (drop-last 1 coll))
   ([n coll] (map (fn [x _] x) coll (drop n coll))))
 
+
+(defn take
+  ([n coll]
+   (take n coll (empty coll)))
+  ([n coll acc]
+   (cond
+     (or (lazy-seq? coll) 
+         (list? coll)) (if (= n (count acc))
+                        acc
+                        (recur n (next coll) (conj acc (first coll))))
+     (vector? coll) (coll.SubVector 0 n)
+     true (throw "argument must be a Seq"))))
+
+(defn take-last [n coll]
+  (drop (- (count coll) n) coll))
+
 (defn into [to from]
   (if (empty? from)
     to
@@ -220,13 +236,6 @@
     (lazy-seq? coll) '()))
     
 
-(defn take
-  ([n coll]
-   (take n coll (empty coll)))
-  ([n coll acc]
-   (if (= n (count acc))
-     acc
-     (recur n (next coll) (conj acc (first coll))))))
 
 (defn reduce
   ([f coll]
@@ -363,9 +372,6 @@
     ([x y & zs] (not (<> f x y zs)))))
 
 
-(defn take-last [n coll]
-  (drop (- (count coll) n) coll))
-
 (defn sum [coll]
   (<> + coll))
 
@@ -456,7 +462,7 @@
 (defmacro assert
     ([expr] (let [message "assertion failed"]
                 `(when-not ~expr (throw ~message))))
-    ([expr message] `(when-not ~expr (throw ~message))))
+    ([message expr] `(when-not ~expr (throw ~message))))
 
 
 (defmacro future [& body]
@@ -492,6 +498,8 @@
 (defn symbol? [arg] (is-type? types/Symbol arg))
 (defn future? [arg] (is-type? types/Future arg))
 (defn lazy-seq? [arg] (is-type? types/LazySeq arg))
+(defn class? [arg] (is-type? types/Class arg))
+(defn object? [arg] (is-type? types/Object arg))
 
 ; Type initialization functions ---------------------
 (defn set [coll] (<> (type #{}) coll))
@@ -511,10 +519,23 @@
 (defn and [& args]
   (reduce (fn [acc x] (and* acc x)) args))
 
-
 (defn or [& args]
   (reduce (fn [acc x] (or* acc x)) args))
 
-
 (defn not [arg] (= false (true? arg)))
 
+
+; clasess -----
+
+(defclass Shell
+  {:err ""
+   :out ""
+   :exit 0})
+
+
+(defn $- [cmd]
+  (let [result ($ cmd)
+        err (:err result)
+        out (:out result)
+        exit (:exit result)]
+    (Shell {:err err, :out out, :exit exit})))
