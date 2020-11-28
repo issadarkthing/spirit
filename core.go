@@ -16,9 +16,9 @@ import (
 // Case implements the switch case construct.
 func caseForm(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
-	err := checkArityAtLeast(2, len(args))
-	if err != nil {
-		return nil, err
+	argc := len(args)
+	if argc < 2 {
+		return nil, internal.ErrWrongArgumentCount(argc, "case")
 	}
 
 	res, err := internal.Eval(scope, args[0])
@@ -160,8 +160,9 @@ func isTruthy(v internal.Value) bool {
 
 func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
-	if err := checkArityAtLeast(1, len(args)); err != nil {
-		return nil, err
+	argc := len(args)
+	if argc < 1 {
+		return nil, internal.ErrWrongArgumentCount(argc, "doseq")
 	}
 
 	arg1 := args[0]
@@ -171,9 +172,9 @@ func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 		return nil, invalidType(internal.NewPersistentVector(), arg1)
 	}
 
-	err := checkArityAtLeast(2, vecs.Size())
-	if err != nil {
-		return nil, err
+	argc = vecs.Size()
+	if argc < 2 {
+		return nil, internal.ErrWrongArgumentCount(argc, "doseq")
 	}
 
 	coll, err := vecs.Index(1).Eval(scope)
@@ -205,9 +206,9 @@ func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 // unsafely swap the value. Does not mutate the value rather just swapping
 func swap(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
-	err := checkArity(2, len(args))
-	if err != nil {
-		return nil, err
+	argc := len(args)
+	if argc != 2 {
+		return nil, internal.ErrWrongArgumentCount(argc, "swap")
 	}
 
 	symbol, ok := args[0].(internal.Symbol)
@@ -399,13 +400,13 @@ func or(x internal.Value, y internal.Value) bool {
 
 func safeSwap(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
-	err := checkArity(2, len(args))
-	if err != nil {
-		return nil, err
+	argc := len(args)
+	if argc != 2 {
+		return nil, internal.ErrWrongArgumentCount(argc, "swap")
 	}
 
 	atom := args[0]
-	atom, err = atom.Eval(scope)
+	atom, err := atom.Eval(scope)
 	if err != nil {
 		return nil, fmt.Errorf("unable to resolve symbol")
 	}
@@ -518,9 +519,9 @@ func convert(data map[string]interface{}) *internal.PersistentMap {
 
 func apply(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 
-	err := checkArityAtLeast(2, len(args))
-	if err != nil {
-		return nil, err
+	argc := len(args)
+	if argc < 2 {
+		return nil, internal.ErrWrongArgumentCount(argc, "<>")
 	}
 
 	evaledArgs, err := internal.EvalValueList(scope, args)
@@ -605,8 +606,9 @@ func source(scope internal.Scope) func(string) (internal.Value, error) {
 
 func defClass(scope internal.Scope, args []internal.Value) (internal.Value, error) {
 	
-	if err := checkArityAtLeast(2, len(args)); err != nil {
-		return nil, err
+	argc := len(args)
+	if argc < 2 {
+		return nil, internal.ErrWrongArgumentCount(argc, "defclass")
 	}
 
 	name, ok := args[0].(internal.Symbol)
