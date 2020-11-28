@@ -73,16 +73,32 @@ func (multiFn MultiFn) Invoke(scope Scope, args ...Value) (Value, error) {
 
 	result, err := fn.Invoke(scope, argVals...)
 
+	if err != nil {
+		return nil, err
+	}
+
 	if !isRecur(result) {
-		return result, err
+		return result, nil
 	}
 
 	for isRecur(result) {
+		
 		args = result.(*List).Values[1:]
+		if len(args) != len(fn.Args) {
+			return nil, ErrWrongArgumentCount(len(args), multiFn.Name)
+		}
+
 		result, err = fn.Invoke(scope, args...)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return result, err
+	return result, nil
+}
+
+func ErrWrongArgumentCount(got int, fn string) error {
+	return fmt.Errorf("wrong number of args (%d) to '%s'", got, fn)
 }
 
 func isRecur(value Value) bool {
@@ -149,8 +165,7 @@ func (multiFn MultiFn) selectMethod(args []Value) (Fn, error) {
 		}
 	}
 
-	return Fn{}, fmt.Errorf("wrong number of args (%d) to '%s'",
-		len(args), multiFn.Name)
+	return Fn{}, ErrWrongArgumentCount(len(args), multiFn.Name)
 }
 
 func (multiFn *MultiFn) validate() error {
