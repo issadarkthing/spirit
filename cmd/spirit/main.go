@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"runtime/pprof"
 	"os"
 	"runtime"
@@ -44,7 +43,7 @@ func main() {
 	} else if *cpuProfile != "" {
 		f, err := os.Create(*cpuProfile)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Fprintln(os.Stderr, err)
 		}
 		defer f.Close()
 
@@ -61,14 +60,14 @@ func main() {
 
 	home, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatalf("error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 	}
 
 	libPath := home + stdpath
 
 	core, err := os.Open(libPath)
 	if err != nil {
-		log.Fatalf("error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 	}
 	defer core.Close()
 
@@ -81,13 +80,13 @@ func main() {
 	if *preload != "" {
 		preloadFile, err := os.Open(*preload)
 		if err != nil {
-			log.Fatalf("error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		}
 		defer preloadFile.Close()
 
 		_, err = sp.ReadEval(preloadFile)
 		if err != nil {
-			log.Fatalf("error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		}
 	}
 
@@ -97,26 +96,26 @@ func main() {
 
 		fh, err := os.Open(flag.Arg(0))
 		if err != nil {
-			log.Fatalf("error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		}
 		defer fh.Close()
 
 		sp.BindGo("*file*", fh.Name())
 		_, err = sp.ReadEval(fh)
 		if err != nil {
-			log.Fatalf("error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		}
 
 
 		if *memProfile != "" {
 			f, err := os.Create(*memProfile)	
 			if err != nil {
-				log.Fatal(err)
+				fmt.Fprintln(os.Stderr, err)
 			}
 			defer f.Close()
 
 			if err := pprof.WriteHeapProfile(f); err != nil {
-				log.Fatal("could not write memory profile: ", err)
+				fmt.Fprintln(os.Stderr, "could not write memory profile: ", err)
 			}
 		}
 
@@ -127,7 +126,7 @@ func main() {
 		result, err = sp.ReadEvalStr(*executeStr)
 		fmt.Println(result)
 		if err != nil {
-			log.Fatalf("error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		}
 		return
 	}
@@ -139,7 +138,7 @@ func main() {
 	)
 
 	if err := repl.Loop(context.Background()); err != nil {
-		log.Fatalf("REPL exited with error: %v", err)
+		fmt.Fprintf(os.Stderr, "REPL exited with error: %v", err)
 	}
 
 	fmt.Println("Bye!")
