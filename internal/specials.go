@@ -559,9 +559,13 @@ func accessClassMember(target reflect.Value, name string) (reflect.Value, error)
 }
 
 func accessMember(target reflect.Value, member string) (reflect.Value, error) {
-	
+
 	if target.Type() == reflect.TypeOf(Object{}) {
 		return accessClassMember(target, member)
+	}
+
+	if len(member) < 1 {
+		return reflect.Value{}, fmt.Errorf("invalid symbol for member")
 	}
 
 	if member[0] >= 'a' && member[0] <= 'z' {
