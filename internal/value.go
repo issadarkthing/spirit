@@ -44,6 +44,9 @@ type Assoc interface {
 
 	// Set should set the value and returns new structure with updated value
 	Set(Value, Value) Value
+	
+	// Get should get a value mapped under passed argument
+	Get(Value) Value
 }
 
 // Compare compares two values in an identity independent manner. If
