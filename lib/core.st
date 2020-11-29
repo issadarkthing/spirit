@@ -55,6 +55,33 @@
 ; assoc functions
 (defn assoc? [arg] (impl? arg types/Assoc))
 
+;; map over key
+(defn mapk 
+  ([f coll]
+   (mapk f coll (empty coll)))
+  ([f coll acc]
+   (if (nil? coll)
+     acc
+     (let [x (first coll)
+           xs (next coll)
+           k (x 0)
+           v (x 1)]
+       (recur f xs (conj acc [(f k) v]))))))
+  
+;; map over value
+(defn mapv 
+  ([f coll]
+   (mapv f coll (empty coll)))
+  ([f coll acc]
+   (if (nil? coll)
+     acc
+     (let [x (first coll)
+           xs (next coll)
+           k (x 0)
+           v (x 1)]
+       (recur f xs (conj acc [k (f v)]))))))
+  
+
 ; sequence operations -------------------------------
 (defn seq? [arg] (impl? arg types/Seq))
 
