@@ -206,15 +206,15 @@
         (last (next coll))))))
 
 
-(defn some [f coll]
+(defn some? [f coll]
   (if (or (empty? coll) (nil? coll))
     false
-    (or (f (first coll)) (some f (next coll)))))  
+    (or (f (first coll)) (some? f (next coll)))))  
 
-(defn every [f coll]
+(defn every? [f coll]
   (if (or (empty? coll) (nil? coll))
     true
-    (and (f (first coll)) (every f (next coll)))))  
+    (and (f (first coll)) (every? f (next coll)))))  
 
 (defn find [f coll]
   (when (and coll (not (empty? coll)))
@@ -392,7 +392,7 @@
 
 ; wait for any of the channels realized and returns the value
 (defn wait-any [forms]
-  (if (some realized? forms)
+  (if (some? realized? forms)
     (find realized? forms)
     (recur forms)))
   
@@ -400,7 +400,7 @@
 ; wait-all does not wait sequentially instead it waits for whichever comes first
 ; and continue wait for others
 (defn wait-all [forms]
-  (if (every (fn [x] (not (future? x))) forms)
+  (if (every? (fn [x] (not (future? x))) forms)
     forms
     (recur (map 
              (fn [v] 

@@ -176,8 +176,8 @@
 (assert (= (drop 2 [1 2 3]) [3]))
 
 
-(assert (some even? '(1 3 5 8)))
-(assert (every even? '(2 4 6 8 10)))
+(assert (some? even? '(1 3 5 8)))
+(assert (every? even? '(2 4 6 8 10)))
 
 (assert (= 8 (find even? '(1 3 5 8 7))))
 (assert (= nil (find even? '(1 3 5 11 7))))
