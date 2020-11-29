@@ -358,13 +358,7 @@ func NewPersistentVector() *PersistentVector {
 	return &PersistentVector{Vec: vector.Empty}
 }
 
-func (p *PersistentVector) First() Value {
-	v, ok := p.Vec.Index(0)
-	if !ok {
-		return nil
-	}
-	return v.(Value)
-}
+
 
 func (p *PersistentVector) Eval(scope Scope) (Value, error) {
 	var pv Seq = NewPersistentVector()
@@ -385,6 +379,14 @@ func (p *PersistentVector) String() string {
 		vals = append(vals, it.Elem().(Value))
 	}
 	return containerString(vals, "[", "]", " ")
+}
+
+func (p *PersistentVector) First() Value {
+	v, ok := p.Vec.Index(0)
+	if !ok {
+		return nil
+	}
+	return v.(Value)
 }
 
 func (p *PersistentVector) Next() Seq {
