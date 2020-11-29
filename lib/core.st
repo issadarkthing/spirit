@@ -52,6 +52,8 @@
 (defn positive? [x]
   (> x 0))
 
+; assoc functions
+(defn assoc? [arg] (impl? arg types/Assoc))
 
 ; sequence operations -------------------------------
 (defn seq? [arg] (impl? arg types/Seq))
@@ -233,7 +235,8 @@
     (string? coll) ""
     (list? coll) '() 
     (vector? coll) []
-    (lazy-seq? coll) '()))
+    (lazy-seq? coll) '()
+    (hash-map? coll) {}))
     
 
 
@@ -350,9 +353,7 @@
          (cons x (flat xs empty-seq)))))))
 
 (defn assoc [coll key value]
-  (if (vector? coll)
-    (coll.Assoc key value)
-    (assoc* coll key value)))
+  (assoc* coll key value))
 
 (defn max
   ([x] x)
@@ -515,6 +516,7 @@
 (defn fn? [arg] (is-type? types/Fn arg))
 (defn vector? [arg] (is-type? types/Vector arg))
 (defn number? [arg] (is-type? types/Number arg))
+(defn hash-map? [arg] (is-type? types/HashMap arg))
 (defn boolean? [arg] (is-type? types/Bool arg))
 (defn string? [arg] (is-type? types/String arg))
 (defn keyword? [arg] (is-type? types/Keyword arg))

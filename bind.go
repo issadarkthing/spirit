@@ -18,7 +18,7 @@ func bindAll(scope internal.Scope) error {
 			Variadic: true,
 			Func:     future,
 		},
-		"core/assoc*":      internal.ValueOf(assoc),
+		"core/assoc*":     internal.ValueOf(assoc),
 		"core/keyword":    internal.ValueOf(keyword),
 		"core/parse-json": internal.ValueOf(parsejson),
 		"core/round":      internal.ValueOf(math.Round),
@@ -141,6 +141,7 @@ func bindAll(scope internal.Scope) error {
 
 		"types/Seq":       typeOf((*internal.Seq)(nil)),
 		"types/Invokable": typeOf((*internal.Invokable)(nil)),
+		"types/Assoc":     typeOf((*internal.Assoc)(nil)),
 	}
 
 	for sym, val := range core {
