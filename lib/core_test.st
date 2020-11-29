@@ -75,6 +75,13 @@
 (assert (= 10 (-> 5 (+ 5) number)))
 (assert (= "hello" (-> 0 ["hello" 1 2 #{}])))
 
+
+;; hashmap tests
+(assert (= {:a 1} {:a 1}))
+(assert (= (assoc {:a 1} :b 2) {:a 1 :b 2}))
+(assert (= "jiman" (:name {:name "jiman"})))
+(assert (= "jiman" ({:name "jiman"} :name)))
+
 ; ; simple function definition
 (def dec (fn* [i] (number (- i 1))))
 (assert (= 9 (dec 10)))
