@@ -202,10 +202,10 @@ func (p *PersistentMap) Set(k, v Value) Value {
 	}
 }
 
-func (p *PersistentMap) Get(key, defValue Value) Value {
+func (p *PersistentMap) Get(key Value) Value {
 	val, ok := p.Data.Index(key)
 	if !ok {
-		return defValue
+		return nil
 	}
 	return val.(Value)
 }
@@ -217,13 +217,13 @@ func (p *PersistentMap) Invoke(scope Scope, args ...Value) (Value, error) {
 	}
 
 	key := args[0]
-	var defaultVal Value = Nil{}
+	value := p.Get(key)
 
-	if len(args) == 2 {
-		defaultVal = args[1]
+	if len(args) == 2 && value == nil {
+		return value, nil
 	}
 
-	return p.Get(key, defaultVal), nil
+	return value, nil
 }
 
 func (p *PersistentMap) Delete(k Value) *PersistentMap {
@@ -667,7 +667,7 @@ func (c Class) String() string {
 }
 
 func (c Class) GetMember(name Keyword) (Value, bool) {
-	member := c.Members.Get(name, nil)
+	member := c.Members.Get(name)
 	if member == nil && c.Parent == nil {
 		return Nil{}, false
 
@@ -678,7 +678,7 @@ func (c Class) GetMember(name Keyword) (Value, bool) {
 }
 
 func (c Class) GetMethod(name Keyword) (Invokable, bool) {
-	method := c.Methods.Get(name, nil)
+	method := c.Methods.Get(name)
 	if method == nil && c.Parent == nil {
 		return nil, false
 
@@ -806,7 +806,7 @@ func (o Object) String() string {
 }
 
 func (o Object) GetMember(name Keyword) (Value, bool) {
-	val := o.Members.Get(name, nil)
+	val := o.Members.Get(name)
 	if val == nil {
 		return nil, false
 	}

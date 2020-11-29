@@ -133,12 +133,12 @@ func (kw Keyword) Invoke(scope Scope, args ...Value) (Value, error) {
 		return Nil{}, nil
 	}
 
-	def := Value(Nil{})
-	if len(argVals) == 2 {
-		def = argVals[1]
+	value := hm.Get(kw)
+	if len(argVals) == 2 && value == nil {
+		return value, nil
 	}
 
-	return hm.Get(kw, def), nil
+	return value, nil
 }
 
 // Symbol represents a name given to a value in memory.
