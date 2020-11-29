@@ -423,11 +423,19 @@ func (p *PersistentVector) Cons(v Value) Seq {
 	return pv
 }
 
-func (p *PersistentVector) Assoc(i int, v Value) Seq {
+func (p *PersistentVector) Set(i Value, v Value) Value {
 	return &PersistentVector{
-		Vec:      p.Vec.Assoc(i, v),
+		Vec:      p.Vec.Assoc(int(i.(Number)), v),
 		Position: p.Position,
 	}
+}
+
+func (p *PersistentVector) Get(i Value) Value {
+	value, ok := p.Vec.Index(int(i.(Number)))
+	if !ok {
+		return nil
+	}
+	return value.(Value)
 }
 
 func (p *PersistentVector) SubVector(i, j int) Seq {
