@@ -452,6 +452,7 @@ func assoc(hm internal.Assoc, args ...internal.Value) (internal.Assoc, error) {
 		return nil, fmt.Errorf("invalid number of arguments passed")
 	}
 
+
 	h := hm
 	for i := 0; i < len(args); i += 2 {
 
@@ -466,6 +467,18 @@ func assoc(hm internal.Assoc, args ...internal.Value) (internal.Assoc, error) {
 
 			if !object.InstanceOf.Exists(keyword) {
 				return nil, fmt.Errorf("cannot find member or method %s", string(keyword))
+			}
+		}
+
+		if vec, ok := h.(*internal.PersistentVector); ok {
+
+			index, ok := key.(internal.Number)
+			if !ok {
+				return nil, invalidType(internal.Number(0), key)
+			}
+
+			if int(index) < 0 || int(index) > vec.Size()-1 {
+				return nil, fmt.Errorf("vector out of bound")
 			}
 		}
 
