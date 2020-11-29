@@ -210,6 +210,54 @@ func (p *PersistentMap) Get(key Value) Value {
 	return val.(Value)
 }
 
+// HashMap implements Seq interface. Note that the order of items is unstable
+func (p *PersistentMap) Size() int {
+	return p.Data.Len()
+}
+
+func (p *PersistentMap) First() Value {
+	it := p.Data.Iterator()
+	if !it.HasElem() {
+		return Nil{}
+	}
+
+	k, v := it.Elem()
+	return NewPersistentVector().Conj(k.(Value), v.(Value))
+}
+
+func (p *PersistentMap) Next() Seq {
+	it := p.Data.Iterator()
+	if p.Size() < 2 {
+		return nil
+	}
+
+	k, _ := it.Elem()
+	return &PersistentMap{
+		Data: p.Data.Dissoc(k),
+	}
+}
+
+func (p *PersistentMap) Cons(v Value) Seq {
+
+	vec, ok := v.(*PersistentVector)
+	if !ok || vec.Size() != 2 {
+		return p
+	}
+
+	key, value := vec.Index(0), vec.Index(1)
+	return &PersistentMap{
+		Data: p.Data.Assoc(key, value),
+	}
+}
+
+func (p *PersistentMap) Conj(vals ...Value) Seq {
+	var hm Seq = p
+	for _, v := range vals {
+		hm = hm.Cons(v)
+	}
+	return hm
+}
+
 func (p *PersistentMap) Invoke(scope Scope, args ...Value) (Value, error) {
 	
 	if len(args) < 1 || len(args) > 2 {
