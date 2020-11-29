@@ -31,6 +31,10 @@ benchmark:
 build-only:
 	@go build -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" -o ./bin/spirit ./cmd/spirit/
 
+build-small:
+	@go build -ldflags="-w -X main.version=${VERSION} -X main.commit=${COMMIT}" -o ./bin/spirit ./cmd/spirit/
+	@upx bin/spirit
+
 build: test
 	@mkdir -p ./bin
 	@go build -ldflags="-X main.version=${VERSION} -X main.commit=${COMMIT}" -o ./bin/spirit ./cmd/spirit/
