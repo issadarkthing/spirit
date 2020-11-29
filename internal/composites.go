@@ -825,6 +825,25 @@ func (o Object) Set(key, value Value) Value {
 	}
 }
 
+func (o Object) Get(key Value) Value {
+	kw, ok := key.(Keyword)
+	if !ok {
+		return nil
+	}
+
+	val, ok := o.GetMember(kw)
+	if ok {
+		return val	
+	}
+
+	val, ok = o.GetMethod(kw)
+	if ok {
+		return val
+	}
+
+	return nil
+}
+
 func (o Object) PrettyPrint(indent int) string {
 
 	// add whitespace based on indentation level
