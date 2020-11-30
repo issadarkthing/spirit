@@ -795,7 +795,7 @@ func TestReader_One_Vector(t *testing.T) {
 		{
 			name: "Empty",
 			src:  `[]`,
-			want: internal.NewPersistentVector().
+			want: internal.NewVector().
 				SetPosition(internal.Position{
 					File:   "<string>",
 					Line:   1,
@@ -805,7 +805,7 @@ func TestReader_One_Vector(t *testing.T) {
 		{
 			name: "WithOneEntry",
 			src:  `[help]`,
-			want: internal.NewPersistentVector().
+			want: internal.NewVector().
 				SetPosition(internal.Position{
 					File:   "<string>",
 					Line:   1,
@@ -823,7 +823,7 @@ func TestReader_One_Vector(t *testing.T) {
 		{
 			name: "WithMultipleEntry",
 			src:  `[+ 0xF 3.1413]`,
-			want: internal.NewPersistentVector().
+			want: internal.NewVector().
 				SetPosition(internal.Position{
 					File:   "<string>",
 					Line:   1,
@@ -842,7 +842,7 @@ func TestReader_One_Vector(t *testing.T) {
 		{
 			name: "WithCommaSeparator",
 			src:  `[+,0xF,3.1413]`,
-			want: internal.NewPersistentVector().
+			want: internal.NewVector().
 				SetPosition(internal.Position{
 					File:   "<string>",
 					Line:   1,
@@ -864,7 +864,7 @@ func TestReader_One_Vector(t *testing.T) {
 					  0xF
 					  3.1413
 					]`,
-			want: internal.NewPersistentVector().
+			want: internal.NewVector().
 				SetPosition(internal.Position{
 					File:   "<string>",
 					Line:   1,
@@ -887,7 +887,7 @@ func TestReader_One_Vector(t *testing.T) {
 					  0xF    ; hex representation of 15
 					  3.1413 ; value of math constant pi
 				  ]`,
-			want: internal.NewPersistentVector().
+			want: internal.NewVector().
 				SetPosition(internal.Position{
 					File:   "<string>",
 					Line:   1,
@@ -932,7 +932,7 @@ func TestReader_One_Set(t *testing.T) {
 			want: internal.Set{
 				Values: []internal.Value{internal.Number(1),
 					internal.Number(2),
-					internal.NewPersistentVector().
+					internal.NewVector().
 						SetPosition(internal.Position{
 							File:   "<string>",
 							Column: 7,

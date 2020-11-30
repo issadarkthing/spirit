@@ -552,7 +552,7 @@ func readLambda(rd *Reader, _ rune) (Value, error) {
 	}
 
 	args = Values(args).Uniq()
-	var vec Seq = NewPersistentVector()
+	var vec Seq = NewVector()
 	for _, v := range args {
 		vec = vec.Conj(v)
 	}
@@ -580,7 +580,7 @@ func readHashMap(rd *Reader, _ rune) (Value, error) {
 		return nil, errors.New("expecting even number of forms within {}")
 	}
 
-	hm := &PersistentMap{
+	hm := &HashMap{
 		Position: pi,
 		Data:     hashmap.New(compare, hasher),
 	}
@@ -591,7 +591,7 @@ func readHashMap(rd *Reader, _ rune) (Value, error) {
 				reflect.TypeOf(forms[i]))
 		}
 
-		hm = hm.Set(forms[i], forms[i+1]).(*PersistentMap)
+		hm = hm.Set(forms[i], forms[i+1]).(*HashMap)
 	}
 
 	return hm, nil
@@ -605,7 +605,7 @@ func readVector(rd *Reader, _ rune) (Value, error) {
 		return nil, err
 	}
 
-	pv := NewPersistentVector()
+	pv := NewVector()
 	pv.Position = pi
 
 	for _, form := range forms {

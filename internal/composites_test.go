@@ -98,29 +98,29 @@ func TestVector_Eval(t *testing.T) {
 	executeEvalTests(t, []evalTestCase{
 		{
 			name:  "EmptyVector",
-			value: internal.NewPersistentVector(),
-			want:  internal.NewPersistentVector(),
+			value: internal.NewVector(),
+			want:  internal.NewVector(),
 		},
 		{
 			name: "EvalFailure",
 			getScope: func() internal.Scope {
 				return internal.NewScope(nil)
 			},
-			value: internal.NewPersistentVector().
+			value: internal.NewVector().
 				Cons(internal.Symbol{Value: "hello"}),
 			wantErr: true,
 		},
 		{
 			name: "Immutability",
 			getScope: func() internal.Scope {
-				list := internal.NewPersistentVector()
+				list := internal.NewVector()
 				list.Cons(internal.Keyword("hello"))
 				scope := internal.NewScope(nil)
 				scope.Bind("ls", list)
 				return scope
 			},
 			value: internal.Symbol{Value: "ls"},
-			want:  internal.NewPersistentVector(),
+			want:  internal.NewVector(),
 		},
 	})
 }
@@ -209,16 +209,16 @@ func TestList_String(t *testing.T) {
 func TestVector_String(t *testing.T) {
 	executeStringTestCase(t, []stringTestCase{
 		{
-			value: internal.NewPersistentVector(),
+			value: internal.NewVector(),
 			want:  "[]",
 		},
 		{
-			value: internal.NewPersistentVector().
+			value: internal.NewVector().
 				Cons(internal.Keyword("hello")),
 			want: "[:hello]",
 		},
 		{
-			value: internal.NewPersistentVector().
+			value: internal.NewVector().
 				Cons(&internal.List{}).
 				Cons(internal.Keyword("hello")),
 			want: "[:hello ()]",
@@ -246,7 +246,7 @@ func TestModule_String(t *testing.T) {
 func TestVector_Invoke(t *testing.T) {
 	t.Parallel()
 
-	vector := internal.NewPersistentVector().Cons(internal.Keyword("hello"))
+	vector := internal.NewVector().Cons(internal.Keyword("hello"))
 
 	table := []struct {
 		name     string
@@ -293,7 +293,7 @@ func TestVector_Invoke(t *testing.T) {
 				scope = tt.getScope()
 			}
 
-			got, err := vector.(*internal.PersistentVector).Invoke(scope, tt.args...)
+			got, err := vector.(*internal.Vector).Invoke(scope, tt.args...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Eval() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -309,22 +309,22 @@ func TestHashMap_Eval(t *testing.T) {
 	executeEvalTests(t, []evalTestCase{
 		{
 			name: "Simple",
-			value: internal.NewPersistentMap().
+			value: internal.NewHashMap().
 				Set(internal.Keyword("name"), internal.String("Bob")),
-			want: internal.NewPersistentMap().
+			want: internal.NewHashMap().
 				Set(internal.Keyword("name"), internal.String("Bob")),
 		},
 		{
 			name: "Immutability",
 			getScope: func() internal.Scope {
 				scope := internal.NewScope(nil)
-				hm := internal.NewPersistentMap()
+				hm := internal.NewHashMap()
 				hm.Set(internal.Keyword("bob"), internal.Number(12))
 				scope.Bind("my-hashmap", hm)
 				return scope
 			},
 			value: internal.Symbol{Value: "my-hashmap"},
-			want:  internal.NewPersistentMap(),
+			want:  internal.NewHashMap(),
 		},
 	})
 }
@@ -332,7 +332,7 @@ func TestHashMap_Eval(t *testing.T) {
 func TestHashMap_String(t *testing.T) {
 	executeStringTestCase(t, []stringTestCase{
 		{
-			value: internal.NewPersistentMap().
+			value: internal.NewHashMap().
 				Set(internal.Keyword("name"), internal.String("Bob")),
 			want: `{:name "Bob"}`,
 		},

@@ -114,7 +114,7 @@ func parseLet(scope Scope, args []Value) (*Fn, error) {
 		return nil, fmt.Errorf("call requires at-least bindings argument")
 	}
 
-	vec, isVector := args[0].(*PersistentVector)
+	vec, isVector := args[0].(*Vector)
 	if !isVector {
 		return nil, fmt.Errorf(
 			"first argument to let must be bindings vector, not %v",
@@ -359,9 +359,9 @@ func recursiveQuote(scope Scope, f Value) (Value, error) {
 		quoted, err := quoteSeq(scope, v.Values)
 		return Set{Values: quoted}, err
 
-	case *PersistentVector:
+	case *Vector:
 		quoted, err := quoteSeq(scope, v.SubVector(0, v.Size()))
-		pv := NewPersistentVector()
+		pv := NewVector()
 		return pv.Conj(quoted...), err
 
 	case String:

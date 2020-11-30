@@ -167,9 +167,9 @@ func doSeq(scope internal.Scope, args []internal.Value) (internal.Value, error) 
 
 	arg1 := args[0]
 	// function arguments binding
-	vecs, ok := arg1.(*internal.PersistentVector)
+	vecs, ok := arg1.(*internal.Vector)
 	if !ok {
-		return nil, invalidType(internal.NewPersistentVector(), arg1)
+		return nil, invalidType(internal.NewVector(), arg1)
 	}
 
 	argc = vecs.Size()
@@ -304,7 +304,7 @@ func parseLoop(scope internal.Scope, args []internal.Value) (*internal.Fn, error
 		return nil, fmt.Errorf("call requires at-least bindings argument")
 	}
 
-	vec, isVector := args[0].(*internal.PersistentVector)
+	vec, isVector := args[0].(*internal.Vector)
 	if !isVector {
 		return nil, fmt.Errorf(
 			"first argument to let must be bindings vector, not %v",
@@ -461,7 +461,7 @@ func assoc(hm internal.Assoc, args ...internal.Value) (internal.Assoc, error) {
 			}
 		}
 
-		if vec, ok := h.(*internal.PersistentVector); ok {
+		if vec, ok := h.(*internal.Vector); ok {
 
 			index, ok := key.(internal.Number)
 			if !ok {
@@ -479,7 +479,7 @@ func assoc(hm internal.Assoc, args ...internal.Value) (internal.Assoc, error) {
 	return h, nil
 }
 
-func parsejson(rawJson string) (*internal.PersistentMap, error) {
+func parsejson(rawJson string) (*internal.HashMap, error) {
 
 	var data map[string]interface{}
 
@@ -491,13 +491,13 @@ func parsejson(rawJson string) (*internal.PersistentMap, error) {
 	return convert(data), nil
 }
 
-func convert(data map[string]interface{}) *internal.PersistentMap {
-	pm := internal.NewPersistentMap()
+func convert(data map[string]interface{}) *internal.HashMap {
+	pm := internal.NewHashMap()
 	for k, v := range data {
 
 		// nested object
 		if nest, ok := v.(map[string]interface{}); ok {
-			pm = pm.Set(internal.Keyword(k), convert(nest)).(*internal.PersistentMap)
+			pm = pm.Set(internal.Keyword(k), convert(nest)).(*internal.HashMap)
 
 			// key with array value
 		} else if nestArr, ok := v.([]interface{}); ok {
@@ -511,11 +511,11 @@ func convert(data map[string]interface{}) *internal.PersistentMap {
 					vals = append(vals, internal.ValueOf(n))
 				}
 			}
-			pm = pm.Set(internal.Keyword(k), internal.ValueOf(vals)).(*internal.PersistentMap)
+			pm = pm.Set(internal.Keyword(k), internal.ValueOf(vals)).(*internal.HashMap)
 
 			// others can simply use ValueOf
 		} else {
-			pm = pm.Set(internal.Keyword(k), internal.ValueOf(v)).(*internal.PersistentMap)
+			pm = pm.Set(internal.Keyword(k), internal.ValueOf(v)).(*internal.HashMap)
 		}
 	}
 	return pm
@@ -652,9 +652,9 @@ func defClass(scope internal.Scope, args []internal.Value) (internal.Value, erro
 
 	
 	// evaluate passed hash map
-	hashMap, ok := evaledArgs[0].(*internal.PersistentMap)
+	hashMap, ok := evaledArgs[0].(*internal.HashMap)
 	if !ok {
-		return nil, invalidType(&internal.PersistentMap{}, evaledArgs[0])
+		return nil, invalidType(&internal.HashMap{}, evaledArgs[0])
 	}
 
 	// ensure all the keys in hashmap are keywords
@@ -669,8 +669,8 @@ func defClass(scope internal.Scope, args []internal.Value) (internal.Value, erro
 
 	class.Members = hashMap
 
-	methods := internal.NewPersistentMap()
-	staticMethods := internal.NewPersistentMap()
+	methods := internal.NewHashMap()
+	staticMethods := internal.NewHashMap()
 
 	for _, m := range evaledArgs[1:] {
 		
@@ -694,9 +694,9 @@ func defClass(scope internal.Scope, args []internal.Value) (internal.Value, erro
 		}
 
 		if methodType == "method" {
-			methods = methods.Set(name, fn).(*internal.PersistentMap)
+			methods = methods.Set(name, fn).(*internal.HashMap)
 		} else if methodType == "static" {
-			staticMethods = staticMethods.Set(name, fn).(*internal.PersistentMap)
+			staticMethods = staticMethods.Set(name, fn).(*internal.HashMap)
 		}
 	}
 

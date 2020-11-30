@@ -185,24 +185,24 @@ func (mod Module) Compare(v Value) bool {
 
 func (mod Module) String() string { return containerString(mod, "", "\n", "\n") }
 
-// PersistentMap is persistant and does not mutate on change
+// HashMap is persistant and does not mutate on change
 // under the hood, it uses structural sharing to reduce the cost of copying
-type PersistentMap struct {
+type HashMap struct {
 	Position
 	Data hashmap.Map
 }
 
-func NewPersistentMap() *PersistentMap {
-	return &PersistentMap{Data: hashmap.New(compare, hasher)}
+func NewHashMap() *HashMap {
+	return &HashMap{Data: hashmap.New(compare, hasher)}
 }
 
-func (p *PersistentMap) Set(k, v Value) Value {
-	return &PersistentMap{
+func (p *HashMap) Set(k, v Value) Value {
+	return &HashMap{
 		Data: p.Data.Assoc(k, v),
 	}
 }
 
-func (p *PersistentMap) Get(key Value) Value {
+func (p *HashMap) Get(key Value) Value {
 	val, ok := p.Data.Index(key)
 	if !ok {
 		return nil
@@ -211,46 +211,46 @@ func (p *PersistentMap) Get(key Value) Value {
 }
 
 // HashMap implements Seq interface. Note that the order of items is unstable
-func (p *PersistentMap) Size() int {
+func (p *HashMap) Size() int {
 	return p.Data.Len()
 }
 
-func (p *PersistentMap) First() Value {
+func (p *HashMap) First() Value {
 	it := p.Data.Iterator()
 	if !it.HasElem() {
 		return Nil{}
 	}
 
 	k, v := it.Elem()
-	return NewPersistentVector().Conj(k.(Value), v.(Value))
+	return NewVector().Conj(k.(Value), v.(Value))
 }
 
-func (p *PersistentMap) Next() Seq {
+func (p *HashMap) Next() Seq {
 	it := p.Data.Iterator()
 	if p.Size() < 2 {
 		return nil
 	}
 
 	k, _ := it.Elem()
-	return &PersistentMap{
+	return &HashMap{
 		Data: p.Data.Dissoc(k),
 	}
 }
 
-func (p *PersistentMap) Cons(v Value) Seq {
+func (p *HashMap) Cons(v Value) Seq {
 
-	vec, ok := v.(*PersistentVector)
+	vec, ok := v.(*Vector)
 	if !ok || vec.Size() != 2 {
 		return p
 	}
 
 	key, value := vec.Index(0), vec.Index(1)
-	return &PersistentMap{
+	return &HashMap{
 		Data: p.Data.Assoc(key, value),
 	}
 }
 
-func (p *PersistentMap) Conj(vals ...Value) Seq {
+func (p *HashMap) Conj(vals ...Value) Seq {
 	var hm Seq = p
 	for _, v := range vals {
 		hm = hm.Cons(v)
@@ -258,7 +258,7 @@ func (p *PersistentMap) Conj(vals ...Value) Seq {
 	return hm
 }
 
-func (p *PersistentMap) Invoke(scope Scope, args ...Value) (Value, error) {
+func (p *HashMap) Invoke(scope Scope, args ...Value) (Value, error) {
 	
 	if len(args) < 1 || len(args) > 2 {
 		return nil, fmt.Errorf("invoking hash map requires 1 or 2 arguments")
@@ -274,13 +274,13 @@ func (p *PersistentMap) Invoke(scope Scope, args ...Value) (Value, error) {
 	return value, nil
 }
 
-func (p *PersistentMap) Delete(k Value) *PersistentMap {
-	return &PersistentMap{Data: p.Data.Dissoc(k)}
+func (p *HashMap) Delete(k Value) *HashMap {
+	return &HashMap{Data: p.Data.Dissoc(k)}
 }
 
-func (p *PersistentMap) Compare(other Value) bool {
+func (p *HashMap) Compare(other Value) bool {
 
-	otherMap, ok := other.(*PersistentMap)
+	otherMap, ok := other.(*HashMap)
 	if !ok {
 		return false
 	}
@@ -306,8 +306,8 @@ func (p *PersistentMap) Compare(other Value) bool {
 	return true
 }
 
-func (p *PersistentMap) Eval(scope Scope) (Value, error) {
-	res := &PersistentMap{Data: hashmap.New(compare, hasher)}
+func (p *HashMap) Eval(scope Scope) (Value, error) {
+	res := &HashMap{Data: hashmap.New(compare, hasher)}
 
 	for it := p.Data.Iterator(); it.HasElem(); it.Next() {
 		k, v := it.Elem()
@@ -328,7 +328,7 @@ func (p *PersistentMap) Eval(scope Scope) (Value, error) {
 	return res, nil
 }
 
-func (p PersistentMap) String() string {
+func (p HashMap) String() string {
 	m := p.Data
 	var str strings.Builder
 	str.WriteRune('{')
@@ -349,19 +349,19 @@ func (p PersistentMap) String() string {
 	return str.String()
 }
 
-type PersistentVector struct {
+type Vector struct {
 	Position
 	Vec vector.Vector
 }
 
-func NewPersistentVector() *PersistentVector {
-	return &PersistentVector{Vec: vector.Empty}
+func NewVector() *Vector {
+	return &Vector{Vec: vector.Empty}
 }
 
 
 
-func (p *PersistentVector) Eval(scope Scope) (Value, error) {
-	var pv Seq = NewPersistentVector()
+func (p *Vector) Eval(scope Scope) (Value, error) {
+	var pv Seq = NewVector()
 	for it := p.Vec.Iterator(); it.HasElem(); it.Next() {
 		v := it.Elem()
 		val, err := v.(Value).Eval(scope)
@@ -373,7 +373,7 @@ func (p *PersistentVector) Eval(scope Scope) (Value, error) {
 	return pv, nil
 }
 
-func (p *PersistentVector) String() string {
+func (p *Vector) String() string {
 	vals := make([]Value, 0, p.Vec.Len())
 	for it := p.Vec.Iterator(); it.HasElem(); it.Next() {
 		vals = append(vals, it.Elem().(Value))
@@ -381,7 +381,7 @@ func (p *PersistentVector) String() string {
 	return containerString(vals, "[", "]", " ")
 }
 
-func (p *PersistentVector) First() Value {
+func (p *Vector) First() Value {
 	v, ok := p.Vec.Index(0)
 	if !ok {
 		return nil
@@ -389,18 +389,18 @@ func (p *PersistentVector) First() Value {
 	return v.(Value)
 }
 
-func (p *PersistentVector) Next() Seq {
+func (p *Vector) Next() Seq {
 	if p.Vec.Len() == 1 || p.Vec.Len() == 0 {
 		return nil
 	}
-	return &PersistentVector{
+	return &Vector{
 		Vec:      p.Vec.SubVector(1, p.Vec.Len()),
 		Position: p.Position,
 	}
 }
 
-func (p *PersistentVector) Conj(vals ...Value) Seq {
-	pv := &PersistentVector{
+func (p *Vector) Conj(vals ...Value) Seq {
+	pv := &Vector{
 		Vec:      p.Vec,
 		Position: p.Position,
 	}
@@ -410,9 +410,9 @@ func (p *PersistentVector) Conj(vals ...Value) Seq {
 	return pv
 }
 
-func (p *PersistentVector) Cons(v Value) Seq {
+func (p *Vector) Cons(v Value) Seq {
 
-	pv := NewPersistentVector()
+	pv := NewVector()
 	pv.Vec = pv.Vec.Cons(v)
 	pv.SetPosition(p.Position)
 	for it := p.Vec.Iterator(); it.HasElem(); it.Next() {
@@ -423,14 +423,14 @@ func (p *PersistentVector) Cons(v Value) Seq {
 	return pv
 }
 
-func (p *PersistentVector) Set(i Value, v Value) Value {
-	return &PersistentVector{
+func (p *Vector) Set(i Value, v Value) Value {
+	return &Vector{
 		Vec:      p.Vec.Assoc(int(i.(Number)), v),
 		Position: p.Position,
 	}
 }
 
-func (p *PersistentVector) Get(i Value) Value {
+func (p *Vector) Get(i Value) Value {
 	value, ok := p.Vec.Index(int(i.(Number)))
 	if !ok {
 		return nil
@@ -438,14 +438,14 @@ func (p *PersistentVector) Get(i Value) Value {
 	return value.(Value)
 }
 
-func (p *PersistentVector) SubVector(i, j int) Seq {
-	return &PersistentVector{
+func (p *Vector) SubVector(i, j int) Seq {
+	return &Vector{
 		Vec:      p.Vec.SubVector(i, j),
 		Position: p.Position,
 	}
 }
 
-func (p *PersistentVector) Index(i int) Value {
+func (p *Vector) Index(i int) Value {
 	val, ok := p.Vec.Index(i)
 	if !ok {
 		panic("error out of bound")
@@ -453,14 +453,14 @@ func (p *PersistentVector) Index(i int) Value {
 	return val.(Value)
 }
 
-func (p *PersistentVector) SetPosition(pos Position) *PersistentVector {
+func (p *Vector) SetPosition(pos Position) *Vector {
 	p.Position = pos
 	return p
 }
 
-func (p *PersistentVector) Compare(other Value) bool {
+func (p *Vector) Compare(other Value) bool {
 
-	pv2, ok := other.(*PersistentVector)
+	pv2, ok := other.(*Vector)
 	if !ok {
 		return false
 	}
@@ -484,11 +484,11 @@ func (p *PersistentVector) Compare(other Value) bool {
 	return true
 }
 
-func (p *PersistentVector) Size() int {
+func (p *Vector) Size() int {
 	return p.Vec.Len()
 }
 
-func (p *PersistentVector) GetValues() []Value {
+func (p *Vector) GetValues() []Value {
 	vals := make([]Value, 0, p.Size())
 	for it := p.Vec.Iterator(); it.HasElem(); it.Next() {
 		vals = append(vals, it.Elem().(Value))
@@ -496,7 +496,7 @@ func (p *PersistentVector) GetValues() []Value {
 	return vals
 }
 
-func (p *PersistentVector) Invoke(scope Scope, args ...Value) (Value, error) {
+func (p *Vector) Invoke(scope Scope, args ...Value) (Value, error) {
 	vals, err := EvalValueList(scope, args)
 	if err != nil {
 		return nil, err
@@ -679,9 +679,9 @@ func errMismatchedType(expected, got Value) error {
 type Class struct {
 	Name          string
 	Parent        *Class
-	Members       *PersistentMap
-	Methods       *PersistentMap
-	StaticsMethod *PersistentMap
+	Members       *HashMap
+	Methods       *HashMap
+	StaticsMethod *HashMap
 }
 
 func (c Class) Eval(_ Scope) (Value, error) {
@@ -809,9 +809,12 @@ func (c Class) Invoke(scope Scope, args ...Value) (Value, error) {
 		return nil, err
 	}
 
-	passedMap, ok := arg.(*PersistentMap)
+	passedMap, ok := arg.(*HashMap)
 	if !ok {
-		return nil, fmt.Errorf("expected PersistentMap")
+		return nil, TypeError{
+			Expected: reflect.TypeOf(NewHashMap()),
+			Got: reflect.TypeOf(arg),
+		}
 	}
 
 	return Object{
@@ -823,7 +826,7 @@ func (c Class) Invoke(scope Scope, args ...Value) (Value, error) {
 
 type Object struct {
 	InstanceOf Class
-	Members    *PersistentMap
+	Members    *HashMap
 }
 
 func (o Object) Eval(_ Scope) (Value, error) {
@@ -833,7 +836,7 @@ func (o Object) Eval(_ Scope) (Value, error) {
 func (o Object) Set(key, value Value) Value {
 	return Object{
 		InstanceOf: o.InstanceOf,
-		Members: o.Members.Set(key, value).(*PersistentMap),
+		Members: o.Members.Set(key, value).(*HashMap),
 	}
 }
 

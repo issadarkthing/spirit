@@ -297,7 +297,7 @@ func (fn Fn) matchArity(args []Value) bool {
 }
 
 func (fn *Fn) parseArgSpec(spec Value) error {
-	vec, isVector := spec.(*PersistentVector)
+	vec, isVector := spec.(*Vector)
 	if !isVector {
 		return fmt.Errorf("argument spec must be a vector of symbols, not '%s'",
 			reflect.TypeOf(spec))

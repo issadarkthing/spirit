@@ -60,12 +60,12 @@ func ValueOf(v interface{}) Value {
 	}
 }
 
-func convertToVector(sl reflect.Value) *PersistentVector {
+func convertToVector(sl reflect.Value) *Vector {
 
-	pv := NewPersistentVector()
+	pv := NewVector()
 
 	for i := 0; i < sl.Len(); i++ {
-		pv = pv.Conj(ValueOf(sl.Index(i).Interface())).(*PersistentVector)
+		pv = pv.Conj(ValueOf(sl.Index(i).Interface())).(*Vector)
 	}
 
 	return pv
@@ -107,9 +107,9 @@ func (t Type) Invoke(scope Scope, args ...Value) (Value, error) {
 	case reflect.TypeOf((*List)(nil)):
 		return &List{Values: argVals}, nil
 
-	case reflect.TypeOf(&PersistentVector{}):
-		pv := NewPersistentVector()
-		pv = pv.Conj(argVals...).(*PersistentVector)
+	case reflect.TypeOf(&Vector{}):
+		pv := NewVector()
+		pv = pv.Conj(argVals...).(*Vector)
 		return pv, nil
 
 	case reflect.TypeOf(Set{}):
