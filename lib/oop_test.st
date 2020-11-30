@@ -3,12 +3,19 @@
    :mileage 1000}
   
   (defmethod add-mileage [self mile]
-    (assoc self :mileage (+ self.mileage mile))))
+    (assoc self :mileage (+ self.mileage mile)))
+  
+  (defstatic kind []
+    "transportation"))
   
 
 (defclass Human
   {:age 0
-   :name ""}
+   :name ""
+   :state "alive"}
+
+  (defstatic code-name []
+    "Homo Sapien")
   
   (defmethod aging [self]
     (assoc self :age (inc self.age)))
@@ -25,7 +32,12 @@
    :car (Car {})}
   
   (defmethod get-id [self]
-    self.id))
+    self.id)
+  
+  (defmethod get-factorial [self value]
+    (if (= 1 value)
+      value
+      (* value (self.get-factorial (dec value))))))
 
 (def student (Student {:id "10" :age 20}))
 
@@ -48,3 +60,12 @@
 ; access nested member
 (assert (= "toyota" student.car.name))
 
+; access static method
+(assert (= "transportation" (Car.kind)))
+
+; inherit static method
+(assert "inherit static method" 
+        (= "Homo Sapien" (Student.code-name)))
+
+(assert "recursive method" 
+        (= 3628800 (student.get-factorial 10)))

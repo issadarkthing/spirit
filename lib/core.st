@@ -478,7 +478,12 @@
 (defmacro defmethod [name & fdecl]
   (let [with-name (fdecl.Cons name)
         method    (with-name.Cons 'fn)]
-    `'(~name ~method))) 
+    `'(method ~name ~method))) 
+
+(defmacro defstatic [name & fdecl]
+  (let [with-name (fdecl.Cons name)
+        method    (with-name.Cons 'fn)]
+    `'(static ~name ~method))) 
 
 (defmacro -> [x & forms]
   (loop [x x forms forms]

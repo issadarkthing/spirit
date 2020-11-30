@@ -558,10 +558,28 @@ func accessClassMember(target reflect.Value, name string) (reflect.Value, error)
 	return reflect.Value{}, fmt.Errorf("cannot find member or method '%s'", name)
 }
 
+func accessStaticMethod(target reflect.Value, name string) (reflect.Value, error) {
+	
+	class := target.Interface().(Class)
+	key := Keyword(name)
+
+	fn, ok := class.GetStaticMethod(key)
+	if ok {
+		return reflect.ValueOf(fn), nil
+	}
+
+	// error if it cannot find member or method
+	return reflect.Value{}, fmt.Errorf("cannot find static method '%s'", name)
+}
+
 func accessMember(target reflect.Value, member string) (reflect.Value, error) {
 
 	if target.Type() == reflect.TypeOf(Object{}) {
 		return accessClassMember(target, member)
+	}
+
+	if target.Type() == reflect.TypeOf(Class{}) {
+		return accessStaticMethod(target, member)
 	}
 
 	if len(member) < 1 {

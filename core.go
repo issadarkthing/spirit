@@ -679,6 +679,8 @@ func defClass(scope internal.Scope, args []internal.Value) (internal.Value, erro
 	class.Members = hashMap
 
 	methods := internal.NewPersistentMap()
+	staticMethods := internal.NewPersistentMap()
+
 	for _, m := range evaledArgs[1:] {
 		
 		method, ok := m.(*internal.List)
@@ -686,8 +688,9 @@ func defClass(scope internal.Scope, args []internal.Value) (internal.Value, erro
 			return nil, fmt.Errorf("expected defmethod")
 		}
 
-		name := internal.Keyword(method.First().String())
-		var body internal.Value = method.Next().First()
+		methodType := method.First().String()
+		name := internal.Keyword(method.Next().First().String())
+		var body internal.Value = method.Next().Next().First()
 		
 		body, err = body.Eval(scope)
 		if err != nil {
@@ -699,10 +702,15 @@ func defClass(scope internal.Scope, args []internal.Value) (internal.Value, erro
 			return nil, fmt.Errorf("expecting invokable")
 		}
 
-		methods = methods.Set(name, fn).(*internal.PersistentMap)
+		if methodType == "method" {
+			methods = methods.Set(name, fn).(*internal.PersistentMap)
+		} else if methodType == "static" {
+			staticMethods = staticMethods.Set(name, fn).(*internal.PersistentMap)
+		}
 	}
 
 	class.Methods = methods
+	class.StaticsMethod = staticMethods
 
 	// define in global variable
 	if scope.Parent() != nil {

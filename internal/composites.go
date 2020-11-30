@@ -677,10 +677,11 @@ func errMismatchedType(expected, got Value) error {
 }
 
 type Class struct {
-	Name    string
-	Parent  *Class
-	Members *PersistentMap
-	Methods *PersistentMap
+	Name          string
+	Parent        *Class
+	Members       *PersistentMap
+	Methods       *PersistentMap
+	StaticsMethod *PersistentMap
 }
 
 func (c Class) Eval(_ Scope) (Value, error) {
@@ -734,6 +735,17 @@ func (c Class) GetMember(name Keyword) (Value, bool) {
 	return member, true
 }
 
+func (c Class) GetStaticMethod(name Keyword) (Invokable, bool) {
+	static := c.StaticsMethod.Get(name)
+	if static == nil && c.Parent == nil {
+		return nil, false
+
+	} else if static == nil && c.Parent != nil {
+		return c.Parent.GetStaticMethod(name)
+	}
+	return static.(Invokable), true
+}
+
 func (c Class) GetMethod(name Keyword) (Invokable, bool) {
 	method := c.Methods.Get(name)
 	if method == nil && c.Parent == nil {
@@ -784,6 +796,7 @@ func (c Class) GetMethods() map[string]Invokable {
 	}
 	return methods
 }
+
 
 func (c Class) Invoke(scope Scope, args ...Value) (Value, error) {
 	
