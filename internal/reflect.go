@@ -296,10 +296,10 @@ func convertArgsTo(expected reflect.Type, args ...reflect.Value) ([]reflect.Valu
 			converted = append(converted, arg.Convert(expected))
 
 		default:
-			return args, fmt.Errorf(
-				"value of type '%s' cannot be converted to '%s'",
-				actual, expected,
-			)
+			return args, TypeError{
+				Got:      actual,
+				Expected: expected,
+			}
 		}
 	}
 
