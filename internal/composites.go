@@ -536,7 +536,6 @@ type Stack []Call
 func (s *Stack) Push(call Call) {
 
 	if s.Size() > MAX_STACK_CALL {
-
 		// remove the bottom element
 		*s = (*s)[1:]
 	}

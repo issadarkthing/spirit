@@ -234,6 +234,8 @@ func (fn *Fn) Invoke(scope Scope, args ...Value) (Value, error) {
 		return fn.Func(scope, args)
 	}
 
+	// lexical scoping as it captures variables at the point of function
+	// creation instead of function invocation
 	fnScope := NewScope(fn.Scope)
 	if s, ok := scope.(*MapScope); ok {
 		for k, v := range s.bindings {
