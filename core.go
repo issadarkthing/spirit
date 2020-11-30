@@ -433,15 +433,6 @@ func resolve(scope internal.Scope) func(internal.Symbol) internal.Value {
 	}
 }
 
-func splitString(str, sep internal.String) *internal.List {
-	result := strings.Split(string(str), string(sep))
-	values := make([]internal.Value, 0, len(result))
-	for _, v := range result {
-		values = append(values, internal.String(v))
-	}
-	return &internal.List{Values: values}
-}
-
 func keyword(str string) internal.Keyword {
 	return internal.Keyword(str)
 }

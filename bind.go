@@ -137,7 +137,8 @@ func bindAll(scope internal.Scope) error {
 		"core/read-file": internal.ValueOf(readFile),
 		"core/source":    internal.ValueOf(source(scope)),
 
-		"string/split": internal.ValueOf(splitString),
+		"core/split": internal.ValueOf(strings.Split),
+		"core/trim":  internal.ValueOf(strings.Trim),
 
 		"types/Seq":       typeOf((*internal.Seq)(nil)),
 		"types/Invokable": typeOf((*internal.Invokable)(nil)),

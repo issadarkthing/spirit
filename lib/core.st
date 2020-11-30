@@ -52,7 +52,7 @@
 (defn positive? [x]
   (> x 0))
 
-; assoc functions
+; assoc functions -------------------------------
 (defn assoc? [arg] (impl? arg types/Assoc))
 
 ;; map over key
@@ -445,6 +445,11 @@
 
 (defn join [coll]
   (<> str (map char->str coll)))
+
+(defn lines [s]
+  (-> s
+    (trim "\n")
+    (split "\n")))
 
 (defn partial
   ([f] f)
