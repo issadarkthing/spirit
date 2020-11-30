@@ -28,7 +28,7 @@ var (
 	executeStr   = flag.String("e", "", "Execute string")
 	unload       = flag.Bool("u", false, "Unload core library")
 	preload      = flag.String("p", "", "Pre-loads file")
-	printVersion = flag.Bool("v", false, "Prints slang version and exit")
+	printVersion = flag.Bool("v", false, "Prints spirit version and exit")
 	memProfile   = flag.String("memprofile", "", "memory profiling")
 	cpuProfile   = flag.String("cpuprofile", "", "cpu profiling")
 )
@@ -101,6 +101,7 @@ func main() {
 		defer fh.Close()
 
 		sp.BindGo("*file*", fh.Name())
+		sp.BindGo("*argv*", flag.Args())
 		_, err = sp.ReadEval(fh)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
