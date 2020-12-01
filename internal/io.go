@@ -26,6 +26,19 @@ func println(args ...interface{}) error {
 	return err
 }
 
+func pprint(args ...interface{}) error {
+	result := []interface{}{}
+	for _, v := range args {
+		if pp, ok := v.(PrettyPrinter); ok {
+			result = append(result, pp.PrettyPrint(0))
+		} else {
+			result = append(result, v)
+		}
+	}
+	_, err := fmt.Println(result...)
+	return err
+}
+
 func removeSuffixPrefix(str, cutset string) string {
 	return strings.TrimSuffix(strings.TrimPrefix(str, cutset), cutset)
 }
