@@ -812,8 +812,8 @@ func (c Class) Invoke(scope Scope, args ...Value) (Value, error) {
 	passedMap, ok := arg.(*HashMap)
 	if !ok {
 		return nil, TypeError{
-			Expected: reflect.TypeOf(NewHashMap()),
-			Got: reflect.TypeOf(arg),
+			Expected: TypeOf(NewHashMap()),
+			Got: TypeOf(arg),
 		}
 	}
 

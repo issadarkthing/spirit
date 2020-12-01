@@ -86,7 +86,7 @@ type Type struct{ T reflect.Type }
 // Eval returns the type value itself.
 func (t Type) Eval(_ Scope) (Value, error) { return t, nil }
 
-func (t Type) String() string { return fmt.Sprintf("%v", t.T) }
+func (t Type) String() string { return RemovePrefix(fmt.Sprintf("%v", t.T)) }
 
 func TypeOf(value interface{}) Type {
 	return Type{reflect.TypeOf(value)}
@@ -296,10 +296,10 @@ func convertArgsTo(expected reflect.Type, args ...reflect.Value) ([]reflect.Valu
 			converted = append(converted, arg.Convert(expected))
 
 		default:
-			return args, TypeError{
-				Got:      actual,
-				Expected: expected,
-			}
+			return args, fmt.Errorf(
+				"TypeError: expected %s instead got %s",
+				RemovePrefix(expected.String()), RemovePrefix(actual.String()),
+			)
 		}
 	}
 
