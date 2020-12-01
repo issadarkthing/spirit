@@ -273,6 +273,8 @@ func (hm *HashMap) Delete(k Value) *HashMap {
 	return &HashMap{Data: hm.Data.Dissoc(k)}
 }
 
+// Compare implements Comparable. It compares each key and value recursively,
+// note that order is not important when comparing
 func (hm *HashMap) Compare(other Value) bool {
 
 	otherMap, ok := other.(*HashMap)
@@ -503,6 +505,8 @@ func (p *Vector) SetPosition(pos Position) *Vector {
 	return p
 }
 
+// Compare implements Comparable which recursively compare values between
+// other value. Order is important
 func (p *Vector) Compare(other Value) bool {
 
 	pv2, ok := other.(*Vector)
@@ -519,7 +523,7 @@ func (p *Vector) Compare(other Value) bool {
 		v1 := it.Elem()
 		v2 := pv2.Index(i)
 
-		if !Compare(v1.(Value), v2.(Value)) {
+		if !compare(v1, v2) {
 			return false
 		}
 
