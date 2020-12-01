@@ -33,7 +33,6 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 		return nil, err
 	}
 
-
 	fnCall := Call{
 		Name:     lf.Values[0].String(),
 		Position: lf.Position,
@@ -58,7 +57,7 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 	if !ok {
 		return nil, ImplementError{
 			Name: invokableStr,
-			Val: target,
+			Val:  target,
 		}
 	}
 
@@ -107,7 +106,6 @@ func (lf *List) parse(scope Scope) error {
 	lf.special = fn
 	return nil
 }
-
 
 // Set represents a list of unique values. (Experimental)
 type Set struct {
@@ -194,14 +192,14 @@ func NewHashMap() *HashMap {
 	return &HashMap{Data: hashmap.New(compare, hasher)}
 }
 
-func (p *HashMap) Set(k, v Value) Value {
+func (hm *HashMap) Set(k, v Value) Value {
 	return &HashMap{
-		Data: p.Data.Assoc(k, v),
+		Data: hm.Data.Assoc(k, v),
 	}
 }
 
-func (p *HashMap) Get(key Value) Value {
-	val, ok := p.Data.Index(key)
+func (hm *HashMap) Get(key Value) Value {
+	val, ok := hm.Data.Index(key)
 	if !ok {
 		return nil
 	}
@@ -209,12 +207,12 @@ func (p *HashMap) Get(key Value) Value {
 }
 
 // HashMap implements Seq interface. Note that the order of items is unstable
-func (p *HashMap) Size() int {
-	return p.Data.Len()
+func (hm *HashMap) Size() int {
+	return hm.Data.Len()
 }
 
-func (p *HashMap) First() Value {
-	it := p.Data.Iterator()
+func (hm *HashMap) First() Value {
+	it := hm.Data.Iterator()
 	if !it.HasElem() {
 		return Nil{}
 	}
@@ -223,47 +221,47 @@ func (p *HashMap) First() Value {
 	return NewVector().Conj(k.(Value), v.(Value))
 }
 
-func (p *HashMap) Next() Seq {
-	it := p.Data.Iterator()
-	if p.Size() < 2 {
+func (hm *HashMap) Next() Seq {
+	it := hm.Data.Iterator()
+	if hm.Size() < 2 {
 		return nil
 	}
 
 	k, _ := it.Elem()
 	return &HashMap{
-		Data: p.Data.Dissoc(k),
+		Data: hm.Data.Dissoc(k),
 	}
 }
 
-func (p *HashMap) Cons(v Value) Seq {
+func (hm *HashMap) Cons(v Value) Seq {
 
 	vec, ok := v.(*Vector)
 	if !ok || vec.Size() != 2 {
-		return p
+		return hm
 	}
 
 	key, value := vec.Index(0), vec.Index(1)
 	return &HashMap{
-		Data: p.Data.Assoc(key, value),
+		Data: hm.Data.Assoc(key, value),
 	}
 }
 
-func (p *HashMap) Conj(vals ...Value) Seq {
-	var hm Seq = p
+func (hm *HashMap) Conj(vals ...Value) Seq {
+	var h Seq = hm
 	for _, v := range vals {
-		hm = hm.Cons(v)
+		h = h.Cons(v)
 	}
-	return hm
+	return h
 }
 
-func (p *HashMap) Invoke(scope Scope, args ...Value) (Value, error) {
-	
+func (hm *HashMap) Invoke(scope Scope, args ...Value) (Value, error) {
+
 	if len(args) < 1 || len(args) > 2 {
 		return nil, fmt.Errorf("invoking hash map requires 1 or 2 arguments")
 	}
 
 	key := args[0]
-	value := p.Get(key)
+	value := hm.Get(key)
 
 	if len(args) == 2 && value == nil {
 		return value, nil
@@ -272,22 +270,22 @@ func (p *HashMap) Invoke(scope Scope, args ...Value) (Value, error) {
 	return value, nil
 }
 
-func (p *HashMap) Delete(k Value) *HashMap {
-	return &HashMap{Data: p.Data.Dissoc(k)}
+func (hm *HashMap) Delete(k Value) *HashMap {
+	return &HashMap{Data: hm.Data.Dissoc(k)}
 }
 
-func (p *HashMap) Compare(other Value) bool {
+func (hm *HashMap) Compare(other Value) bool {
 
 	otherMap, ok := other.(*HashMap)
 	if !ok {
 		return false
 	}
 
-	if otherMap.Data.Len() != p.Data.Len() {
+	if otherMap.Data.Len() != hm.Data.Len() {
 		return false
 	}
 
-	for it := p.Data.Iterator(); it.HasElem(); it.Next() {
+	for it := hm.Data.Iterator(); it.HasElem(); it.Next() {
 
 		k1, v1 := it.Elem()
 
@@ -304,10 +302,10 @@ func (p *HashMap) Compare(other Value) bool {
 	return true
 }
 
-func (p *HashMap) Eval(scope Scope) (Value, error) {
+func (hm *HashMap) Eval(scope Scope) (Value, error) {
 	res := &HashMap{Data: hashmap.New(compare, hasher)}
 
-	for it := p.Data.Iterator(); it.HasElem(); it.Next() {
+	for it := hm.Data.Iterator(); it.HasElem(); it.Next() {
 		k, v := it.Elem()
 
 		key, err := k.(Value).Eval(scope)
@@ -326,8 +324,9 @@ func (p *HashMap) Eval(scope Scope) (Value, error) {
 	return res, nil
 }
 
-func (p HashMap) String() string {
-	m := p.Data
+
+func (hm HashMap) String() string {
+	m := hm.Data
 	var str strings.Builder
 	str.WriteRune('{')
 	length := m.Len()
@@ -355,8 +354,6 @@ type Vector struct {
 func NewVector() *Vector {
 	return &Vector{Vec: vector.Empty}
 }
-
-
 
 func (p *Vector) Eval(scope Scope) (Value, error) {
 	var pv Seq = NewVector()
@@ -602,13 +599,13 @@ func (c *Future) Eval(_ Scope) (Value, error) {
 
 // Implements Seq interface but lazy
 type LazySeq struct {
-	Min    int
-	Max    int
-	Step   int
+	Min  int
+	Max  int
+	Step int
 }
 
 func (l LazySeq) First() Value {
-	
+
 	if l.Min >= l.Max {
 		return ValueOf(nil)
 	}
@@ -620,8 +617,8 @@ func (l LazySeq) Next() Seq {
 
 	if l.Min+l.Step < l.Max {
 		return LazySeq{
-			Min: l.Min + l.Step,
-			Max: l.Max,
+			Min:  l.Min + l.Step,
+			Max:  l.Max,
 			Step: l.Step,
 		}
 	}
@@ -655,7 +652,7 @@ func (l LazySeq) Conj(v ...Value) Seq {
 }
 
 func (l LazySeq) Size() int {
-	return ((l.Max-l.Min) / l.Step)
+	return ((l.Max - l.Min) / l.Step)
 }
 
 func (l LazySeq) String() string {
@@ -664,14 +661,6 @@ func (l LazySeq) String() string {
 
 func (l LazySeq) Eval(_ Scope) (Value, error) {
 	return l, nil
-}
-
-func errMemberNotFound(member Keyword) error {
-	return fmt.Errorf("cannot find member %v", member)
-}
-
-func errMismatchedType(expected, got Value) error {
-	return fmt.Errorf("mismatched types: expected %T instead got %T", expected, got)
 }
 
 type Class struct {
@@ -683,7 +672,7 @@ type Class struct {
 }
 
 func (c Class) Eval(_ Scope) (Value, error) {
-	return c, nil	
+	return c, nil
 }
 
 func (c Class) PrettyPrint(indent int) string {
@@ -700,13 +689,9 @@ func (c Class) PrettyPrint(indent int) string {
 	fmt.Fprintf(&str, "class %s {", c.Name)
 	for name, member := range c.GetMembers() {
 
-		if m, ok := member.(Class); ok {
+		if m, ok := member.(PrettyPrinter); ok {
 			classStr := m.PrettyPrint(indent + IndentLevel)
 			fmt.Fprintf(&str, "\n%s    %s: %s", space, name, classStr)
-
-		} else if m, ok := member.(Object); ok {
-			objectStr := m.PrettyPrint(indent + IndentLevel)
-			fmt.Fprintf(&str, "\n%s    %s: %s", space, name, objectStr)
 
 		} else {
 			fmt.Fprintf(&str, "\n%s    %s: %s", space, name, member)
@@ -795,9 +780,8 @@ func (c Class) GetMethods() map[string]Invokable {
 	return methods
 }
 
-
 func (c Class) Invoke(scope Scope, args ...Value) (Value, error) {
-	
+
 	if len(args) != 1 {
 		return nil, fmt.Errorf("invalid arguments passed; expected 1")
 	}
@@ -811,7 +795,7 @@ func (c Class) Invoke(scope Scope, args ...Value) (Value, error) {
 	if !ok {
 		return nil, TypeError{
 			Expected: TypeOf(NewHashMap()),
-			Got: TypeOf(arg),
+			Got:      TypeOf(arg),
 		}
 	}
 
@@ -820,7 +804,6 @@ func (c Class) Invoke(scope Scope, args ...Value) (Value, error) {
 		Members:    passedMap,
 	}, nil
 }
-
 
 type Object struct {
 	InstanceOf Class
@@ -834,7 +817,7 @@ func (o Object) Eval(_ Scope) (Value, error) {
 func (o Object) Set(key, value Value) Value {
 	return Object{
 		InstanceOf: o.InstanceOf,
-		Members: o.Members.Set(key, value).(*HashMap),
+		Members:    o.Members.Set(key, value).(*HashMap),
 	}
 }
 
@@ -846,7 +829,7 @@ func (o Object) Get(key Value) Value {
 
 	val, ok := o.GetMember(kw)
 	if ok {
-		return val	
+		return val
 	}
 
 	val, ok = o.GetMethod(kw)
@@ -870,19 +853,16 @@ func (o Object) PrettyPrint(indent int) string {
 
 	fmt.Fprintf(&str, "%s {", o.InstanceOf.Name)
 	for it := o.Members.Data.Iterator(); it.HasElem(); it.Next() {
-		
+
 		name, member := it.Elem()
 
-		if m, ok := member.(Class); ok {
+		if m, ok := member.(PrettyPrinter); ok {
 			classStr := m.PrettyPrint(indent + IndentLevel)
 			fmt.Fprintf(&str, "\n%s    %s: %s", space, name, classStr)
 
-		} else if m, ok := member.(Object); ok {
-			objectStr := m.PrettyPrint(indent + IndentLevel)
-			fmt.Fprintf(&str, "\n%s    %s: %s", space, name, objectStr)
-
 		} else {
-			fmt.Fprintf(&str, "\n%s    %s: %s", space, string(name.(Keyword)), member)
+			fmt.Fprintf(&str, "\n%s    %s: %s",
+				space, string(name.(Keyword)), member)
 		}
 
 	}
@@ -908,8 +888,6 @@ func (o Object) GetMethod(name Keyword) (Invokable, bool) {
 }
 
 // ------------------ helper functions ---------------------------
-
-
 
 func hasher(s interface{}) uint32 {
 	return hash.String(s.(Value).String())
