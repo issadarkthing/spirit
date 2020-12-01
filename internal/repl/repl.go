@@ -103,6 +103,7 @@ func (repl *REPL) readEvalPrint() error {
 
 	v, err := internal.Eval(repl.scope, form)
 	if err != nil {
+		internal.ClearStack(repl.scope)
 		return repl.print(err)
 	}
 

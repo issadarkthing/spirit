@@ -943,3 +943,7 @@ func addStackTrace(scope Scope, err error) error {
 	}
 	return err
 }
+
+func ClearStack(scope Scope) {
+	for call := scope.Pop(); call != (Call{}); call = scope.Pop() {}
+}
