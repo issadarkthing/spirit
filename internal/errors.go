@@ -43,6 +43,18 @@ func (r ResolveError) Error() string {
 	)
 }
 
+type ImplementError struct {
+	Name string
+	Val  Value
+}
+
+func (i ImplementError) Error() string {
+	return fmt.Sprintf(
+		"ImplementError: type %v does not implement %s type",
+		TypeOf(i.Val), i.Name,
+	)
+}
+
 func RemovePrefix(str string) string {
 	str = strings.TrimLeft(str, "*")
 	str = strings.TrimLeft(str, "internal.")

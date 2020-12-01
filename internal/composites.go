@@ -2,7 +2,6 @@ package internal
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	"github.com/xiaq/persistent/hash"
@@ -57,11 +56,10 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 
 	invokable, ok := target.(Invokable)
 	if !ok {
-		err = fmt.Errorf(
-			"cannot invoke value of type '%s'", reflect.TypeOf(target),
-		)
-
-		return nil, err
+		return nil, ImplementError{
+			Name: invokableStr,
+			Val: target,
+		}
 	}
 
 	scope.Push(fnCall)

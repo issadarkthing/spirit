@@ -555,7 +555,10 @@ func accessClassMember(target reflect.Value, name string) (reflect.Value, error)
 	}
 
 	// error if it cannot find member or method
-	return reflect.Value{}, fmt.Errorf("cannot find member or method '%s'", name)
+	return reflect.Value{}, fmt.Errorf(
+		"cannot find member or method '%s' for class '%s'",
+		name, object.InstanceOf.Name,
+	)
 }
 
 func accessStaticMethod(target reflect.Value, name string) (reflect.Value, error) {
@@ -590,8 +593,8 @@ func accessMember(target reflect.Value, member string) (reflect.Value, error) {
 		return reflect.Value{}, fmt.Errorf("cannot access private member")
 	}
 
-	errNoMember := fmt.Errorf("value of type '%s' has no member named '%s'",
-		target.Type(), member)
+	errNoMember := fmt.Errorf("value of type %s has no member named '%s'",
+		RemovePrefix(target.Type().String()), member)
 
 	if _, found := target.Type().MethodByName(member); found {
 		return target.MethodByName(member), nil

@@ -11,6 +11,11 @@ import (
 	"time"
 )
 
+var (
+	seqStr       = reflect.TypeOf((*Seq)(nil)).Elem().Name()
+	invokableStr = reflect.TypeOf((*Seq)(nil)).Elem().Name()
+)
+
 // Case implements the switch case construct.
 func caseForm(scope Scope, args []Value) (Value, error) {
 
@@ -18,7 +23,7 @@ func caseForm(scope Scope, args []Value) (Value, error) {
 	if argc < 2 {
 		return nil, ArgumentError{
 			Got: argc,
-			Fn: "case",
+			Fn:  "case",
 		}
 	}
 
@@ -119,7 +124,6 @@ func toType(to Type, val Value) (Value, error) {
 	return nil, fmt.Errorf("cannot convert '%s' to '%s'", rv.Type(), to.T)
 }
 
-
 // MakeString returns stringified version of all args.
 func makeString(vals ...Value) Value {
 	argc := len(vals)
@@ -144,18 +148,13 @@ func makeString(vals ...Value) Value {
 	}
 }
 
-
-
-
-
-
 func doSeq(scope Scope, args []Value) (Value, error) {
 
 	argc := len(args)
 	if argc < 1 {
 		return nil, ArgumentError{
 			Got: argc,
-			Fn: "doseq",
+			Fn:  "doseq",
 		}
 	}
 
@@ -165,7 +164,7 @@ func doSeq(scope Scope, args []Value) (Value, error) {
 	if !ok {
 		return nil, TypeError{
 			Expected: &Vector{},
-			Got: arg1,
+			Got:      arg1,
 		}
 	}
 
@@ -173,7 +172,7 @@ func doSeq(scope Scope, args []Value) (Value, error) {
 	if argc < 2 {
 		return nil, ArgumentError{
 			Got: argc,
-			Fn: "binding",
+			Fn:  "binding",
 		}
 	}
 
@@ -184,7 +183,10 @@ func doSeq(scope Scope, args []Value) (Value, error) {
 
 	l, ok := coll.(Seq)
 	if !ok {
-		return nil, fmt.Errorf("does not implement Seq")
+		return nil, ImplementError{
+			Name: seqStr,
+			Val:  coll,
+		}
 	}
 
 	symbol, ok := vecs.Index(0).(Symbol)
@@ -210,13 +212,16 @@ func swap(scope Scope, args []Value) (Value, error) {
 	if argc != 2 {
 		return nil, ArgumentError{
 			Got: argc,
-			Fn: "swap",
+			Fn:  "swap",
 		}
 	}
 
 	symbol, ok := args[0].(Symbol)
 	if !ok {
-		return nil, fmt.Errorf("Expected symbol")
+		return nil, TypeError{
+			Expected: Symbol{},
+			Got:      args[0],
+		}
 	}
 
 	value, err := args[1].Eval(scope)
@@ -255,7 +260,7 @@ func future(scope Scope, args []Value) (Value, error) {
 
 	ch := &Future{
 		Channel: make(chan Value),
-		Value: Nil{},
+		Value:   Nil{},
 	}
 
 	ch.Submit(scope, args[0])
@@ -369,9 +374,6 @@ func parseLoop(scope Scope, args []Value) (*Fn, error) {
 	}, nil
 }
 
-
-
-
 func and(x Value, y Value) bool {
 	return isTruthy(x) && isTruthy(y)
 }
@@ -386,7 +388,7 @@ func safeSwap(scope Scope, args []Value) (Value, error) {
 	if argc != 2 {
 		return nil, ArgumentError{
 			Got: argc,
-			Fn: "swap",
+			Fn:  "swap",
 		}
 	}
 
@@ -399,16 +401,15 @@ func safeSwap(scope Scope, args []Value) (Value, error) {
 	if !ok {
 		return nil, TypeError{
 			Expected: &Atom{},
-			Got: args[0],
+			Got:      args[0],
 		}
 	}
-
 
 	fn, ok := args[1].(Invokable)
 	if !ok {
 		return nil, TypeError{
 			Expected: Invokable(nil),
-			Got: args[1],
+			Got:      args[1],
 		}
 	}
 
@@ -438,10 +439,9 @@ func assoc(hm Assoc, args ...Value) (Assoc, error) {
 	if len(args)%2 != 0 {
 		return nil, ArgumentError{
 			Got: len(args),
-			Fn: "assoc",
+			Fn:  "assoc",
 		}
 	}
-
 
 	h := hm
 	for i := 0; i < len(args); i += 2 {
@@ -450,7 +450,7 @@ func assoc(hm Assoc, args ...Value) (Assoc, error) {
 		value := args[i+1]
 
 		if object, ok := hm.(Object); ok {
-			keyword, ok := key.(Keyword); 
+			keyword, ok := key.(Keyword)
 			if !ok {
 				return nil, fmt.Errorf("object requires Keyword as key")
 			}
@@ -466,7 +466,7 @@ func assoc(hm Assoc, args ...Value) (Assoc, error) {
 			if !ok {
 				return nil, TypeError{
 					Expected: Number(0),
-					Got: key,
+					Got:      key,
 				}
 			}
 
@@ -529,7 +529,7 @@ func apply(scope Scope, args []Value) (Value, error) {
 	if argc < 2 {
 		return nil, ArgumentError{
 			Got: argc,
-			Fn: "<>",
+			Fn:  "<>",
 		}
 	}
 
@@ -540,7 +540,10 @@ func apply(scope Scope, args []Value) (Value, error) {
 
 	fn, ok := evaledArgs[0].(Invokable)
 	if !ok {
-		return nil, fmt.Errorf("does not implement Invokable")
+		return nil, ImplementError{
+			Name: invokableStr,
+			Val:  evaledArgs[0],
+		}
 	}
 
 	fnArgs := evaledArgs[1 : len(evaledArgs)-1]
@@ -548,7 +551,10 @@ func apply(scope Scope, args []Value) (Value, error) {
 	lastArg := evaledArgs[len(evaledArgs)-1]
 	coll, ok := lastArg.(Seq)
 	if !ok {
-		return nil, fmt.Errorf("does not implement Seq")
+		return nil, ImplementError{
+			Name: seqStr,
+			Val: lastArg,
+		}
 	}
 
 	if coll.Size() != 0 {
@@ -583,22 +589,20 @@ func evalStr(scope Scope, args []Value) (Value, error) {
 	if !ok {
 		return nil, TypeError{
 			Expected: String(""),
-			Got: form,
+			Got:      form,
 		}
 	}
 
 	return ReadEvalStr(scope, string(fromStr))
 }
 
-
 func lazyRange(min, max, step int) LazySeq {
 	return LazySeq{
-		Min: min,
-		Max: max,
+		Min:  min,
+		Max:  max,
 		Step: step,
 	}
 }
-
 
 func source(scope Scope) func(string) (Value, error) {
 	return func(file string) (Value, error) {
@@ -617,12 +621,12 @@ func source(scope Scope) func(string) (Value, error) {
 }
 
 func defClass(scope Scope, args []Value) (Value, error) {
-	
+
 	argc := len(args)
 	if argc < 2 {
 		return nil, ArgumentError{
+			Fn:  "defclass",
 			Got: argc,
-			Fn: "defclass",
 		}
 	}
 
@@ -630,7 +634,7 @@ func defClass(scope Scope, args []Value) (Value, error) {
 	if !ok {
 		return nil, TypeError{
 			Expected: Symbol{},
-			Got: args[0],
+			Got:      args[0],
 		}
 	}
 
@@ -653,7 +657,7 @@ func defClass(scope Scope, args []Value) (Value, error) {
 		}
 
 		if parent, ok := arg2.(Class); ok {
-			class.Parent = &parent	
+			class.Parent = &parent
 		}
 
 		hashMapIndex = 3
@@ -664,13 +668,12 @@ func defClass(scope Scope, args []Value) (Value, error) {
 		return nil, err
 	}
 
-	
 	// evaluate passed hash map
 	hashMap, ok := evaledArgs[0].(*HashMap)
 	if !ok {
 		return nil, TypeError{
 			Expected: &HashMap{},
-			Got: evaledArgs[0],
+			Got:      evaledArgs[0],
 		}
 	}
 
@@ -682,7 +685,7 @@ func defClass(scope Scope, args []Value) (Value, error) {
 		if !ok {
 			return nil, TypeError{
 				Expected: Keyword(""),
-				Got: key.(Value),
+				Got:      key.(Value),
 			}
 		}
 	}
@@ -693,7 +696,7 @@ func defClass(scope Scope, args []Value) (Value, error) {
 	staticMethods := NewHashMap()
 
 	for _, m := range evaledArgs[1:] {
-		
+
 		method, ok := m.(*List)
 		if !ok {
 			return nil, fmt.Errorf("expected defmethod")
@@ -702,15 +705,18 @@ func defClass(scope Scope, args []Value) (Value, error) {
 		methodType := method.First().String()
 		name := Keyword(method.Next().First().String())
 		var body Value = method.Next().Next().First()
-		
+
 		body, err = body.Eval(scope)
 		if err != nil {
 			return nil, err
 		}
-		
+
 		fn, ok := body.(Invokable)
 		if !ok {
-			return nil, fmt.Errorf("expecting invokable")
+			return nil, ImplementError{
+				Name: invokableStr,
+				Val: body,
+			}
 		}
 
 		if methodType == "method" {
@@ -764,15 +770,15 @@ func memory() {
 
 // converts byte to human readable format
 func byteCount(b uint64) string {
-    const unit = 1000
-    if b < unit {
-        return fmt.Sprintf("%d B", b)
-    }
-    div, exp := unit, 0
-    for n := b / unit; n >= unit; n /= unit {
-        div *= unit
-        exp++
-    }
-    return fmt.Sprintf("%.2f %cB",
-        float64(b)/float64(div), "kMGTPE"[exp])
+	const unit = 1000
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := unit, 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.2f %cB",
+		float64(b)/float64(div), "kMGTPE"[exp])
 }
