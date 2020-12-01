@@ -28,7 +28,7 @@ func bindAll(scope Scope) error {
 		},
 		"core/bounded?": ValueOf(bound(scope)),
 		"core/sleep":    ValueOf(sleep),
-		"core/deref":   ValueOf(deref(scope)),
+		"core/deref":    ValueOf(deref(scope)),
 		"core/doseq": &Fn{
 			Args:     []string{"vector", "exprs"},
 			Variadic: true,
@@ -75,14 +75,14 @@ func bindAll(scope Scope) error {
 			Func: defClass,
 		},
 		"core/mem": &Fn{
-			Args: []string{"exprs"},
+			Args:     []string{"exprs"},
 			Variadic: true,
-			Func: mem,
+			Func:     mem,
 		},
 		"core/recur": &Fn{
-			Args: []string{"bindings"},
+			Args:     []string{"bindings"},
 			Variadic: true,
-			Func: recur,
+			Func:     recur,
 		},
 
 		// special forms
@@ -112,23 +112,24 @@ func bindAll(scope Scope) error {
 		"core/str": ValueOf(makeString),
 
 		// Math functions
-		"core/+":   ValueOf(add),
-		"core/-":   ValueOf(sub),
-		"core/*":   ValueOf(multiply),
-		"core//":   ValueOf(divide),
-		"core/mod": ValueOf(math.Mod),
-		"core/=":   ValueOf(Compare),
-		"core/>":   ValueOf(gt),
-		"core/>=":  ValueOf(gtE),
-		"core/<":   ValueOf(lt),
-		"core/<=":  ValueOf(ltE),
-		"core/sqrt": ValueOf(math.Sqrt),
+		"core/+":      ValueOf(add),
+		"core/-":      ValueOf(sub),
+		"core/*":      ValueOf(multiply),
+		"core//":      ValueOf(divide),
+		"core/mod":    ValueOf(math.Mod),
+		"core/=":      ValueOf(Compare),
+		"core/>":      ValueOf(gt),
+		"core/>=":     ValueOf(gtE),
+		"core/<":      ValueOf(lt),
+		"core/<=":     ValueOf(ltE),
+		"core/sqrt":   ValueOf(math.Sqrt),
 		"core/prime?": ValueOf(isPrime),
 
 		// io functions
 		"core/$":         ValueOf(shell),
 		"core/print":     ValueOf(println),
 		"core/printf":    ValueOf(printf),
+		"core/pprint":    ValueOf(pprint),
 		"core/read*":     ValueOf(read),
 		"core/random":    ValueOf(random),
 		"core/shuffle":   ValueOf(shuffle),
