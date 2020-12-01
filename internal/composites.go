@@ -324,6 +324,34 @@ func (hm *HashMap) Eval(scope Scope) (Value, error) {
 	return res, nil
 }
 
+func (hm HashMap) PrettyPrint(indent int) string {
+
+	space := strings.Repeat(" ", indent)
+
+	if hm.Size() == 0 {
+		return fmt.Sprintf("{}")
+	}
+
+	str := strings.Builder{}
+
+	fmt.Fprintf(&str, "%s{", space)
+
+	for it := hm.Data.Iterator(); it.HasElem(); it.Next() {
+		
+		key, val := it.Elem()
+		if v, ok := val.(PrettyPrinter); ok {
+			vStr := v.PrettyPrint(indent + IndentLevel)
+			fmt.Fprintf(&str, "\n%s    %s %s", space, key, vStr)
+
+		} else {
+			fmt.Fprintf(&str, "\n%s    %s %s", space, key, val)
+		}
+
+	}
+
+	fmt.Fprintf(&str, "\n%s}", space)
+	return str.String()
+}
 
 func (hm HashMap) String() string {
 	m := hm.Data
