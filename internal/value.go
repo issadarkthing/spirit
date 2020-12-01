@@ -72,6 +72,10 @@ type Comparable interface {
 	Compare(other Value) bool
 }
 
+type PrettyPrinter interface {
+	PrettyPrint(indent int) string	
+}
+
 // Values represents a list of values and implements the Seq interface.
 type Values []Value
 
