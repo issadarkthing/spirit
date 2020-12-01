@@ -195,8 +195,7 @@ func NewHashMap() *HashMap {
 func (hm *HashMap) Set(k, v Value) Value {
 	return &HashMap{
 		Data: hm.Data.Assoc(k, v),
-	}
-}
+	} }
 
 func (hm *HashMap) Get(key Value) Value {
 	val, ok := hm.Data.Index(key)
@@ -333,20 +332,17 @@ func (hm HashMap) PrettyPrint(indent int) string {
 	}
 
 	str := strings.Builder{}
-
-	fmt.Fprintf(&str, "%s{", space)
+	fmt.Fprintf(&str, "{")
 
 	for it := hm.Data.Iterator(); it.HasElem(); it.Next() {
 		
 		key, val := it.Elem()
+
 		if v, ok := val.(PrettyPrinter); ok {
-			vStr := v.PrettyPrint(indent + IndentLevel)
-			fmt.Fprintf(&str, "\n%s    %s %s", space, key, vStr)
+			val = v.PrettyPrint(indent + IndentLevel)
+		} 
 
-		} else {
-			fmt.Fprintf(&str, "\n%s    %s %s", space, key, val)
-		}
-
+		fmt.Fprintf(&str, "\n%s    %s %s", space, key, val)
 	}
 
 	fmt.Fprintf(&str, "\n%s}", space)
@@ -394,6 +390,32 @@ func (p *Vector) Eval(scope Scope) (Value, error) {
 		pv = pv.Conj(val)
 	}
 	return pv, nil
+}
+
+func (p *Vector) PrettyPrint(indent int) string {
+
+	space := strings.Repeat(" ", indent)
+
+	if p.Size() == 0 {
+		return fmt.Sprintf("[]")
+	}
+	
+	str := strings.Builder{}
+	fmt.Fprintf(&str, "[")
+
+	for it := p.Vec.Iterator(); it.HasElem(); it.Next() {
+		elem := it.Elem()
+		ppStr := elem
+
+		if pp, ok := elem.(PrettyPrinter); ok {
+			ppStr = pp.PrettyPrint(indent + IndentLevel)
+		} 		
+
+		fmt.Fprintf(&str, "\n    %s%s,", space, ppStr)
+	}
+
+	fmt.Fprintf(&str, "\n%s]", space)
+	return str.String()
 }
 
 func (p *Vector) String() string {
