@@ -481,6 +481,7 @@ func assoc(hm Assoc, args ...Value) (Assoc, error) {
 	return h, nil
 }
 
+// TODO: add support for array only json
 func parsejson(rawJson string) (*HashMap, error) {
 
 	var data map[string]interface{}

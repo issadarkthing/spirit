@@ -225,3 +225,9 @@
 (assert (= 6 (pass-four #(+ %4 (+ %1 %1)))))
 
 
+;; json
+(assert (= {:name "jiman"} (parse-json "{\"name\": \"jiman\"}")))
+(assert (= {:fruits ["apple" "grape"]} 
+           (parse-json "{\"fruits\": [\"apple\", \"grape\"]}")))
+(assert "nested json" (= {:fruits {:items 1}} 
+                         (parse-json "{\"fruits\": { \"items\": 1} }")))
