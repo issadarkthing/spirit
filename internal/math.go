@@ -1,14 +1,12 @@
-package spirit
+package internal
 
 import (
 	"math"
-
-	"github.com/issadarkthing/spirit/internal"
 )
 
 // Add adds given floating point numbers and returns the sum.
-func add(args ...internal.Number) internal.Number {
-	var result internal.Number
+func add(args ...Number) Number {
+	var result Number
 	for _, v := range args {
 		result += v
 	}
@@ -16,7 +14,7 @@ func add(args ...internal.Number) internal.Number {
 }
 
 // Sub subtracts args from 'x' and returns the final result.
-func sub(x internal.Number, args ...internal.Number) internal.Number {
+func sub(x Number, args ...Number) Number {
 	result := x
 	if len(args) == 0 {
 		return -1 * result
@@ -29,7 +27,7 @@ func sub(x internal.Number, args ...internal.Number) internal.Number {
 }
 
 // Multiply multiplies the given args to 1 and returns the result.
-func multiply(first internal.Number, args ...internal.Number) internal.Number {
+func multiply(first Number, args ...Number) Number {
 	result := first
 	for _, v := range args {
 		result *= v
@@ -38,7 +36,7 @@ func multiply(first internal.Number, args ...internal.Number) internal.Number {
 }
 
 // Divide returns the product of given numbers.
-func divide(first internal.Number, args ...internal.Number) internal.Number {
+func divide(first Number, args ...Number) Number {
 
 	result := first
 
@@ -54,7 +52,7 @@ func divide(first internal.Number, args ...internal.Number) internal.Number {
 }
 
 // Lt returns true if the given args are monotonically increasing.
-func lt(base internal.Number, args ...internal.Number) bool {
+func lt(base Number, args ...Number) bool {
 	inc := true
 	for _, arg := range args {
 		inc = inc && (arg > base)
@@ -64,7 +62,7 @@ func lt(base internal.Number, args ...internal.Number) bool {
 
 // LtE returns true if the given args are monotonically increasing or
 // are all equal.
-func ltE(base internal.Number, args ...internal.Number) bool {
+func ltE(base Number, args ...Number) bool {
 	inc := true
 	for _, arg := range args {
 		inc = inc && (arg >= base)
@@ -73,7 +71,7 @@ func ltE(base internal.Number, args ...internal.Number) bool {
 }
 
 // Gt returns true if the given args are monotonically decreasing.
-func gt(base internal.Number, args ...internal.Number) bool {
+func gt(base Number, args ...Number) bool {
 	inc := true
 	for _, arg := range args {
 		inc = inc && (arg < base)
@@ -83,7 +81,7 @@ func gt(base internal.Number, args ...internal.Number) bool {
 
 // GtE returns true if the given args are monotonically decreasing or
 // all equal.
-func gtE(base internal.Number, args ...internal.Number) bool {
+func gtE(base Number, args ...Number) bool {
 	inc := true
 	for _, arg := range args {
 		inc = inc && (arg <= base)
@@ -91,7 +89,7 @@ func gtE(base internal.Number, args ...internal.Number) bool {
 	return inc
 }
 
-func isPrime(value internal.Number) bool {
+func isPrime(value Number) bool {
     for i := 2; i <= int(math.Floor(float64(value)/2)); i++ {
         if int(value)%i == 0 {
             return false

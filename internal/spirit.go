@@ -1,12 +1,10 @@
-package spirit
+package internal
 
 import (
 	"fmt"
 	"io"
 	"strings"
 	"sync"
-
-	"github.com/issadarkthing/spirit/internal"
 )
 
 const (
@@ -15,9 +13,9 @@ const (
 )
 
 // returns new Spirit instance
-func New() *Spirit {
+func NewSpirit() *Spirit {
 	sl := &Spirit{ mu:       &sync.RWMutex{},
-		Bindings: map[nsSymbol]internal.Value{},
+		Bindings: map[nsSymbol]Value{},
 	}
 
 	if err := bindAll(sl); err != nil {
@@ -25,41 +23,41 @@ func New() *Spirit {
 	}
 	sl.checkNS = true
 
-	_ = sl.SwitchNS(internal.Symbol{Value: defaultNS})
+	_ = sl.SwitchNS(Symbol{Value: defaultNS})
 	_ = sl.BindGo("ns", sl.SwitchNS)
 	return sl
 }
 
 // Spirit instance
 type Spirit struct {
-	internal.Stack
+	Stack
 	mu        *sync.RWMutex
 	currentNS string
 	checkNS   bool
-	Bindings  map[nsSymbol]internal.Value
+	Bindings  map[nsSymbol]Value
 }
 
 // Eval evaluates the given value in spirit context.
-func (spirit *Spirit) Eval(v internal.Value) (internal.Value, error) {
-	return internal.Eval(spirit, v)
+func (spirit *Spirit) Eval(v Value) (Value, error) {
+	return Eval(spirit, v)
 }
 
 // ReadEval reads from the given reader and evaluates all the forms
 // obtained in spirit context.
-func (spirit *Spirit) ReadEval(r io.Reader) (internal.Value, error) {
-	return internal.ReadEval(spirit, r)
+func (spirit *Spirit) ReadEval(r io.Reader) (Value, error) {
+	return ReadEval(spirit, r)
 }
 
 
 
 // ReadEvalStr reads the source and evaluates it in spirit context.
-func (spirit *Spirit) ReadEvalStr(src string) (internal.Value, error) {
+func (spirit *Spirit) ReadEvalStr(src string) (Value, error) {
 	return spirit.ReadEval(strings.NewReader(src))
 }
 
 // Bind binds the given name to the given Value into the spirit interpreter
 // context.
-func (spirit *Spirit) Bind(symbol string, v internal.Value) error {
+func (spirit *Spirit) Bind(symbol string, v Value) error {
 	spirit.mu.Lock()
 	defer spirit.mu.Unlock()
 
@@ -78,7 +76,7 @@ func (spirit *Spirit) Bind(symbol string, v internal.Value) error {
 
 // Resolve finds the value bound to the given symbol and returns it if
 // found in the spirit context and returns it.
-func (spirit *Spirit) Resolve(symbol string) (internal.Value, error) {
+func (spirit *Spirit) Resolve(symbol string) (Value, error) {
 	spirit.mu.RLock()
 	defer spirit.mu.RUnlock()
 
@@ -97,11 +95,11 @@ func (spirit *Spirit) Resolve(symbol string) (internal.Value, error) {
 // BindGo is similar to Bind but handles conversion of Go value 'v' to
 // internal Value type.
 func (spirit *Spirit) BindGo(symbol string, v interface{}) error {
-	return spirit.Bind(symbol, internal.ValueOf(v))
+	return spirit.Bind(symbol, ValueOf(v))
 }
 
 // SwitchNS changes the current namespace to the string value of given symbol.
-func (spirit *Spirit) SwitchNS(sym internal.Symbol) error {
+func (spirit *Spirit) SwitchNS(sym Symbol) error {
 	spirit.mu.Lock()
 	spirit.currentNS = sym.String()
 	spirit.mu.Unlock()
@@ -118,11 +116,11 @@ func (spirit *Spirit) CurrentNS() string {
 }
 
 // Parent always returns nil to represent this is the root scope.
-func (spirit *Spirit) Parent() internal.Scope {
+func (spirit *Spirit) Parent() Scope {
 	return nil
 }
 
-func (spirit *Spirit) resolveAny(symbol string, syms ...nsSymbol) (internal.Value, error) {
+func (spirit *Spirit) resolveAny(symbol string, syms ...nsSymbol) (Value, error) {
 	for _, s := range syms {
 		v, found := spirit.Bindings[s]
 		if found {

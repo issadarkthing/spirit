@@ -8,7 +8,6 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/issadarkthing/spirit"
 	"github.com/issadarkthing/spirit/internal"
 	"github.com/issadarkthing/spirit/internal/repl"
 )
@@ -52,7 +51,7 @@ func main() {
 	}
 
 
-	sp := spirit.New()
+	sp := internal.NewSpirit()
 	sp.BindGo("*version*", version)
 
 	var result internal.Value

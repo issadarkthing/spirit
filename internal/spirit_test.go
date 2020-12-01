@@ -1,4 +1,4 @@
-package spirit_test
+package internal_test
 
 import (
 	"io/ioutil"
@@ -7,19 +7,18 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/issadarkthing/spirit"
 	"github.com/issadarkthing/spirit/internal"
 )
 
 const (
-	testDir = "./lib"
-	libDir  = "./lib"
+	testDir = "../lib"
+	libDir  = "../lib"
 )
 
-var _ internal.Scope = (*spirit.Spirit)(nil)
+var _ internal.Scope = (*internal.Spirit)(nil)
 
 func TestSpirit_Bind(t *testing.T) {
-	sl := spirit.New()
+	sl := internal.NewSpirit()
 
 	tests := []struct {
 		name    string
@@ -58,7 +57,7 @@ func TestSpirit_Bind(t *testing.T) {
 }
 
 func TestSpirit_Resolve(t *testing.T) {
-	sl := spirit.New()
+	sl := internal.NewSpirit()
 	sl.Bind("pi", internal.Number(3.1412))
 
 	tests := []struct {
@@ -133,13 +132,13 @@ func testFile(t *testing.T, file string) {
 	}
 }
 
-func initspirit() (*spirit.Spirit, error) {
+func initspirit() (*internal.Spirit, error) {
 	di, err := ioutil.ReadDir(testDir)
 	if err != nil {
 		return nil, err
 	}
 
-	sl := spirit.New()
+	sl := internal.NewSpirit()
 	for _, fi := range di {
 		if !strings.HasSuffix(fi.Name(), ".st") ||
 			strings.HasSuffix(fi.Name(), "_test.st") {
@@ -162,7 +161,7 @@ func initspirit() (*spirit.Spirit, error) {
 
 func BenchmarkBinaryTree(b *testing.B) {
 
-	f, err := os.Open("./sample/tree.st")
+	f, err := os.Open("../sample/tree.st")
 	if err != nil {
 		b.Error(err)
 	}

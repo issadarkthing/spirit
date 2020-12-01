@@ -1,4 +1,4 @@
-package spirit
+package internal
 
 import (
 	"bufio"
@@ -10,15 +10,13 @@ import (
 	"os/exec"
 	"strings"
 	"time"
-
-	"github.com/issadarkthing/spirit/internal"
 )
 
 // Println is an alias for fmt.Println which ignores the return values.
 func println(args ...interface{}) error {
 	result := []interface{}{}
 	for _, v := range args {
-		if str, ok := v.(internal.String); ok {
+		if str, ok := v.(String); ok {
 			result = append(result, removeSuffixPrefix(string(str), `"`))
 			continue
 		}
@@ -57,7 +55,7 @@ func random(max int) int {
 	return result
 }
 
-func shuffle(seq internal.Seq) internal.Seq {
+func shuffle(seq Seq) Seq {
 	rand.Seed(time.Now().UnixNano())
 	list := realize(seq)
 	values := list.Values
@@ -77,15 +75,15 @@ func readFile(name string) (string, error) {
 	return string(content), nil
 }
 
-func createShellOutput(out, err string, exit int) *internal.HashMap {
-	m := internal.NewHashMap()
-	m = m.Set(internal.Keyword("exit"), internal.Number(exit)).(*internal.HashMap)
-	m = m.Set(internal.Keyword("out"), internal.String(out)).(*internal.HashMap)
-	m = m.Set(internal.Keyword("err"), internal.String(err)).(*internal.HashMap)
+func createShellOutput(out, err string, exit int) *HashMap {
+	m := NewHashMap()
+	m = m.Set(Keyword("exit"), Number(exit)).(*HashMap)
+	m = m.Set(Keyword("out"), String(out)).(*HashMap)
+	m = m.Set(Keyword("err"), String(err)).(*HashMap)
 	return m
 }
 
-func shell(command string) (*internal.HashMap, error) {
+func shell(command string) (*HashMap, error) {
 
 	cmd := exec.Command("bash", "-c", command)
 	var cmdout, cmderr bytes.Buffer
@@ -98,7 +96,7 @@ func shell(command string) (*internal.HashMap, error) {
 		errMsg := strings.TrimSpace(cmderr.String())
 		return createShellOutput("", errMsg, exitErr.ExitCode()), nil
 	} else if err != nil {
-		return internal.NewHashMap(), err
+		return NewHashMap(), err
 	}
 
 	output := strings.TrimSpace(cmdout.String())
