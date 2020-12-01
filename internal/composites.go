@@ -293,7 +293,7 @@ func (hm *HashMap) Compare(other Value) bool {
 			return false
 		}
 
-		if v1 != v2 {
+		if !compare(v1, v2) {
 			return false
 		}
 	}
