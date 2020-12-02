@@ -231,3 +231,6 @@
            (parse-json "{\"fruits\": [\"apple\", \"grape\"]}")))
 (assert "nested json" (= {:fruits {:items 1}} 
                          (parse-json "{\"fruits\": { \"items\": 1} }")))
+(assert "array" 
+        (= [{:name "jiman"} 1 ["name" 1 2 23]]
+           (parse-json "[{\"name\": \"jiman\"}, 1, [\"name\", 1, 2, 23]]")))

@@ -195,7 +195,8 @@ func NewHashMap() *HashMap {
 func (hm *HashMap) Set(k, v Value) Value {
 	return &HashMap{
 		Data: hm.Data.Assoc(k, v),
-	} }
+	} 
+}
 
 func (hm *HashMap) Get(key Value) Value {
 	val, ok := hm.Data.Index(key)

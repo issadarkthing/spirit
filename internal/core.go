@@ -481,45 +481,56 @@ func assoc(hm Assoc, args ...Value) (Assoc, error) {
 	return h, nil
 }
 
-// TODO: add support for array only json
-func parsejson(rawJson string) (*HashMap, error) {
+func parsejson(rawJson string) (Value, error) {
+
+	if isArray(rawJson) {
+		var data []interface{}
+		err := json.Unmarshal([]byte(rawJson), &data)
+		if err != nil {
+			return nil, err
+		}
+		return convertVector(data), nil
+	}
 
 	var data map[string]interface{}
-
 	err := json.Unmarshal([]byte(rawJson), &data)
 	if err != nil {
 		return nil, err
 	}
 
-	return convert(data), nil
+	return convertHashMap(data), nil
 }
 
-func convert(data map[string]interface{}) *HashMap {
+func isArray(rawJson string) bool {
+	rawJson = strings.TrimPrefix(rawJson, " ")
+	return rawJson[0] == '['
+}
+
+func convert(content interface{}) interface{} {
+	
+	if hashMap, ok := content.(map[string]interface{}); ok {
+		return convertHashMap(hashMap)
+	} else if vector, ok := content.([]interface{}); ok {
+		return convertVector(vector)
+	} else {
+		return ValueOf(content)
+	}
+}
+
+func convertVector(data []interface{}) *Vector {
+	var vec Seq = NewVector()
+	for _, v := range data {
+		value := convert(v)	
+		vec = vec.Conj(value.(Value))
+	}
+	return vec.(*Vector)
+}
+
+func convertHashMap(data map[string]interface{}) *HashMap {
 	pm := NewHashMap()
 	for k, v := range data {
-
-		// nested object
-		if nest, ok := v.(map[string]interface{}); ok {
-			pm = pm.Set(Keyword(k), convert(nest)).(*HashMap)
-
-			// key with array value
-		} else if nestArr, ok := v.([]interface{}); ok {
-			vals := make([]Value, 0, len(nestArr))
-
-			for _, n := range nestArr {
-				// nested object
-				if nested, ok := n.(map[string]interface{}); ok {
-					vals = append(vals, convert(nested))
-				} else {
-					vals = append(vals, ValueOf(n))
-				}
-			}
-			pm = pm.Set(Keyword(k), ValueOf(vals)).(*HashMap)
-
-			// others can simply use ValueOf
-		} else {
-			pm = pm.Set(Keyword(k), ValueOf(v)).(*HashMap)
-		}
+		value := convert(v)
+		pm = pm.Set(Keyword(k), value.(Value)).(*HashMap)
 	}
 	return pm
 }
