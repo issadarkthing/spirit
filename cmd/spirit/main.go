@@ -4,9 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"runtime/pprof"
 	"os"
+	"path/filepath"
 	"runtime"
+	"runtime/pprof"
 
 	"github.com/issadarkthing/spirit/internal"
 	"github.com/issadarkthing/spirit/internal/repl"
@@ -96,10 +97,24 @@ func main() {
 		fh, err := os.Open(flag.Arg(0))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			return
 		}
 		defer fh.Close()
 
+		abs, err := filepath.Abs(fh.Name())
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			return
+		}
+
+		err = os.Chdir(filepath.Dir(abs))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			return
+		}
+
 		sp.BindGo("*file*", fh.Name())
+		sp.BindGo("*path*", abs)
 		sp.BindGo("*argv*", flag.Args())
 		_, err = sp.ReadEval(fh)
 		if err != nil {
