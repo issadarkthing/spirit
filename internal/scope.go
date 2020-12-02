@@ -2,7 +2,6 @@ package internal
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 )
 
@@ -78,7 +77,7 @@ func (scope *MapScope) Resolve(symbol string) (Value, error) {
 			return scope.parent.Resolve(symbol)
 		}
 
-		return nil, fmt.Errorf("%w: %v", ErrResolving, symbol)
+		return nil, ResolveError{Symbol{Value:symbol}}
 	}
 
 	return v, nil

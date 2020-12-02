@@ -128,7 +128,7 @@ func (spirit *Spirit) resolveAny(symbol string, syms ...nsSymbol) (Value, error)
 		}
 	}
 
-	return nil, fmt.Errorf("unable to resolve symbol: %v", symbol)
+	return nil, ResolveError{Sym: Symbol{Value:symbol}}
 }
 
 func (spirit *Spirit) splitSymbol(symbol string) (*nsSymbol, error) {
