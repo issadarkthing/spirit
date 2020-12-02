@@ -762,6 +762,10 @@ func (c Class) String() string {
 	return c.PrettyPrint(0)
 }
 
+func (c *Class) Inherit(parent *Class) {
+	c.Parent = parent
+}
+
 func (c Class) GetMember(name Keyword) (Value, bool) {
 	member := c.Members.Get(name)
 	if member == nil && c.Parent == nil {

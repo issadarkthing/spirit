@@ -669,7 +669,7 @@ func defClass(scope Scope, args []Value) (Value, error) {
 		}
 
 		if parent, ok := arg2.(Class); ok {
-			class.Parent = &parent
+			class.Inherit(&parent)
 		}
 
 		hashMapIndex = 3
