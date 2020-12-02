@@ -411,7 +411,6 @@
 
 ; source a file. Beware of circular dependency
 (defn source [filename]
-  (def *file* filename)
   (eval-string (read-file filename)))
 
 (defn complement
