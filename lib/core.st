@@ -409,10 +409,6 @@
                  v)) 
              forms))))
 
-; source a file. Beware of circular dependency
-(defn source [filename]
-  (eval-string (read-file filename)))
-
 (defn complement
   [f] 
   (fn 
