@@ -587,8 +587,9 @@ func readHashMap(rd *Reader, _ rune) (Value, error) {
 
 	for i := 0; i < len(forms); i += 2 {
 		if !isHashable(forms[i]) {
-			return nil, fmt.Errorf("value of type '%s' is not hashable",
-				reflect.TypeOf(forms[i]))
+			return nil, fmt.Errorf("value of type %s is not hashable",
+				RemovePrefix(reflect.TypeOf(forms[i]).String()),
+			)
 		}
 
 		hm = hm.Set(forms[i], forms[i+1]).(*HashMap)
@@ -921,8 +922,8 @@ func (err ReadError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"syntax error in '%s' (Line %d Col %d): %v",
-		err.File, err.Line, err.Column, err.Cause,
+		"SyntaxError: %v in '%s' (Line %d Col %d)",
+		err.Cause, err.File, err.Line, err.Column, 
 	)
 }
 
