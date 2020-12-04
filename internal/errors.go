@@ -55,6 +55,14 @@ func (i ImplementError) Error() string {
 	)
 }
 
+type OSError struct {
+	err error
+}
+
+func (o OSError) Error() string {
+	return fmt.Sprintf("OSError: %v", o.err)
+}
+
 func RemovePrefix(str string) string {
 	str = strings.TrimLeft(str, "*")
 	str = strings.TrimLeft(str, "internal.")
