@@ -13,7 +13,7 @@ import (
 
 var (
 	seqStr       = reflect.TypeOf((*Seq)(nil)).Elem().Name()
-	invokableStr = reflect.TypeOf((*Seq)(nil)).Elem().Name()
+	invokableStr = reflect.TypeOf((*Invokable)(nil)).Elem().Name()
 )
 
 // Case implements the switch case construct.
