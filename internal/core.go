@@ -618,12 +618,31 @@ func lazyRange(min, max, step int) LazySeq {
 
 func source(scope Scope) func(string) (Value, error) {
 	return func(file string) (Value, error) {
-		content, err := readFile(file)
+
+		ns, err := scope.Resolve("*ns*")
 		if err != nil {
 			return nil, err
 		}
 
-		value, err := ReadEvalStr(scope, content)
+		spirit, ok := scope.(*Spirit)
+		if !ok {
+			return nil, fmt.Errorf("expecting Spirit instance")
+		}
+
+		value, err := spirit.ReadFile(file)		
+		if err != nil {
+			return nil, err
+		}
+
+		nsSymbol, ok := ns.(Symbol)
+		if !ok {
+			return nil, TypeError{
+				Expected: Symbol{},
+				Got: ns,
+			}
+		}
+
+		err = spirit.SwitchNS(nsSymbol)
 		if err != nil {
 			return nil, err
 		}

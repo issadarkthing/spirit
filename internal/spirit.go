@@ -3,6 +3,8 @@ package internal
 import (
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 )
@@ -37,6 +39,7 @@ type Spirit struct {
 	currentNS string
 	checkNS   bool
 	Bindings  map[nsSymbol]Value
+	Files     []string
 }
 
 // Eval evaluates the given value in spirit context.
@@ -50,7 +53,58 @@ func (spirit *Spirit) ReadEval(r io.Reader) (Value, error) {
 	return ReadEval(spirit, r)
 }
 
+// ReadFile reads the content of the filename given. Use this to
+// prevent recursive source
+func (spirit *Spirit) ReadFile(filePath string) (Value, error) {
 
+	if spirit.FileImported(filePath) {
+		return nil, nil
+	}
+
+	spirit.AddFile(filePath)
+
+	f, err := os.Open(filePath)
+	defer f.Close()
+	if err != nil {
+		return nil, OSError{err}
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, OSError{err}
+	}
+	
+	dir := filepath.Dir(filePath)
+
+	os.Chdir(dir)
+	value, err := spirit.ReadEval(f)
+	if err != nil {
+		return nil, err
+	}
+	os.Chdir(cwd)
+
+	// spirit.Files = spirit.Files[:len(spirit.Files)-1]
+
+	return value, nil
+}
+
+// AddFile adds file to slice of imported files to prevent circular dependency.
+func (s *Spirit) AddFile(file string) {
+	s.mu.Lock()
+	s.Files = append(s.Files, file)
+	s.mu.Unlock()
+}
+
+func (s *Spirit) FileImported(file string) bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for _, v := range s.Files {
+		if v == file {
+			return true
+		}
+	}
+	return false
+}
 
 // ReadEvalStr reads the source and evaluates it in spirit context.
 func (spirit *Spirit) ReadEvalStr(src string) (Value, error) {
