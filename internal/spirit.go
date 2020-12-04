@@ -66,7 +66,7 @@ func (spirit *Spirit) ReadFile(filePath string) (Value, error) {
 	f, err := os.Open(filePath)
 	defer f.Close()
 	if err != nil {
-		return nil, OSError{err}
+		return nil, ImportError{err}
 	}
 
 	cwd, err := os.Getwd()
@@ -75,6 +75,7 @@ func (spirit *Spirit) ReadFile(filePath string) (Value, error) {
 	}
 	
 	dir := filepath.Dir(filePath)
+	spirit.BindGo("*cwd*", dir)
 
 	os.Chdir(dir)
 	value, err := spirit.ReadEval(f)
@@ -82,8 +83,6 @@ func (spirit *Spirit) ReadFile(filePath string) (Value, error) {
 		return nil, err
 	}
 	os.Chdir(cwd)
-
-	// spirit.Files = spirit.Files[:len(spirit.Files)-1]
 
 	return value, nil
 }

@@ -145,13 +145,14 @@ func initspirit() (*internal.Spirit, error) {
 			continue
 		}
 
-		fh, err := os.Open(filepath.Join(testDir, fi.Name()))
+		p := filepath.Join(testDir, fi.Name())
+
+		err := os.Chdir(testDir)
 		if err != nil {
 			return nil, err
 		}
-		defer fh.Close()
 
-		if _, err := sl.ReadEval(fh); err != nil {
+		if _, err := sl.ReadFile(p); err != nil {
 			return nil, err
 		}
 	}
@@ -178,6 +179,5 @@ func BenchmarkBinaryTree(b *testing.B) {
 			b.Error(err)
 		}
 	}
-
 }
 

@@ -616,7 +616,7 @@ func lazyRange(min, max, step int) LazySeq {
 	}
 }
 
-func source(scope Scope) func(string) (Value, error) {
+func spiritImport(scope Scope) func(string) (Value, error) {
 	return func(file string) (Value, error) {
 
 		ns, err := scope.Resolve("*ns*")

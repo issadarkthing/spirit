@@ -134,7 +134,7 @@ func bindAll(scope Scope) error {
 		"core/random":    ValueOf(random),
 		"core/shuffle":   ValueOf(shuffle),
 		"core/read-file": ValueOf(readFile),
-		"core/source":    ValueOf(source(scope)),
+		"core/import":    ValueOf(spiritImport(scope)),
 
 		"core/split": ValueOf(strings.Split),
 		"core/trim":  ValueOf(strings.Trim),

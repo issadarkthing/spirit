@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 	"runtime"
 	"runtime/pprof"
 
@@ -94,31 +93,13 @@ func main() {
 
 	if len(flag.Args()) > 0 {
 
-		fh, err := os.Open(flag.Arg(0))
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
-			return
-		}
-		defer fh.Close()
+		f := flag.Arg(0)
 
-		abs, err := filepath.Abs(fh.Name())
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
-			return
-		}
-
-		err = os.Chdir(filepath.Dir(abs))
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
-			return
-		}
-
-		sp.BindGo("*file*", fh.Name())
-		sp.BindGo("*path*", abs)
+		sp.BindGo("*file*", f)
 		sp.BindGo("*argv*", flag.Args())
-		_, err = sp.ReadEval(fh)
+		_, err = sp.ReadFile(f)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			fmt.Fprintln(os.Stderr, err)
 		}
 
 
