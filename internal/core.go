@@ -94,7 +94,8 @@ func implements(v interface{}, t Type) (bool, error) {
 	}
 
 	if t.T.Kind() != reflect.Interface {
-		return false, fmt.Errorf("type '%s' is not an interface type", t)
+		return false, fmt.Errorf(
+			"TypeError: type '%s' is not an interface type", t)
 	}
 
 	return reflect.TypeOf(v).Implements(t.T), nil
@@ -109,7 +110,10 @@ func toType(to Type, val Value) (Value, error) {
 		if str, ok := val.(String); ok {
 			fl, err := strconv.ParseFloat(string(str), 64)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf(
+					"TypeError: %v",
+					errors.Unwrap(err),
+				)
 			}
 
 			return Number(fl), nil
@@ -121,7 +125,10 @@ func toType(to Type, val Value) (Value, error) {
 		return ValueOf(rv.Convert(to.T).Interface()), nil
 	}
 
-	return nil, fmt.Errorf("cannot convert '%s' to '%s'", rv.Type(), to.T)
+	return nil, fmt.Errorf(
+		"cannot convert %s to %s", 
+		RemovePrefix(rv.Type().String()), RemovePrefix(to.T.String()),
+	)
 }
 
 // MakeString returns stringified version of all args.
