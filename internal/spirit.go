@@ -12,6 +12,8 @@ const (
 	defaultNS   = "user"
 )
 
+var _ Scope = (*Spirit)(nil)
+
 // returns new Spirit instance
 func NewSpirit() *Spirit {
 	sl := &Spirit{ mu:       &sync.RWMutex{},
