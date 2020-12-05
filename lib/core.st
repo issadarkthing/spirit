@@ -43,6 +43,11 @@
   ([prompt]
    (read* prompt)))
 
+; use this only on repl as import statement does not re-evaluate file
+; that has been imported
+(defn source [filename]
+  (eval-string (read-file filename)))
+
 (defmacro tap [expr]
   `(let [result ~expr]
      (print result)
@@ -539,6 +544,14 @@
     `(if (eval (first '~clauses))
        (eval (second '~clauses))
        (eval (cons 'cond (drop 2 '~clauses))))))
+
+(defmacro when-let
+  [bindings body]
+  (let [form (bindings 0) tst (bindings 1)]
+    `(let [temp ~tst]
+       (when temp
+         (let [~form temp]
+           ~body)))))
 
 ; Type check functions -------------------------------
 (defn is-type? [typ arg] (= typ (type arg)))
