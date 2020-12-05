@@ -343,7 +343,8 @@ func recursiveQuote(scope Scope, f Value) (Value, error) {
 			list, ok := evaled.(*List)
 			if !ok {
 				return nil, fmt.Errorf(
-					"unquote splice must evaluate to list not %T", evaled)
+					"unquote splice must evaluate to list not %T", evaled,
+				)
 			}
 
 			for _, listVal := range list.Values {
@@ -353,7 +354,10 @@ func recursiveQuote(scope Scope, f Value) (Value, error) {
 		v.Values = result
 
 		quoted, err := quoteSeq(scope, v.Values)
-		return &List{Values: quoted}, err
+		if err != nil {
+			return nil, err
+		}
+		return &List{Values: quoted}, nil
 
 	case Set:
 		quoted, err := quoteSeq(scope, v.Values)
