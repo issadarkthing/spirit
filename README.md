@@ -27,6 +27,6 @@ These are the differences that I deliberately made to differ from Clojure.
 - Function hoisting for `defn` and `defmacro`
 - Function `apply` in clojure is equivalent to `<>` in spirit
 - All functions that acts on Seq returns the same concrete type Seq.
-	For example, `map` on vector returns vector instead of list
-- Keyword is used instead of String as key on JSON object
-- Object Oriented
+	For example, `map` on **`Vector`** returns **`Vector`** instead of **`List`**
+- **`Keyword`** is used instead of **`String`** as key when parsing JSON object.
+- Object Oriented system
