@@ -2,7 +2,6 @@ package internal
 
 import (
 	"errors"
-	"sync"
 )
 
 // ErrResolving is returned when a scope implementation fails to resolve
@@ -13,7 +12,6 @@ var ErrResolving = errors.New("unable to resolve symbol")
 func New() *MapScope {
 	scope := &MapScope{
 		parent:   nil,
-		mu:       new(sync.RWMutex),
 		bindings: map[string]Value{},
 	}
 
@@ -40,7 +38,6 @@ func New() *MapScope {
 func NewScope(parent Scope) *MapScope {
 	return &MapScope{
 		parent:   parent,
-		mu:       new(sync.RWMutex),
 		bindings: map[string]Value{},
 	}
 }
@@ -49,7 +46,6 @@ func NewScope(parent Scope) *MapScope {
 type MapScope struct {
 	Stack
 	parent   Scope
-	mu       *sync.RWMutex
 	bindings map[string]Value
 }
 
@@ -58,9 +54,6 @@ func (scope *MapScope) Parent() Scope { return scope.parent }
 
 // Bind adds the given value to the scope and binds the symbol to it.
 func (scope *MapScope) Bind(symbol string, v Value) error {
-	scope.mu.Lock()
-	defer scope.mu.Unlock()
-
 	scope.bindings[symbol] = v
 	return nil
 }
@@ -68,8 +61,6 @@ func (scope *MapScope) Bind(symbol string, v Value) error {
 // Resolve finds the value bound to the given symbol and returns it if
 // found in this scope or parent scope if any. Returns error otherwise.
 func (scope *MapScope) Resolve(symbol string) (Value, error) {
-	scope.mu.RLock()
-	defer scope.mu.RUnlock()
 
 	v, found := scope.bindings[symbol]
 	if !found {
