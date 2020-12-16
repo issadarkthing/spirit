@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 )
 
 const (
@@ -18,7 +17,7 @@ var _ Scope = (*Spirit)(nil)
 
 // returns new Spirit instance
 func NewSpirit() *Spirit {
-	sl := &Spirit{mu: &sync.RWMutex{},
+	sl := &Spirit{
 		Bindings: map[nsSymbol]Value{},
 	}
 
@@ -35,7 +34,6 @@ func NewSpirit() *Spirit {
 // Spirit instance
 type Spirit struct {
 	Stack
-	mu        *sync.RWMutex
 	currentNS string
 	checkNS   bool
 	Bindings  map[nsSymbol]Value
@@ -89,14 +87,10 @@ func (spirit *Spirit) ReadFile(filePath string) (Value, error) {
 
 // AddFile adds file to slice of imported files to prevent circular dependency.
 func (s *Spirit) AddFile(file string) {
-	s.mu.Lock()
 	s.Files = append(s.Files, file)
-	s.mu.Unlock()
 }
 
 func (s *Spirit) FileImported(file string) bool {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
 	for _, v := range s.Files {
 		if v == file {
 			return true
@@ -113,8 +107,6 @@ func (spirit *Spirit) ReadEvalStr(src string) (Value, error) {
 // Bind binds the given name to the given Value into the spirit interpreter
 // context.
 func (spirit *Spirit) Bind(symbol string, v Value) error {
-	spirit.mu.Lock()
-	defer spirit.mu.Unlock()
 
 	nsSym, err := spirit.splitSymbol(symbol)
 	if err != nil {
@@ -132,8 +124,6 @@ func (spirit *Spirit) Bind(symbol string, v Value) error {
 // Resolve finds the value bound to the given symbol and returns it if
 // found in the spirit context and returns it.
 func (spirit *Spirit) Resolve(symbol string) (Value, error) {
-	spirit.mu.RLock()
-	defer spirit.mu.RUnlock()
 
 	if symbol == "ns" {
 		symbol = "user/ns"
@@ -155,18 +145,12 @@ func (spirit *Spirit) BindGo(symbol string, v interface{}) error {
 
 // SwitchNS changes the current namespace to the string value of given symbol.
 func (spirit *Spirit) SwitchNS(sym Symbol) error {
-	spirit.mu.Lock()
 	spirit.currentNS = sym.String()
-	spirit.mu.Unlock()
-
 	return spirit.Bind("*ns*", sym)
 }
 
 // CurrentNS returns the current active namespace.
 func (spirit *Spirit) CurrentNS() string {
-	spirit.mu.RLock()
-	defer spirit.mu.RUnlock()
-
 	return spirit.currentNS
 }
 
