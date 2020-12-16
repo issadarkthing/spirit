@@ -37,6 +37,7 @@ func New() *MapScope {
 // builtin special forms, pass result of New() as argument.
 func NewScope(parent Scope) *MapScope {
 	return &MapScope{
+		Stack:    make(Stack, 0, MAX_STACK_CALL),
 		parent:   parent,
 		bindings: map[string]Value{},
 	}
