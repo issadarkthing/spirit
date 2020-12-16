@@ -126,7 +126,7 @@ func toType(to Type, val Value) (Value, error) {
 	}
 
 	return nil, fmt.Errorf(
-		"cannot convert %s to %s", 
+		"cannot convert %s to %s",
 		RemovePrefix(rv.Type().String()), RemovePrefix(to.T.String()),
 	)
 }
@@ -514,7 +514,7 @@ func isArray(rawJson string) bool {
 }
 
 func convert(content interface{}) interface{} {
-	
+
 	if hashMap, ok := content.(map[string]interface{}); ok {
 		return convertHashMap(hashMap)
 	} else if vector, ok := content.([]interface{}); ok {
@@ -527,7 +527,7 @@ func convert(content interface{}) interface{} {
 func convertVector(data []interface{}) *Vector {
 	var vec Seq = NewVector()
 	for _, v := range data {
-		value := convert(v)	
+		value := convert(v)
 		vec = vec.Conj(value.(Value))
 	}
 	return vec.(*Vector)
@@ -572,7 +572,7 @@ func apply(scope Scope, args []Value) (Value, error) {
 	if !ok {
 		return nil, ImplementError{
 			Name: seqStr,
-			Val: lastArg,
+			Val:  lastArg,
 		}
 	}
 
@@ -636,7 +636,7 @@ func spiritImport(scope Scope) func(string) (Value, error) {
 			return nil, fmt.Errorf("expecting Spirit instance")
 		}
 
-		value, err := spirit.ReadFile(file)		
+		value, err := spirit.ReadFile(file)
 		if err != nil {
 			return nil, err
 		}
@@ -645,7 +645,7 @@ func spiritImport(scope Scope) func(string) (Value, error) {
 		if !ok {
 			return nil, TypeError{
 				Expected: Symbol{},
-				Got: ns,
+				Got:      ns,
 			}
 		}
 
@@ -753,7 +753,7 @@ func defClass(scope Scope, args []Value) (Value, error) {
 		if !ok {
 			return nil, ImplementError{
 				Name: invokableStr,
-				Val: body,
+				Val:  body,
 			}
 		}
 

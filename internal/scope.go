@@ -68,7 +68,7 @@ func (scope *MapScope) Resolve(symbol string) (Value, error) {
 			return scope.parent.Resolve(symbol)
 		}
 
-		return nil, ResolveError{Symbol{Value:symbol}}
+		return nil, ResolveError{Symbol{Value: symbol}}
 	}
 
 	return v, nil

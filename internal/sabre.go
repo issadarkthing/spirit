@@ -44,7 +44,7 @@ func hoistValues(scope Scope, value Value) error {
 
 	hoistedVals := []string{"def", "defn", "defmacro", "defclass"}
 	for _, form := range value.(Module) {
-		list, ok := form.(*List); 
+		list, ok := form.(*List)
 		if !ok {
 			continue
 		}
@@ -56,7 +56,7 @@ func hoistValues(scope Scope, value Value) error {
 		def, isSymbol := list.Values[0].(Symbol)
 		if !isSymbol {
 			return fmt.Errorf("first argument must be symbol, not '%v'",
-			reflect.TypeOf(list.Values[0]))
+				reflect.TypeOf(list.Values[0]))
 		}
 
 		if !includes(def.String(), hoistedVals) {
@@ -66,7 +66,7 @@ func hoistValues(scope Scope, value Value) error {
 		sym, isSymbol := list.Values[1].(Symbol)
 		if !isSymbol {
 			return fmt.Errorf("first argument must be symbol, not '%v'",
-			reflect.TypeOf(list.Values[1]))
+				reflect.TypeOf(list.Values[1]))
 		}
 		symbol := sym.String()
 

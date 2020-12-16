@@ -15,9 +15,9 @@ import (
 const (
 	help = `spirit %s [Commit: %s] [Compiled with %s]
 Visit https://github.com/issadarkthing/spirit for more.`
-	prompt = " λ >>"
+	prompt    = " λ >>"
 	multiline = "|"
-	stdpath = "/.local/lib/spirit/core.st"
+	stdpath   = "/.local/lib/spirit/core.st"
 )
 
 var (
@@ -49,7 +49,6 @@ func main() {
 		pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
 	}
-
 
 	sp := internal.NewSpirit()
 	sp.BindGo("*version*", version)
@@ -102,9 +101,8 @@ func main() {
 			fmt.Fprintln(os.Stderr, err)
 		}
 
-
 		if *memProfile != "" {
-			f, err := os.Create(*memProfile)	
+			f, err := os.Create(*memProfile)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 			}
@@ -126,7 +124,6 @@ func main() {
 		}
 		return
 	}
-
 
 	repl := repl.New(sp,
 		repl.WithBanner(fmt.Sprintf(help, version, commit, runtime.Version())),

@@ -90,10 +90,10 @@ func gtE(base Number, args ...Number) bool {
 }
 
 func isPrime(value Number) bool {
-    for i := 2; i <= int(math.Floor(float64(value)/2)); i++ {
-        if int(value)%i == 0 {
-            return false
-        }
-    }
-    return value > 1
+	for i := 2; i <= int(math.Floor(float64(value)/2)); i++ {
+		if int(value)%i == 0 {
+			return false
+		}
+	}
+	return value > 1
 }

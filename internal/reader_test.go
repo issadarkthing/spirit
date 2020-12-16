@@ -283,8 +283,8 @@ func TestReader_One(t *testing.T) {
 											internal.Symbol{
 												Value: "list",
 												Position: internal.Position{
-													File: "<string>",
-													Line: 1,
+													File:   "<string>",
+													Line:   1,
 													Column: 10,
 												},
 											},
@@ -293,8 +293,8 @@ func TestReader_One(t *testing.T) {
 											internal.Number(3),
 										},
 										Position: internal.Position{
-											File: "<string>",
-											Line: 1,
+											File:   "<string>",
+											Line:   1,
 											Column: 9,
 										},
 									},
@@ -312,7 +312,7 @@ func TestReader_One(t *testing.T) {
 		},
 		{
 			name: "UnQuoteSplice",
-			src: "~@x",
+			src:  "~@x",
 			want: &internal.List{
 				Values: []internal.Value{
 					internal.Symbol{
@@ -320,8 +320,8 @@ func TestReader_One(t *testing.T) {
 					},
 					internal.Symbol{
 						Position: internal.Position{
-							File: "<string>",
-							Line: 1,
+							File:   "<string>",
+							Line:   1,
 							Column: 2,
 						},
 						Value: "x",
@@ -989,14 +989,14 @@ func executeReaderTests(t *testing.T, tests []readerTestCase) {
 			}
 			if got, ok := got.(internal.Comparable); ok {
 				if !got.Compare(tt.want) {
-					t.Errorf("One() got -> %s\nwant -> %s", 
+					t.Errorf("One() got -> %s\nwant -> %s",
 						pretty.Sprint(got), pretty.Sprint(tt.want),
 					)
 					return
 				}
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("One() got -> %s\nwant -> %s", 
+				t.Errorf("One() got -> %s\nwant -> %s",
 					pretty.Sprint(got), pretty.Sprint(tt.want),
 				)
 			}

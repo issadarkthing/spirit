@@ -259,8 +259,6 @@ func parseSyntaxQuote(scope Scope, forms []Value) (*Fn, error) {
 	}, nil
 }
 
-
-
 // SpecialForm is a Value type for representing special forms that will be
 // subjected to an intermediate Parsing stage before evaluation.
 type SpecialForm struct {
@@ -325,7 +323,7 @@ func recursiveQuote(scope Scope, f Value) (Value, error) {
 			}
 
 			return v.Values[1].Eval(scope)
-		} 
+		}
 
 		result := make([]Value, 0, len(v.Values))
 		for _, value := range v.Values {
@@ -334,12 +332,12 @@ func recursiveQuote(scope Scope, f Value) (Value, error) {
 				result = append(result, unquote)
 				continue
 			}
-			
+
 			evaled, err := unquote.Eval(scope)
 			if err != nil {
 				return nil, err
 			}
-			
+
 			list, ok := evaled.(*List)
 			if !ok {
 				return nil, fmt.Errorf(
@@ -537,7 +535,7 @@ type binding struct {
 }
 
 func accessClassMember(target reflect.Value, name string) (reflect.Value, error) {
-	
+
 	object := target.Interface().(Object)
 	key := Keyword(name)
 
@@ -566,7 +564,7 @@ func accessClassMember(target reflect.Value, name string) (reflect.Value, error)
 }
 
 func accessStaticMethod(target reflect.Value, name string) (reflect.Value, error) {
-	
+
 	class := target.Interface().(Class)
 	key := Keyword(name)
 

@@ -18,7 +18,7 @@ var _ Scope = (*Spirit)(nil)
 
 // returns new Spirit instance
 func NewSpirit() *Spirit {
-	sl := &Spirit{ mu:       &sync.RWMutex{},
+	sl := &Spirit{mu: &sync.RWMutex{},
 		Bindings: map[nsSymbol]Value{},
 	}
 
@@ -73,7 +73,7 @@ func (spirit *Spirit) ReadFile(filePath string) (Value, error) {
 	if err != nil {
 		return nil, OSError{err}
 	}
-	
+
 	dir := filepath.Dir(filePath)
 	spirit.BindGo("*cwd*", dir)
 
@@ -183,7 +183,7 @@ func (spirit *Spirit) resolveAny(symbol string, syms ...nsSymbol) (Value, error)
 		}
 	}
 
-	return nil, ResolveError{Sym: Symbol{Value:symbol}}
+	return nil, ResolveError{Sym: Symbol{Value: symbol}}
 }
 
 func (spirit *Spirit) splitSymbol(symbol string) (*nsSymbol, error) {

@@ -44,7 +44,7 @@ type Assoc interface {
 
 	// Set should set the value and returns new structure with updated value
 	Set(Value, Value) Value
-	
+
 	// Get should get a value mapped under passed argument
 	Get(Value) Value
 }
@@ -73,7 +73,7 @@ type Comparable interface {
 }
 
 type PrettyPrinter interface {
-	PrettyPrint(indent int) string	
+	PrettyPrint(indent int) string
 }
 
 // Values represents a list of values and implements the Seq interface.

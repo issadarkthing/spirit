@@ -56,12 +56,12 @@ func (se String) First() Value {
 
 // Next slices the string by excluding first character and returns the
 // remainder.
-func (se String) Next() Seq { 
+func (se String) Next() Seq {
 	if len(se) <= 1 {
 		return nil
 	}
 
-	return String(se[1:]) 
+	return String(se[1:])
 }
 
 // Cons converts the string to character sequence and adds the given value
@@ -70,7 +70,7 @@ func (se String) Cons(v Value) Seq { return se.castString(v) + se }
 
 // Conj joins the given values to list of characters of the string and returns
 // the new sequence.
-func (se String) Conj(vals ...Value) Seq { 
+func (se String) Conj(vals ...Value) Seq {
 	result := se
 	for _, val := range vals {
 		result += se.castString(val)
@@ -82,7 +82,7 @@ func (se String) Size() int { return utf8.RuneCountInString(string(se)) }
 
 func (se String) castString(val Value) String {
 	switch v := val.(type) {
-	case String: 
+	case String:
 		return v
 	case Character:
 		return String(v)
@@ -192,7 +192,6 @@ func (sym Symbol) resolveValue(scope Scope) (Value, error) {
 		return target, err
 	}
 
-
 	rv := reflect.ValueOf(target)
 	for i := 1; i < len(fields); i++ {
 		if rv.Type() == reflect.TypeOf(Any{}) {
@@ -216,7 +215,7 @@ func (sym Symbol) resolveValue(scope Scope) (Value, error) {
 		if !ok {
 			return ValueOf(rv.Interface()), nil
 		}
-		
+
 		// if it is a method call, supply the instance as the first param
 		return &Fn{
 			Args: []string{"instance"},

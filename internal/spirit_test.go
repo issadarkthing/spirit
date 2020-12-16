@@ -180,4 +180,3 @@ func BenchmarkBinaryTree(b *testing.B) {
 		}
 	}
 }
-

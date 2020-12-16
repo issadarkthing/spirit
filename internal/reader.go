@@ -514,7 +514,7 @@ func findArgs(forms []Value) []string {
 			argsString = append(argsString, findArgs(list.Values)...)
 		}
 
-		sym, ok := v.(Symbol); 
+		sym, ok := v.(Symbol)
 		if !ok {
 			continue
 		}
@@ -923,7 +923,7 @@ func (err ReadError) Error() string {
 
 	return fmt.Sprintf(
 		"SyntaxError: %v in '%s' (Line %d Col %d)",
-		err.Cause, err.File, err.Line, err.Column, 
+		err.Cause, err.File, err.Line, err.Column,
 	)
 }
 

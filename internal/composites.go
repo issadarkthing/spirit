@@ -195,7 +195,7 @@ func NewHashMap() *HashMap {
 func (hm *HashMap) Set(k, v Value) Value {
 	return &HashMap{
 		Data: hm.Data.Assoc(k, v),
-	} 
+	}
 }
 
 func (hm *HashMap) Get(key Value) Value {
@@ -338,12 +338,12 @@ func (hm HashMap) PrettyPrint(indent int) string {
 	fmt.Fprintf(&str, "{")
 
 	for it := hm.Data.Iterator(); it.HasElem(); it.Next() {
-		
+
 		key, val := it.Elem()
 
 		if v, ok := val.(PrettyPrinter); ok {
 			val = v.PrettyPrint(indent + IndentLevel)
-		} 
+		}
 
 		fmt.Fprintf(&str, "\n%s    %s %s", space, key, val)
 	}
@@ -402,7 +402,7 @@ func (p *Vector) PrettyPrint(indent int) string {
 	if p.Size() == 0 {
 		return fmt.Sprintf("[]")
 	}
-	
+
 	str := strings.Builder{}
 	fmt.Fprintf(&str, "[")
 
@@ -412,7 +412,7 @@ func (p *Vector) PrettyPrint(indent int) string {
 
 		if pp, ok := elem.(PrettyPrinter); ok {
 			ppStr = pp.PrettyPrint(indent + IndentLevel)
-		} 		
+		}
 
 		fmt.Fprintf(&str, "\n    %s%s,", space, ppStr)
 	}
@@ -976,5 +976,6 @@ func addStackTrace(scope Scope, err error) error {
 }
 
 func ClearStack(scope Scope) {
-	for call := scope.Pop(); call != (Call{}); call = scope.Pop() {}
+	for call := scope.Pop(); call != (Call{}); call = scope.Pop() {
+	}
 }
