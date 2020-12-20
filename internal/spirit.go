@@ -41,25 +41,25 @@ type Spirit struct {
 }
 
 // Eval evaluates the given value in spirit context.
-func (spirit *Spirit) Eval(v Value) (Value, error) {
-	return Eval(spirit, v)
+func (s *Spirit) Eval(v Value) (Value, error) {
+	return Eval(s, v)
 }
 
 // ReadEval reads from the given reader and evaluates all the forms
 // obtained in spirit context.
-func (spirit *Spirit) ReadEval(r io.Reader) (Value, error) {
-	return ReadEval(spirit, r)
+func (s *Spirit) ReadEval(r io.Reader) (Value, error) {
+	return ReadEval(s, r)
 }
 
 // ReadFile reads the content of the filename given. Use this to
 // prevent recursive source
-func (spirit *Spirit) ReadFile(filePath string) (Value, error) {
+func (s *Spirit) ReadFile(filePath string) (Value, error) {
 
-	if spirit.FileImported(filePath) {
+	if s.FileImported(filePath) {
 		return nil, nil
 	}
 
-	spirit.AddFile(filePath)
+	s.AddFile(filePath)
 
 	f, err := os.Open(filePath)
 	defer f.Close()
@@ -73,10 +73,10 @@ func (spirit *Spirit) ReadFile(filePath string) (Value, error) {
 	}
 
 	dir := filepath.Dir(filePath)
-	spirit.BindGo("*cwd*", dir)
+	s.BindGo("*cwd*", dir)
 
 	os.Chdir(dir)
-	value, err := spirit.ReadEval(f)
+	value, err := s.ReadEval(f)
 	if err != nil {
 		return nil, err
 	}
@@ -100,68 +100,68 @@ func (s *Spirit) FileImported(file string) bool {
 }
 
 // ReadEvalStr reads the source and evaluates it in spirit context.
-func (spirit *Spirit) ReadEvalStr(src string) (Value, error) {
-	return spirit.ReadEval(strings.NewReader(src))
+func (s *Spirit) ReadEvalStr(src string) (Value, error) {
+	return s.ReadEval(strings.NewReader(src))
 }
 
 // Bind binds the given name to the given Value into the spirit interpreter
 // context.
-func (spirit *Spirit) Bind(symbol string, v Value) error {
+func (s *Spirit) Bind(symbol string, v Value) error {
 
-	nsSym, err := spirit.splitSymbol(symbol)
+	nsSym, err := s.splitSymbol(symbol)
 	if err != nil {
 		return err
 	}
 
-	if spirit.checkNS && nsSym.NS != spirit.currentNS {
+	if s.checkNS && nsSym.NS != s.currentNS {
 		return fmt.Errorf("cannot bind outside current namespace")
 	}
 
-	spirit.Bindings[*nsSym] = v
+	s.Bindings[*nsSym] = v
 	return nil
 }
 
 // Resolve finds the value bound to the given symbol and returns it if
 // found in the spirit context and returns it.
-func (spirit *Spirit) Resolve(symbol string) (Value, error) {
+func (s *Spirit) Resolve(symbol string) (Value, error) {
 
 	if symbol == "ns" {
 		symbol = "user/ns"
 	}
 
-	nsSym, err := spirit.splitSymbol(symbol)
+	nsSym, err := s.splitSymbol(symbol)
 	if err != nil {
 		return nil, err
 	}
 
-	return spirit.resolveAny(symbol, *nsSym, nsSym.WithNS("core"))
+	return s.resolveAny(symbol, *nsSym, nsSym.WithNS("core"))
 }
 
 // BindGo is similar to Bind but handles conversion of Go value 'v' to
 // internal Value type.
-func (spirit *Spirit) BindGo(symbol string, v interface{}) error {
-	return spirit.Bind(symbol, ValueOf(v))
+func (s *Spirit) BindGo(symbol string, v interface{}) error {
+	return s.Bind(symbol, ValueOf(v))
 }
 
 // SwitchNS changes the current namespace to the string value of given symbol.
-func (spirit *Spirit) SwitchNS(sym Symbol) error {
-	spirit.currentNS = sym.String()
-	return spirit.Bind("*ns*", sym)
+func (s *Spirit) SwitchNS(sym Symbol) error {
+	s.currentNS = sym.String()
+	return s.Bind("*ns*", sym)
 }
 
 // CurrentNS returns the current active namespace.
-func (spirit *Spirit) CurrentNS() string {
-	return spirit.currentNS
+func (s *Spirit) CurrentNS() string {
+	return s.currentNS
 }
 
 // Parent always returns nil to represent this is the root scope.
-func (spirit *Spirit) Parent() Scope {
+func (s *Spirit) Parent() Scope {
 	return nil
 }
 
-func (spirit *Spirit) resolveAny(symbol string, syms ...nsSymbol) (Value, error) {
-	for _, s := range syms {
-		v, found := spirit.Bindings[s]
+func (s *Spirit) resolveAny(symbol string, syms ...nsSymbol) (Value, error) {
+	for _, symbol := range syms {
+		v, found := s.Bindings[symbol]
 		if found {
 			return v, nil
 		}
@@ -170,11 +170,11 @@ func (spirit *Spirit) resolveAny(symbol string, syms ...nsSymbol) (Value, error)
 	return nil, ResolveError{Sym: Symbol{Value: symbol}}
 }
 
-func (spirit *Spirit) splitSymbol(symbol string) (*nsSymbol, error) {
+func (s *Spirit) splitSymbol(symbol string) (*nsSymbol, error) {
 	sep := string(nsSeparator)
 	if symbol == sep {
 		return &nsSymbol{
-			NS:   spirit.currentNS,
+			NS:   s.currentNS,
 			Name: symbol,
 		}, nil
 	}
@@ -182,7 +182,7 @@ func (spirit *Spirit) splitSymbol(symbol string) (*nsSymbol, error) {
 	parts := strings.SplitN(symbol, sep, 2)
 	if len(parts) < 2 {
 		return &nsSymbol{
-			NS:   spirit.currentNS,
+			NS:   s.currentNS,
 			Name: symbol,
 		}, nil
 	}
