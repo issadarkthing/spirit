@@ -186,16 +186,20 @@ func parseDef(scope Scope, forms []Value) (*Fn, error) {
 		Func: func(scope Scope, args []Value) (Value, error) {
 			sym, isSymbol := args[0].(Symbol)
 			if !isSymbol {
-				return nil, fmt.Errorf("first argument must be symbol, not '%v'",
-					reflect.TypeOf(args[0]))
+				return nil, TypeError{
+					Expected: Symbol{},
+					Got: args[0],
+				}
 			}
+
+			root := RootScope(scope)
 
 			v, err := args[1].Eval(scope)
 			if err != nil {
 				return nil, err
 			}
 
-			if err := rootScope(scope).Bind(sym.String(), v); err != nil {
+			if err := root.Bind(sym.String(), v); err != nil {
 				return nil, err
 			}
 
@@ -490,7 +494,7 @@ func verifyArgCount(arities []int, args []Value) error {
 	return nil
 }
 
-func rootScope(scope Scope) Scope {
+func RootScope(scope Scope) Scope {
 	if scope == nil {
 		return nil
 	}

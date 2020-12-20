@@ -27,7 +27,7 @@ func TestList_Eval(t *testing.T) {
 				Values: []internal.Value{internal.Symbol{Value: "greet"}, internal.String("Bob")},
 			},
 			getScope: func() internal.Scope {
-				scope := internal.NewScope(nil)
+				scope := internal.NewSpirit()
 				scope.BindGo("greet", func(name internal.String) string {
 					return fmt.Sprintf("Hello %s!", string(name))
 				})

@@ -101,9 +101,15 @@ func (repl *REPL) readEvalPrint() error {
 		return nil
 	}
 
+	root := internal.RootScope(repl.scope)
+	spirit, ok := root.(*internal.Spirit)
+	if !ok {
+		return fmt.Errorf("InternalError: cannot find Spirit instance")
+	}
+
 	v, err := internal.Eval(repl.scope, form)
 	if err != nil {
-		internal.ClearStack(repl.scope)
+		internal.ClearStack(&spirit.Stack)
 		return repl.print(err)
 	}
 

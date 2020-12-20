@@ -20,7 +20,7 @@ const sampleProgram = `
 (def set #{1 2 3})
 (def empty-set #{})
 
-(def complex-calc (let* [sample '(1 2 3 4 [])]
+(def complex-calc (let [sample '(1 2 3 4 [])]
 					(sample.First)))
 
 (assert (= int-num 10)
@@ -94,7 +94,7 @@ func TestEval(t *testing.T) {
 		{
 			name: "WithFunctionCalls",
 			getScope: func() internal.Scope {
-				scope := internal.NewScope(nil)
+				scope := internal.NewSpirit()
 				_ = scope.BindGo("ten?", func(i internal.Number) bool {
 					return i == 10
 				})
@@ -111,6 +111,9 @@ func TestEval(t *testing.T) {
 		},
 		{
 			name: "Program",
+			getScope: func() internal.Scope {
+				return internal.NewSpirit()
+			},
 			src:  sampleProgram,
 			want: internal.Number(3.1412),
 		},

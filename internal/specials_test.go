@@ -10,7 +10,7 @@ import (
 )
 
 const src = `
-(def temp (let* [pi 3.1412]
+(def temp (let [pi 3.1412]
 			pi))
 
 (def hello (fn* hello
@@ -19,7 +19,7 @@ const src = `
 `
 
 func TestSpecials(t *testing.T) {
-	scope := internal.New()
+	scope := internal.NewSpirit()
 
 	expected := internal.MultiFn{
 		Name:    "hello",
@@ -95,7 +95,7 @@ func TestDot(t *testing.T) {
 
 	for _, tt := range table {
 		t.Run(tt.name, func(t *testing.T) {
-			scope := internal.New()
+			scope := internal.NewSpirit()
 			scope.BindGo("foo", &Foo{
 				Name: "Bob",
 			})

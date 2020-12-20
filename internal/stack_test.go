@@ -20,7 +20,7 @@ func TestStack_Eval(t *testing.T) {
 		{
 			name: "Simple",
 			getScope: func() internal.Scope {
-				return internal.New()
+				return internal.NewSpirit()
 			},
 			src: "(do (if true (bruh)))",
 			want: internal.Stack{
@@ -45,7 +45,7 @@ func TestStack_Eval(t *testing.T) {
 		{
 			name: "MultipleCalls",
 			getScope: func() internal.Scope {
-				return internal.New()
+				return internal.NewSpirit()
 			},
 			src: `(do (def x 100) 
 					(if true (bruh)))`,
@@ -71,7 +71,7 @@ func TestStack_Eval(t *testing.T) {
 		{
 			name: "NestedMultiLine",
 			getScope: func() internal.Scope {
-				return internal.New()
+				return internal.NewSpirit()
 			},
 			want: internal.Stack{
 				internal.Call{
@@ -98,6 +98,14 @@ func TestStack_Eval(t *testing.T) {
 						Column: 8,
 					},
 				},
+				internal.Call{
+					Name: "case",
+					Position: internal.Position{
+						File:   "<string>",
+						Line:   4,
+						Column: 7,
+					},
+				},
 			},
 			src: `(do
 					(do
@@ -105,6 +113,50 @@ func TestStack_Eval(t *testing.T) {
 						(case))))`,
 		},
 		{
+			name: "NestedScope",
+			getScope: func() internal.Scope {
+				return internal.NewSpirit()
+			},
+			want: internal.Stack{
+				internal.Call{
+					Name: "print",
+					Position: internal.Position{
+						File: "<string>",
+						Line: 5,
+						Column: 7,
+					},
+				},
+				internal.Call{
+					Name: "add",
+					Position: internal.Position{
+						File: "<string>",
+						Line: 5,
+						Column: 14,
+					},
+				},
+				internal.Call{
+					Name: "let",
+					Position: internal.Position{
+						File: "<string>",
+						Line: 2,
+						Column: 9,
+					},
+				},
+				internal.Call{
+					Name: "+",
+					Position: internal.Position{
+						File: "<string>",
+						Line: 3,
+						Column: 10,
+					},
+				},
+			},
+			src: `(def add (fn* [x y]
+								(let [a x b y]
+									(+ a b))))
+
+				  (print (add 1 []))`,
+		},
 		{
 			name: "SpecialFormError",
 			getScope: func() internal.Scope {
@@ -140,7 +192,7 @@ func executeStackTests(t *testing.T, tests []stackTestCase) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			scope, _ := tt.getScope().(*internal.MapScope)
+			scope, _ := tt.getScope().(*internal.Spirit)
 			internal.ReadEvalStr(scope, tt.src)
 
 			if scope.Size() != len(tt.want) {

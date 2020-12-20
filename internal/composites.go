@@ -38,14 +38,20 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 		Position: lf.Position,
 	}
 
+	root := RootScope(scope)
+	spirit, ok := root.(*Spirit)
+	if !ok {
+		return nil, fmt.Errorf("InternalError: cannot find root scope")
+	}
+
 	if lf.special != nil {
-		scope.Push(fnCall)
+		spirit.Push(fnCall)
 		val, err := lf.special.Invoke(scope, lf.Values[1:]...)
 		if err != nil {
 			err = newEvalErr(lf, err)
 			return nil, addStackTrace(spirit.Stack, err)
 		}
-		scope.Pop()
+		spirit.Pop()
 		return val, nil
 	}
 
@@ -62,12 +68,12 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 		}
 	}
 
-	scope.Push(fnCall)
+	spirit.Push(fnCall)
 	val, err := invokable.Invoke(scope, lf.Values[1:]...)
 	if err != nil {
-		return nil, addStackTrace(scope, err)
+		return nil, addStackTrace(spirit.Stack, err)
 	}
-	scope.Pop()
+	spirit.Pop()
 
 	return val, nil
 }
@@ -967,16 +973,16 @@ func containerString(vals []Value, begin, end, sep string) string {
 
 // if an error occured when function is called, the error produced does not
 // contain stackTrace. This helper function will add stackTrace to the EvalError
-// type, and return as is if it has stackTrace
-func addStackTrace(scope Scope, err error) error {
+// type, and return as if it has stackTrace
+func addStackTrace(stack Stack, err error) error {
 	if evalErr, ok := err.(EvalError); ok && evalErr.StackTrace == "" {
-		evalErr.StackTrace = scope.StackTrace()
+		evalErr.StackTrace = stack.StackTrace()
 		return evalErr
 	}
 	return err
 }
 
-func ClearStack(scope Scope) {
-	for call := scope.Pop(); call != (Call{}); call = scope.Pop() {
+func ClearStack(stack *Stack) {
+	for call := stack.Pop(); call != (Call{}); call = stack.Pop() {
 	}
 }
