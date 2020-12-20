@@ -104,6 +104,33 @@ func TestStack_Eval(t *testing.T) {
 					  (if true
 						(case))))`,
 		},
+		{
+		{
+			name: "SpecialFormError",
+			getScope: func() internal.Scope {
+				return internal.NewSpirit()
+			},
+			want: internal.Stack{
+				internal.Call{
+					Name: "let",
+					Position: internal.Position{
+						File: "<string>",
+						Line: 1,
+						Column: 1,
+					},
+				},
+				internal.Call{
+					Name: "+",
+					Position: internal.Position{
+						File: "<string>",
+						Line: 1,
+						Column: 9,
+					},
+				},
+			},
+			src: `(let [x (+ 1 [])]
+					(print x))`,
+		},
 	})
 }
 

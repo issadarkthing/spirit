@@ -42,7 +42,8 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 		scope.Push(fnCall)
 		val, err := lf.special.Invoke(scope, lf.Values[1:]...)
 		if err != nil {
-			return nil, addStackTrace(scope, err)
+			err = newEvalErr(lf, err)
+			return nil, addStackTrace(spirit.Stack, err)
 		}
 		scope.Pop()
 		return val, nil
