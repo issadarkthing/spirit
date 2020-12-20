@@ -107,9 +107,6 @@ func ReadEvalStr(scope Scope, src string) (Value, error) {
 
 // Scope implementation is responsible for managing value bindings.
 type Scope interface {
-	Push(Call)
-	Pop() Call
-	StackTrace() string
 	Parent() Scope
 	Bind(symbol string, v Value) error
 	Resolve(symbol string) (Value, error)
