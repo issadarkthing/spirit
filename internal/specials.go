@@ -78,6 +78,13 @@ func fnParser(isMacro bool) func(scope Scope, forms []Value) (*Fn, error) {
 			nextIndex++
 		}
 
+		doc, isDoc := forms[nextIndex].(String)
+		if isDoc {
+			def.Doc = string(doc)
+			nextIndex++
+		}
+
+
 		return &Fn{
 			Func: func(_ Scope, args []Value) (Value, error) {
 				_, isList := forms[nextIndex].(*List)

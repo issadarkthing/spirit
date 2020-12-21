@@ -32,6 +32,7 @@ func MacroExpand(scope Scope, form Value) (Value, bool, error) {
 type MultiFn struct {
 	Name    string
 	IsMacro bool
+	Doc     string
 	Methods []Fn
 }
 
@@ -46,6 +47,14 @@ func (multiFn MultiFn) String() string {
 
 	s := multiFn.Name + " " + strings.TrimSpace(sb.String())
 	return "(" + strings.TrimSpace(s) + ")"
+}
+
+func (multiFn MultiFn) GetDoc() (string, bool) {
+	doc := multiFn.Doc
+	if doc == "" {
+		return doc, false
+	}
+	return doc, true
 }
 
 // Invoke dispatches the call to a method based on number of arguments.

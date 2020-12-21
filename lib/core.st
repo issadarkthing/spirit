@@ -43,7 +43,7 @@
   ([prompt]
    (read* prompt)))
 
-; use this only on repl as import statement does not re-evaluate file
+; use this only on repl because import statement does not re-evaluate file
 ; that has been imported
 (defn source [filename]
   (eval-string (read-file filename)))
@@ -60,8 +60,8 @@
 ; assoc functions -------------------------------
 (defn assoc? [arg] (impl? arg types/Assoc))
 
-;; map over key
 (defn mapk 
+  "map over key"
   ([f coll]
    (mapk f coll (empty coll)))
   ([f coll acc]
@@ -73,8 +73,8 @@
            v (x 1)]
        (recur f xs (conj acc [(f k) v]))))))
   
-;; map over value
 (defn mapv 
+  "map over value"
   ([f coll]
    (mapv f coll (empty coll)))
   ([f coll acc]
@@ -136,8 +136,9 @@
         (throw "argument must be a collection, not " (type coll)))
     (coll.Next))
 
-; same as next but returns empty list if no next member instead of nil
-(defn rest [coll]
+(defn rest 
+  "same as next but returns empty list if no next member instead of nil" 
+  [coll]
   (if (> (count coll) 1)
     (next coll)
    (cond 
@@ -395,16 +396,18 @@
 (defn abs [x]
   (if (< x 0) (- x) x))
 
-; wait for any of the channels realized and returns the value
-(defn wait-any [forms]
+(defn wait-any 
+  "wait for any of the channels realized and returns the value"
+  [forms]
   (if (some? realized? forms)
     (find realized? forms)
     (recur forms)))
   
-; wait for all of the channels realized and returns Seq of values
-; wait-all does not wait sequentially instead it waits for whichever comes first
-; and continue wait for others
-(defn wait-all [forms]
+(defn wait-all 
+  "wait for all of the channels realized and returns Seq of values
+  wait-all does not wait sequentially instead it waits for whichever comes first
+  and continue wait for others"
+  [forms]
   (if (every? (fn [x] (not (future? x))) forms)
     forms
     (recur (map 
@@ -476,6 +479,16 @@
      ([x y z & args] (<> f arg1 arg2 arg3 x y z args))))
   ([f arg1 arg2 arg3 & more]
    (fn [& args] (<> f arg1 arg2 arg3 (concat more args)))))
+
+(defn doc
+  "finds documentation string of a function"
+  [x]
+  (let [res (x.GetDoc)
+        doc (first res)
+        found (first (next res))]
+    (if (not found)
+      (print (conj "no documentation found for " \' x.Name \'))
+      (print doc))))
 
 ; important macros -----------------------------------
 
