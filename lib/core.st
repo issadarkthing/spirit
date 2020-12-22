@@ -239,9 +239,9 @@
   (when-not (seq? coll)
     (throw "argument must be Seq"))
   (loop [result (empty coll) target coll]
-    (if (nil? target)
+    (if (empty? target)
       result
-      (recur (cons (first target) result) (next target)))))
+      (recur (cons (first target) result) (rest target)))))
 
 (defn inc [num]
     (if (not (number? num))
