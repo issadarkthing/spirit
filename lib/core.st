@@ -88,16 +88,22 @@
   
 
 ; sequence operations -------------------------------
-(defn seq? [arg] (impl? arg types/Seq))
+(defn seq? 
+  "checks if value implements Seq interface"
+  [arg] (impl? arg types/Seq))
 
 
 (defn lazy-range
+  "Returns LazySeq which only evaluates if First or Next called."
   ([] (lazy-range* 0 922337203685477 1))
   ([max] (lazy-range* 0 max 1))
   ([min max] (lazy-range* min max 1))
   ([min max step] (lazy-range* min max step)))
 
 (defn range
+  "Creates a list with specified parameter. Note that this is not lazy and it
+  will consume both time and space. You should consider to use the lazy
+  counterpart LazySeq"
   ([max]
    (range 0 max 1))
   ([min max]
@@ -109,6 +115,8 @@
        (recur (+ i step) (conj res i))))))
 
 (defn range-vec
+  "Like range it creates Seq with specified parameter. Unlike range,
+  it will create a vector instead of list"
   ([max]
    (range-vec 0 max 1))
   ([min max]
