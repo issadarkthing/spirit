@@ -377,6 +377,15 @@
   ([coll1 coll2 & more]
    (reduce concat (concat coll1 coll2) more)))
 
+(defn all 
+  "Checks if all elements are truthy"
+  [coll]
+  (<> and coll))
+
+(defn any
+  "Checks if any elements are truthy"
+  [coll]
+  (<> or coll))
 
 (defn realized? [x]
   (if (fn? x)
@@ -439,6 +448,8 @@
 (defn sum [coll]
   (<> + coll))
 
+(defn product [coll]
+  (<> * coll))
 
 (defn constantly [x]
   (fn [& args] x))
