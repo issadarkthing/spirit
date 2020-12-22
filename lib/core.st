@@ -362,6 +362,8 @@
     (deref v)))
 
 (defn concat 
+  ([coll1]
+   coll1)
   ([coll1 coll2]
    (<> coll1.Conj coll2))
   ([coll1 coll2 & more]
