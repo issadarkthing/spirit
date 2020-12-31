@@ -626,8 +626,10 @@ func (s *Stack) StackTrace() string {
 		// iterate over slice in reverse
 		call := (*s)[last-i]
 		file, line, col := call.GetPos()
-		fmt.Fprintf(&str, "\nat %s (%s:%d:%d)", 
-			call.Name, file, line, col)
+		if file != "" && line != 0 && col != 0 {
+			fmt.Fprintf(&str, "\nat %s (%s:%d:%d)", 
+				call.Name, file, line, col)
+		}
 	}
 
 	return str.String()
