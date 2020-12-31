@@ -71,6 +71,7 @@ func (lf *List) Eval(scope Scope) (Value, error) {
 	spirit.Push(fnCall)
 	val, err := invokable.Invoke(scope, lf.Values[1:]...)
 	if err != nil {
+		err = newEvalErr(lf, err)
 		return nil, addStackTrace(spirit.Stack, err)
 	}
 	spirit.Pop()
