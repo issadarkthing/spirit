@@ -93,6 +93,21 @@
   [arg] (impl? arg types/Seq))
 
 
+(defn tails 
+  "returns possible ending sub-sequences of Seq"
+  ([x]
+   (tails x (empty x)))
+  ([x res]
+   (if (empty? x)
+     (conj res x)
+     (recur (rest x) (conj res x)))))
+
+
+(defn inits
+  "returns possible initial sequences"
+  [x]
+  (reverse (map reverse (tails (reverse x)))))
+
 (defn lazy-range
   "Returns LazySeq which only evaluates if First or Next called."
   ([] (lazy-range* 0 922337203685477 1))
