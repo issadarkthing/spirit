@@ -71,6 +71,14 @@ func (i ImportError) Error() string {
 	return fmt.Sprintf("ImportError: %v", i.err)
 }
 
+type Exception struct {
+	message string
+}
+
+func (e Exception) Error() string {
+	return fmt.Sprintf("Exception: %v", e.message)
+}
+
 func RemovePrefix(str string) string {
 	str = strings.TrimLeft(str, "*")
 	str = strings.TrimLeft(str, "internal.")

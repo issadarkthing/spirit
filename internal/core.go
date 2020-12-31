@@ -61,7 +61,8 @@ func macroExpand(scope Scope, f Value) (Value, error) {
 // Throw converts args to strings and returns an error with all the strings
 // joined.
 func throw(scope Scope, args ...Value) error {
-	return errors.New(strings.Trim(makeString(args...).String(), "\""))
+	msg := strings.Trim(makeString(args...).String(), "\"")
+	return Exception{msg}
 }
 
 // Realize realizes a sequence by continuously calling First() and Next()
