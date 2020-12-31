@@ -85,6 +85,21 @@ func (s *Spirit) ReadFile(filePath string) (Value, error) {
 	return value, nil
 }
 
+func (s *Spirit) Has(symbol string) bool {
+
+	if symbol == "ns" {
+		symbol = "user/ns"
+	}
+
+	nsSym, err := s.splitSymbol(symbol)
+	if err != nil {
+		return false
+	}
+
+	_, found := s.Bindings[*nsSym]
+	return found
+}
+
 // AddFile adds file to slice of imported files to prevent circular dependency.
 func (s *Spirit) AddFile(file string) {
 	s.Files = append(s.Files, file)

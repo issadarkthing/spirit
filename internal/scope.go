@@ -73,6 +73,11 @@ func (scope *MapScope) Resolve(symbol string) (Value, error) {
 	return v, nil
 }
 
+func (scope *MapScope) Has(symbol string) bool {
+	_, found := scope.bindings[symbol]
+	return found
+}
+
 // BindGo is similar to Bind but handles conversion of Go value 'v' to
 //  Value type. See `ValueOf()`
 func (scope *MapScope) BindGo(symbol string, v interface{}) error {

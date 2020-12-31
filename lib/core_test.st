@@ -234,3 +234,10 @@
 (assert "array" 
         (= [{:name "jiman"} 1 ["name" 1 2 23]]
            (parse-json "[{\"name\": \"jiman\"}, 1, [\"name\", 1, 2, 23]]")))
+
+;; unsafe/swap should change the value bounded to the symbol
+(let [x 10]
+  (let []
+    (unsafe/swap x 1000)
+    (assert (= x 1000)))
+  (assert (= x 1000)))

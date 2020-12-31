@@ -236,7 +236,18 @@ func swap(scope Scope, args []Value) (Value, error) {
 		return nil, err
 	}
 
-	scope.Bind(symbol.Value, value)
+	sym := symbol.Value
+	target := scope
+	for !target.Has(sym) {
+		target = target.Parent()
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	target.Bind(sym, value)
+	// scope.Bind(symbol.Value, value)
 	return value, nil
 }
 
