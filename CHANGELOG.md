@@ -1,3 +1,12 @@
+v0.9.0
+- Add: add ExceptionError
+- Add: add documentation string
+- Fix: remove stack trace with no postion information
+- Fix: unsafe/swap does not change reference of symbol at the correct scope
+- Fix: reverse function does not work as intended when Seq with singel element
+	is passed
+
+
 v0.8.0
 - Float64 and Int64 are removed and changed to type `Number` which is float64 in Go.
 - Added basic JSON parser
