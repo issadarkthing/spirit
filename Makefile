@@ -9,7 +9,8 @@ fmt:
 
 install:
 	mkdir -p ~/.local/lib/spirit
-	cp ./bin/spirit ~/.local/bin && cp ./lib/core.st ~/.local/lib/spirit
+	mkdir -p ~/.local/bin
+	cp ./bin/spirit ~/.local/bin/spirit && cp ./lib/core.st ~/.local/lib/spirit
 
 clean:
 	@echo "Cleaning up..."
