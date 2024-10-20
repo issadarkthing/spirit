@@ -109,7 +109,7 @@ func ReadEvalStr(scope Scope, src string) (Value, error) {
 type Scope interface {
 	Parent() Scope
 	Bind(symbol string, v Value) error
-	// Has returns true if symbol is bounded to a value in the current scope 
+	// Has returns true if symbol is bounded to a value in the current scope
 	// excluding parent scope.
 	Has(symbol string) bool
 	Resolve(symbol string) (Value, error)

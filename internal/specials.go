@@ -84,7 +84,6 @@ func fnParser(isMacro bool) func(scope Scope, forms []Value) (*Fn, error) {
 			nextIndex++
 		}
 
-
 		return &Fn{
 			Func: func(_ Scope, args []Value) (Value, error) {
 				_, isList := forms[nextIndex].(*List)
@@ -195,7 +194,7 @@ func parseDef(scope Scope, forms []Value) (*Fn, error) {
 			if !isSymbol {
 				return nil, TypeError{
 					Expected: Symbol{},
-					Got: args[0],
+					Got:      args[0],
 				}
 			}
 

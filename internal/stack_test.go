@@ -121,32 +121,32 @@ func TestStack_Eval(t *testing.T) {
 				internal.Call{
 					Name: "print",
 					Position: internal.Position{
-						File: "<string>",
-						Line: 5,
+						File:   "<string>",
+						Line:   5,
 						Column: 7,
 					},
 				},
 				internal.Call{
 					Name: "add",
 					Position: internal.Position{
-						File: "<string>",
-						Line: 5,
+						File:   "<string>",
+						Line:   5,
 						Column: 14,
 					},
 				},
 				internal.Call{
 					Name: "let",
 					Position: internal.Position{
-						File: "<string>",
-						Line: 2,
+						File:   "<string>",
+						Line:   2,
 						Column: 9,
 					},
 				},
 				internal.Call{
 					Name: "+",
 					Position: internal.Position{
-						File: "<string>",
-						Line: 3,
+						File:   "<string>",
+						Line:   3,
 						Column: 10,
 					},
 				},
@@ -166,16 +166,16 @@ func TestStack_Eval(t *testing.T) {
 				internal.Call{
 					Name: "let",
 					Position: internal.Position{
-						File: "<string>",
-						Line: 1,
+						File:   "<string>",
+						Line:   1,
 						Column: 1,
 					},
 				},
 				internal.Call{
 					Name: "+",
 					Position: internal.Position{
-						File: "<string>",
-						Line: 1,
+						File:   "<string>",
+						Line:   1,
 						Column: 9,
 					},
 				},

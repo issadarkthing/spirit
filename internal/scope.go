@@ -79,7 +79,8 @@ func (scope *MapScope) Has(symbol string) bool {
 }
 
 // BindGo is similar to Bind but handles conversion of Go value 'v' to
-//  Value type. See `ValueOf()`
+//
+//	Value type. See `ValueOf()`
 func (scope *MapScope) BindGo(symbol string, v interface{}) error {
 	return scope.Bind(symbol, ValueOf(v))
 }

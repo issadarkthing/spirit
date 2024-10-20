@@ -628,7 +628,7 @@ func (s *Stack) StackTrace() string {
 		call := (*s)[last-i]
 		file, line, col := call.GetPos()
 		if file != "" && line != 0 && col != 0 {
-			fmt.Fprintf(&str, "\nat %s (%s:%d:%d)", 
+			fmt.Fprintf(&str, "\nat %s (%s:%d:%d)",
 				call.Name, file, line, col)
 		}
 	}

@@ -165,7 +165,7 @@ func TestString_String(t *testing.T) {
 		},
 		{
 			value: internal.String("hello\tworld"),
-			want: `"hello	world"`,
+			want:  `"hello	world"`,
 		},
 	})
 }
