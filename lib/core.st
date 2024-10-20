@@ -179,6 +179,11 @@
 
 (defn conj [coll & others]
   (reduce conj-1 coll others))
+
+(defn nth [index coll]
+  (if (< (dec (count coll)) index)
+    (throw "index is greater than coll size"))
+  (last (take (inc index) coll)))
   
 ; (defn swap! [atom f]
 ;   (atom.UpdateState f))
