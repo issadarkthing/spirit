@@ -85,6 +85,8 @@ func bindAll(scope Scope) error {
 			Func:     recur,
 		},
 
+        "core/exception": ValueOf(Exception{}),
+
 		// special forms
 		"core/do":           Do,
 		"core/def":          Def,
@@ -92,6 +94,7 @@ func bindAll(scope Scope) error {
 		"core/fn*":          Lambda,
 		"core/macro*":       Macro,
 		"core/let":          Let,
+		"core/try":          Try,
 		"core/quote":        SimpleQuote,
 		"core/syntax-quote": SyntaxQuote,
 
@@ -103,6 +106,7 @@ func bindAll(scope Scope) error {
 		"core/impl?":       ValueOf(implements),
 		"core/realized*":   ValueOf(futureRealize),
 		"core/throw":       ValueOf(throw),
+		"core/error-is":    ValueOf(errorIs),
 		"core/substring":   ValueOf(strings.Contains),
 		"core/trim-suffix": ValueOf(strings.TrimSuffix),
 		"core/resolve":     ValueOf(resolve(scope)),

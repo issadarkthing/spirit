@@ -61,8 +61,42 @@ func macroExpand(scope Scope, f Value) (Value, error) {
 // Throw converts args to strings and returns an error with all the strings
 // joined.
 func throw(scope Scope, args ...Value) error {
-	msg := strings.Trim(makeString(args...).String(), "\"")
-	return Exception{msg}
+	if err := verifyArgCount([]int{1, 2}, args); err != nil {
+		return err
+	}
+
+	message := strings.Trim(makeString(args[0]).String(), "\"")
+
+    if len(args) == 1 {
+        return Exception{
+            message: message,
+            id:  nil,
+        }
+    }
+
+    id, ok := args[1].(Keyword)
+
+    if !ok {
+        return TypeError{
+            Expected: Keyword(""),
+            Got:      args[1],
+        }
+    }
+
+    return Exception{
+        message: message,
+        id: &id,
+    }
+}
+
+func errorIs(keyword Keyword, err EvalError) Bool {
+    exception, ok := err.Cause.(Exception)
+
+    if !ok {
+        return false
+    }
+
+    return *exception.id == keyword
 }
 
 // Realize realizes a sequence by continuously calling First() and Next()

@@ -48,6 +48,11 @@ var (
 		Parse: parseIf,
 	}
 
+	Try = SpecialForm{
+		Name:  "try",
+		Parse: parseTry,
+	}
+
 	// SimpleQuote prevents a form from being evaluated.
 	SimpleQuote = SpecialForm{
 		Name:  "quote",
@@ -175,6 +180,43 @@ func parseDo(scope Scope, args []Value) (*Fn, error) {
 				return nil, err
 			}
 			return results, err
+		},
+	}, nil
+}
+
+func parseTry(scope Scope, args []Value) (*Fn, error) {
+	if err := verifyArgCount([]int{1, 2}, args); err != nil {
+		return nil, err
+	}
+
+	if err := analyze(scope, args[0]); err != nil {
+		return nil, err
+	}
+
+	return &Fn{
+		Func: func(scope Scope, args []Value) (Value, error) {
+			tryBlock, tryErr := args[0].Eval(scope)
+
+			if tryErr != nil {
+                if len(args) < 2 {
+                    return ValueOf(nil), nil
+                }
+
+                v, err := args[1].Eval(scope)
+                if err != nil {
+                    return nil, err
+                }
+
+                fn, isFn := v.(MultiFn)
+
+                if !isFn {
+                    return ValueOf(nil), TypeError{ Expected: MultiFn{}, Got: v }
+                }
+
+                return fn.Invoke(scope, ValueOf(tryErr))
+			}
+
+			return tryBlock, nil
 		},
 	}, nil
 }
