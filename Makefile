@@ -20,7 +20,7 @@ clean:
 test: build-only
 	@echo "Running tests..."
 	@go test -cover ./...
-	@bin/spirit lib/core_test.st
+	@bin/spirit -u -p ./lib/core.st lib/core_test.st
 
 test-verbose:
 	@echo "Running tests..."
