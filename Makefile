@@ -17,9 +17,10 @@ clean:
 	@rm -rf ./bin
 	@go mod tidy -v
 
-test:
+test: build-only
 	@echo "Running tests..."
 	@go test -cover ./...
+	@bin/spirit lib/core_test.st
 
 test-verbose:
 	@echo "Running tests..."

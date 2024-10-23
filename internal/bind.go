@@ -85,7 +85,7 @@ func bindAll(scope Scope) error {
 			Func:     recur,
 		},
 
-        "core/exception": ValueOf(Exception{}),
+		"core/exception": ValueOf(Exception{}),
 
 		// special forms
 		"core/do":           Do,

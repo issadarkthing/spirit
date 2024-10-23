@@ -73,7 +73,7 @@ func (i ImportError) Error() string {
 
 type Exception struct {
 	message string
-    id      *Keyword
+	id      *Keyword
 }
 
 func (e Exception) Error() string {

@@ -45,7 +45,15 @@ func removeSuffixPrefix(str, cutset string) string {
 
 // Printf is an alias for fmt.Printf which ignores the return values.
 func printf(format string, args ...interface{}) error {
-	_, err := fmt.Printf(format, args...)
+	result := []interface{}{}
+	for _, v := range args {
+		if str, ok := v.(String); ok {
+			result = append(result, removeSuffixPrefix(string(str), `"`))
+			continue
+		}
+		result = append(result, v)
+	}
+	_, err := fmt.Printf(format, result...)
 	return err
 }
 

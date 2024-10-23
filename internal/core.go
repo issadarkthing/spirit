@@ -67,36 +67,36 @@ func throw(scope Scope, args ...Value) error {
 
 	message := strings.Trim(makeString(args[0]).String(), "\"")
 
-    if len(args) == 1 {
-        return Exception{
-            message: message,
-            id:  nil,
-        }
-    }
+	if len(args) == 1 {
+		return Exception{
+			message: message,
+			id:      nil,
+		}
+	}
 
-    id, ok := args[1].(Keyword)
+	id, ok := args[1].(Keyword)
 
-    if !ok {
-        return TypeError{
-            Expected: Keyword(""),
-            Got:      args[1],
-        }
-    }
+	if !ok {
+		return TypeError{
+			Expected: Keyword(""),
+			Got:      args[1],
+		}
+	}
 
-    return Exception{
-        message: message,
-        id: &id,
-    }
+	return Exception{
+		message: message,
+		id:      &id,
+	}
 }
 
 func errorIs(keyword Keyword, err EvalError) Bool {
-    exception, ok := err.Cause.(Exception)
+	exception, ok := err.Cause.(Exception)
 
-    if !ok {
-        return false
-    }
+	if !ok {
+		return false
+	}
 
-    return *exception.id == keyword
+	return *exception.id == keyword
 }
 
 // Realize realizes a sequence by continuously calling First() and Next()

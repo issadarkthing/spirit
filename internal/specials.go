@@ -198,22 +198,22 @@ func parseTry(scope Scope, args []Value) (*Fn, error) {
 			tryBlock, tryErr := args[0].Eval(scope)
 
 			if tryErr != nil {
-                if len(args) < 2 {
-                    return ValueOf(nil), nil
-                }
+				if len(args) < 2 {
+					return ValueOf(nil), nil
+				}
 
-                v, err := args[1].Eval(scope)
-                if err != nil {
-                    return nil, err
-                }
+				v, err := args[1].Eval(scope)
+				if err != nil {
+					return nil, err
+				}
 
-                fn, isFn := v.(MultiFn)
+				fn, isFn := v.(MultiFn)
 
-                if !isFn {
-                    return ValueOf(nil), TypeError{ Expected: MultiFn{}, Got: v }
-                }
+				if !isFn {
+					return ValueOf(nil), TypeError{Expected: MultiFn{}, Got: v}
+				}
 
-                return fn.Invoke(scope, ValueOf(tryErr))
+				return fn.Invoke(scope, ValueOf(tryErr))
 			}
 
 			return tryBlock, nil
